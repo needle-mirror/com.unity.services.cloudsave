@@ -1,6 +1,6 @@
 using System;
 using System.Collections.Generic;
-using Unity.GameBackend.CloudSave.Models;
+using Unity.Services.CloudSave.Internal.Models;
 using Unity.Services.Core;
 using UnityEngine.Scripting;
 
@@ -22,6 +22,9 @@ namespace Unity.Services.CloudSave
         ServiceUnavailable
     }
     
+    /// <summary>
+    /// Represents a generic error.
+    /// </summary>
     [Preserve]
     public class CloudSaveException: RequestFailedException
     {
@@ -34,6 +37,9 @@ namespace Unity.Services.CloudSave
         }
     }
     
+    /// <summary>
+    /// Represents a validation error from the Cloud Save service.
+    /// </summary>
     [Preserve]
     public class CloudSaveValidationException: CloudSaveException
     {
@@ -59,9 +65,9 @@ namespace Unity.Services.CloudSave
         /// <summary>
         /// Single error in the Validation Error Response.
         /// </summary>
-        /// <param name="field">field parameter</param>
-        /// <param name="messages">messages parameter</param>
-        /// <param name="key"></param>
+        /// <param name="field">The field in the data that caused the error.</param>
+        /// <param name="messages">Messages that describe the errors.</param>
+        /// <param name="key">The data key that caused the error.</param>
         [Preserve]
         public CloudSaveValidationErrorDetail(string field, List<string> messages, string key = null)
         {

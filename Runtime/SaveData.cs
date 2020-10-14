@@ -1,9 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
-using Unity.GameBackend.CloudSave.Apis.Data;
+using Unity.Services.CloudSave.Internal.Apis.Data;
 using Unity.Services.Authentication.Internal;
-using Unity.Services.CloudSave.Exceptions;
 using UnityEngine;
 
 namespace Unity.Services.CloudSave
@@ -26,19 +25,24 @@ namespace Unity.Services.CloudSave
         /// This method includes pagination.
         /// </summary>
         /// <returns>A list of keys stored in the server for the logged in player.</returns>
+        /// <exception cref="CloudSaveException">Thrown if request is unsuccessful.</exception>
+        /// <exception cref="CloudSaveValidationException">Thrown if the service returned validation error.</exception>
         public static async Task<List<string>> RetrieveAllKeysAsync()
         {
             return await _saveData.RetrieveAllKeysAsync();
         }
 
         /// <summary>
-        /// Force upload one or more key-value pairs to the Cloud Save service - it ignores write lock validation.
+        /// Upload one or more key-value pairs to the Cloud Save service, overwriting any values
+        /// that are currently stored under the given keys.
         /// Throws a CloudSaveException with a reason code and explanation of what happened.
         /// 
         /// <code>Dictionary</code> as a parameter ensures the uniqueness of given keys.
         /// There is no client validation in place, which means the API can be called regardless if data is incorrect and/or missing.
         /// </summary>
         /// <param name="data">The dictionary of keys and corresponding values to upload</param>
+        /// <exception cref="CloudSaveException">Thrown if request is unsuccessful.</exception>
+        /// <exception cref="CloudSaveValidationException">Thrown if the service returned validation error.</exception>
         public static async Task ForceSaveAsync(Dictionary<string, object> data)
         {
             await _saveData.ForceSaveAsync(data);
@@ -46,11 +50,13 @@ namespace Unity.Services.CloudSave
 
         /// <summary>
         /// Removes one key at the time. If a given key doesn't exist, there is no feedback in place to inform a developer about it. 
-        /// There is no write lock or client validation implemented for this method.
+        /// There is no client validation implemented for this method.
         /// Throws a CloudSaveException with a reason code and explanation of what happened.
         /// 
         /// </summary>
         /// <param name="key">The key to be removed from the server</param>
+        /// <exception cref="CloudSaveException">Thrown if request is unsuccessful.</exception>
+        /// <exception cref="CloudSaveValidationException">Thrown if the service returned validation error.</exception>
         public static async Task ForceDeleteAsync(string key)
         {
             await _saveData.ForceDeleteAsync(key);
@@ -65,6 +71,8 @@ namespace Unity.Services.CloudSave
         /// </summary>
         /// <param name="keys">The HashSet of keys to download from the server</param>
         /// <returns>The dictionary of key-value pairs that represents the current state of data on the server</returns>
+        /// <exception cref="CloudSaveException">Thrown if request is unsuccessful.</exception>
+        /// <exception cref="CloudSaveValidationException">Thrown if the service returned validation error.</exception>
         public static async Task<Dictionary<string, string>> LoadAsync(HashSet<string> keys)
         {
             return await _saveData.LoadAsync(keys);
@@ -77,6 +85,8 @@ namespace Unity.Services.CloudSave
         /// Throws a CloudSaveException with a reason code and explanation of what happened.
         /// </summary>
         /// <returns>The dictionary of all key-value pairs that represents the current state of data on the server</returns>
+        /// <exception cref="CloudSaveException">Thrown if request is unsuccessful.</exception>
+        /// <exception cref="CloudSaveValidationException">Thrown if the service returned validation error.</exception>
         public static async Task<Dictionary<string, string>> LoadAllAsync()
         {
             return await _saveData.LoadAsync();

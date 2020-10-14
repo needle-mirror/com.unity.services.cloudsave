@@ -1,7 +1,7 @@
 {
     "name": "Unity.Services.CloudSave",
     "references": [
-        "Unity.GameBackend.CloudSave",
+        "Unity.Services.CloudSave.Internal",
         "Unity.Services.Core",
         "Unity.Services.Core.Internal",
         "Unity.Services.Authentication"

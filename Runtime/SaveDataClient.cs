@@ -2,10 +2,9 @@ using System;
 using System.Collections.Generic;
 using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
-using Unity.GameBackend.CloudSave;
-using Unity.GameBackend.CloudSave.Http;
-using Unity.GameBackend.CloudSave.Models;
-using Unity.Services.CloudSave.Exceptions;
+using Unity.Services.CloudSave.Internal;
+using Unity.Services.CloudSave.Internal.Http;
+using Unity.Services.CloudSave.Internal.Models;
 using UnityEngine;
 
 [assembly: InternalsVisibleTo("Unity.Services.CloudSave.Tests")]

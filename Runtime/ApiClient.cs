@@ -3,10 +3,10 @@ using System;
 using System.Runtime.CompilerServices;
 using UnityEngine;
 using System.Threading.Tasks;
-using Unity.GameBackend.CloudSave;
-using Unity.GameBackend.CloudSave.Apis.Data;
-using Unity.GameBackend.CloudSave.Data;
-using Unity.GameBackend.CloudSave.Models;
+using Unity.Services.CloudSave.Internal;
+using Unity.Services.CloudSave.Internal.Apis.Data;
+using Unity.Services.CloudSave.Internal.Data;
+using Unity.Services.CloudSave.Internal.Models;
 using Unity.Services.Core;
 
 [assembly: InternalsVisibleTo("Unity.Services.CloudSave.Tests")]

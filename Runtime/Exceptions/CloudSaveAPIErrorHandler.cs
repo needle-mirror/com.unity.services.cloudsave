@@ -1,9 +1,9 @@
 using System;
-using Unity.GameBackend.CloudSave.Http;
-using Unity.GameBackend.CloudSave.Models;
+using Unity.Services.CloudSave.Internal.Http;
+using Unity.Services.CloudSave.Internal.Models;
 using Unity.Services.Core;
 
-namespace Unity.Services.CloudSave.Exceptions
+namespace Unity.Services.CloudSave
 {
     internal interface ICloudSaveApiErrorHandler
     {

@@ -1,6 +1,6 @@
 ﻿using System.Threading.Tasks;
-using Unity.GameBackend.CloudSave.Apis.Data;
-using Unity.GameBackend.CloudSave.Http;
+using Unity.Services.CloudSave.Internal.Apis.Data;
+using Unity.Services.CloudSave.Internal.Http;
 using Unity.Services.Authentication.Internal;
 using Unity.Services.Core.Internal;
 using Unity.Services.Core.Device.Internal;
