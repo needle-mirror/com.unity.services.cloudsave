@@ -1,0 +1,12 @@
+generatorName: csharp-unity
+outputDir: generated-cloudsave-sdk
+inputSpec: unity-services-api-docs/docs/public/v1/cloud-save.yaml
+packageName: com.unity.gamebackend.cloudsave
+additionalProperties:
+  unityVersion: "2019.4"
+  packageVersion: "0.5.0"
+  unityPackageNamespace: "Unity.GameBackend.CloudSave"
+  unityServiceName: "CloudSave"
+  unityPackageDescription: Client API SDK Package for communicating with Cloud Save
+  useUnityAuthentication: true
+  accessModifier: internal

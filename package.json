@@ -1,0 +1,29 @@
+{
+  "name": "com.unity.services.cloudsave",
+  "displayName": "CloudSave",
+  "version": "1.0.0-pre.2",
+  "unity": "2020.3",
+  "description": "This package allows users to store player data off-device.",
+  "dependencies": {
+    "com.unity.services.authentication": "1.0.0-pre.4",
+    "com.unity.services.core": "1.1.0-pre.8"
+  },
+  "samples": [
+    {
+      "displayName": "Cloud Save Sample",
+      "description": "A basic UGUI control panel that lets you save and load data, with commented backing code that demonstrates and explains how to use it.",
+      "path": "Samples~/Basic Example"
+    }
+  ],
+  "relatedPackages": {
+    "com.unity.services.cloudsave.tests": "1.0.0-pre.2"
+  },
+  "upmCi": {
+    "footprint": "0c03937c7b4166f1bcbc705ff9c71ecc7983b77d"
+  },
+  "repository": {
+    "url": "https://github.cds.internal.unity3d.com/unity/Catapult.mono.git",
+    "type": "git",
+    "revision": "f63153fabeef3e3900c7341595cb59f880baf513"
+  }
+}
