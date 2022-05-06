@@ -4,12 +4,26 @@ All notable changes to this package will be documented in this file.
 The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/)
 and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.html).
 
-## [1.0.0-pre.3] - 2020-10-14
-* All models that weren't documented have been made internal as they were not designed to be used externally
+## [2.0.0-pre.2] - 2022-05-06
+
+* **Breaking Change:** Code in the `Unity.Services.CloudSave.Editor.Settings` namespace has been made internal as it was never meant to be public.
+* Updated dependencies.
+
+## [2.0.0-pre.1] - 2022-03-14
+
+* Added mechanism to halt web traffic when request limits have been exceeded and requests are guaranteed to be rejected by the server.
+* The Cloud Save service is now accessed using `CloudSaveService.Instance.Data.<API>`.
+* When a rate limit error occurs, a specific `CloudSaveRateLimitedException` will now be thrown. The new exception type includes the RetryAfter value (in seconds).
+* Added the Project Settings tab with link to Cloud Save dashboard.
+
+## [1.0.0-pre.3] - 2021-10-14
+
+* All models that weren't documented have been made internal as they were not designed to be used externally.
 * Improved documentation (sample scene and annotations).
 * Updated dependencies (Core and Authentication).
 
-## [1.0.0] - 2020-08-17
+## [1.0.0] - 2021-08-17
+
 * Open Beta release
 * Updated dependencies (Core and Authentication).
 * Methods marked with `Obsolete` annotations have been removed.

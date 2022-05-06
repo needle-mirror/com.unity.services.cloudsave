@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using Unity.Services.Authentication;
@@ -48,12 +48,16 @@ namespace CloudSaveSample
         {
             try
             {
-                var keys = await SaveData.RetrieveAllKeysAsync();
+                var keys = await CloudSaveService.Instance.Data.RetrieveAllKeysAsync();
 
-                Debug.Log($"Keys count: {keys.Count}\n" + 
-                          $"Keys: {String.Join(", ", keys)}");
+                Debug.Log($"Keys count: {keys.Count}\n" +
+                    $"Keys: {String.Join(", ", keys)}");
             }
             catch (CloudSaveValidationException e)
+            {
+                Debug.LogError(e);
+            }
+            catch (CloudSaveRateLimitedException e)
             {
                 Debug.LogError(e);
             }
@@ -83,11 +87,15 @@ namespace CloudSaveSample
                     oneElement.Add(key, value);
                 }
 
-                await SaveData.ForceSaveAsync(oneElement);
+                await CloudSaveService.Instance.Data.ForceSaveAsync(oneElement);
 
                 Debug.Log($"Successfully saved {key}:{value}");
             }
             catch (CloudSaveValidationException e)
+            {
+                Debug.LogError(e);
+            }
+            catch (CloudSaveRateLimitedException e)
             {
                 Debug.LogError(e);
             }
@@ -108,11 +116,15 @@ namespace CloudSaveSample
                     { key, value }
                 };
 
-                await SaveData.ForceSaveAsync(oneElement);
+                await CloudSaveService.Instance.Data.ForceSaveAsync(oneElement);
 
                 Debug.Log($"Successfully saved {key}:{value}");
             }
             catch (CloudSaveValidationException e)
+            {
+                Debug.LogError(e);
+            }
+            catch (CloudSaveRateLimitedException e)
             {
                 Debug.LogError(e);
             }
@@ -126,8 +138,8 @@ namespace CloudSaveSample
         {
             try
             {
-                var results = await SaveData.LoadAsync(new HashSet<string>{key});
-                
+                var results = await CloudSaveService.Instance.Data.LoadAsync(new HashSet<string> {key});
+
                 if (results.TryGetValue(key, out string value))
                 {
                     return JsonUtility.FromJson<T>(value);
@@ -138,6 +150,10 @@ namespace CloudSaveSample
                 }
             }
             catch (CloudSaveValidationException e)
+            {
+                Debug.LogError(e);
+            }
+            catch (CloudSaveRateLimitedException e)
             {
                 Debug.LogError(e);
             }
@@ -155,16 +171,20 @@ namespace CloudSaveSample
             {
                 // If you wish to load only a subset of keys rather than everything, you
                 // can call a method LoadAsync and pass a HashSet of keys into it.
-                var results = await SaveData.LoadAllAsync();
+                var results = await CloudSaveService.Instance.Data.LoadAllAsync();
 
                 Debug.Log($"Elements loaded!");
-                
+
                 foreach (var element in results)
                 {
                     Debug.Log($"Key: {element.Key}, Value: {element.Value}");
                 }
             }
             catch (CloudSaveValidationException e)
+            {
+                Debug.LogError(e);
+            }
+            catch (CloudSaveRateLimitedException e)
             {
                 Debug.LogError(e);
             }
@@ -178,11 +198,15 @@ namespace CloudSaveSample
         {
             try
             {
-                await SaveData.ForceDeleteAsync(key);
+                await CloudSaveService.Instance.Data.ForceDeleteAsync(key);
 
                 Debug.Log($"Successfully deleted {key}");
             }
             catch (CloudSaveValidationException e)
+            {
+                Debug.LogError(e);
+            }
+            catch (CloudSaveRateLimitedException e)
             {
                 Debug.LogError(e);
             }

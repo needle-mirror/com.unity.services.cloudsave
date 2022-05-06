@@ -1,30 +1,32 @@
 {
   "name": "com.unity.services.cloudsave",
   "displayName": "Cloud Save",
-  "version": "1.0.0-pre.3",
+  "version": "2.0.0-pre.2",
   "unity": "2020.3",
   "description": "Build better player experiences with seamless game data stored securely in the cloud.\n\nUse Cloud Save to store your players’ progress and preferences, by doing so you can share this data between all the players’ devices and any game backend services.",
-  "documentationUrl": "https://docs.unity.com/cloud-save/",
   "dependencies": {
-    "com.unity.services.authentication": "1.0.0-pre.6",
-    "com.unity.services.core": "1.1.0-pre.10"
+    "com.unity.services.authentication": "2.0.0",
+    "com.unity.services.core": "1.4.0"
   },
   "samples": [
     {
-      "displayName": "Cloud Save Sample",
-      "description": "A basic UGUI control panel that lets you save and load data, with commented backing code that demonstrates and explains how to use it.",
+      "displayName": "CloudSave Sample Scene",
+      "description": "Example scripts with UI elements demonstrating the Cloud Save package.",
       "path": "Samples~/Basic Example"
     }
   ],
+  "_upm": {
+    "changelog": "* **Breaking Change:** Code in the `Unity.Services.CloudSave.Editor.Settings` namespace has been made internal as it was never meant to be public.\n* Updated dependencies."
+  },
   "relatedPackages": {
-    "com.unity.services.cloudsave.tests": "1.0.0-pre.3"
+    "com.unity.services.cloudsave.tests": "2.0.0-pre.2"
   },
   "upmCi": {
-    "footprint": "14a495c9c0e8b646628429049095ad5c3e727252"
+    "footprint": "8a7f7d87cffd3d6b54257329f8bb1c27d7ba8c7c"
   },
   "repository": {
-    "url": "https://github.cds.internal.unity3d.com/unity/Catapult.mono.git",
+    "url": "https://github.cds.internal.unity3d.com/unity/operate-services-sdk.git",
     "type": "git",
-    "revision": "fc7e77f7b90ddb9b41d8857bd9f3b81d8955eee1"
+    "revision": "b080a5b32cb6f036c4b06d905fb86238a84a1926"
   }
 }

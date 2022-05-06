@@ -1,4 +1,4 @@
-﻿using System.Threading.Tasks;
+using System.Threading.Tasks;
 using Unity.Services.CloudSave.Internal.Apis.Data;
 using Unity.Services.CloudSave.Internal.Http;
 using Unity.Services.Authentication.Internal;
@@ -23,11 +23,14 @@ namespace Unity.Services.CloudSave
             // This is a temporary fix until the code generator creates services that can be depended on as part of the core init flow
             IDataApiClient cloudSaveDataApiClient = new DataApiClient(new HttpClient(), registry.GetServiceComponent<IAccessToken>());
             // End of temporary fix
-            
-            SaveData.InitializeSaveData(registry.GetServiceComponent<IPlayerId>(),
-                                        registry.GetServiceComponent<IAccessToken>(), 
-                                        cloudSaveDataApiClient);
-            
+
+            IAuthentication authentication = new AuthenticationWrapper(registry.GetServiceComponent<IPlayerId>(),
+                registry.GetServiceComponent<IAccessToken>());
+
+            IApiClient apiClient = new ApiClient(Application.cloudProjectId, authentication, cloudSaveDataApiClient);
+
+            CloudSaveService.instance = new CloudSaveServiceInstance(new SaveDataInternal(apiClient, new CloudSaveApiErrorHandler(new RateLimiter())));
+
             return Task.CompletedTask;
         }
     }

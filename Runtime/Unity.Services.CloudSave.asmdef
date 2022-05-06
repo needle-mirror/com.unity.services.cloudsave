@@ -3,8 +3,7 @@
     "references": [
         "Unity.Services.CloudSave.Internal",
         "Unity.Services.Core",
-        "Unity.Services.Core.Internal",
-        "Unity.Services.Authentication"
+        "Unity.Services.Core.Internal"
     ],
     "includePlatforms": [],
     "excludePlatforms": [],

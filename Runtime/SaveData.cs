@@ -1,21 +1,33 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
+using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
-using Unity.Services.CloudSave.Internal.Apis.Data;
-using Unity.Services.Authentication.Internal;
-using UnityEngine;
+using Unity.Services.CloudSave.Internal;
+using Unity.Services.CloudSave.Internal.Http;
+using Unity.Services.CloudSave.Internal.Models;
+
+[assembly: InternalsVisibleTo("DynamicProxyGenAssembly2")]
 
 namespace Unity.Services.CloudSave
 {
-    public static class SaveData
+    public interface ICloudSaveDataClient
     {
-        static ISaveDataClient _saveData;
+        Task<List<string>> RetrieveAllKeysAsync();
+        Task ForceSaveAsync(Dictionary<string, object> data);
+        Task ForceDeleteAsync(string key);
+        Task<Dictionary<string, string>> LoadAsync(HashSet<string> keys = null);
+        Task<Dictionary<string, string>> LoadAllAsync();
+    }
 
-        internal static void InitializeSaveData(IPlayerId playerId, IAccessToken accessToken, IDataApiClient cloudSaveDataApiClient)
+    internal class SaveDataInternal : ICloudSaveDataClient
+    {
+        readonly IApiClient _mApiClient;
+        readonly ICloudSaveApiErrorHandler _mErrorHandler;
+
+        internal SaveDataInternal(IApiClient apiClient, ICloudSaveApiErrorHandler errorHandler)
         {
-            IAuthentication authentication = new AuthenticationWrapper(playerId, accessToken);
-            IApiClient apiClient = new ApiClient(Application.cloudProjectId, authentication, cloudSaveDataApiClient);
-            _saveData = new SaveDataClient(apiClient, new CloudSaveApiErrorHandler());
+            _mApiClient = apiClient;
+            _mErrorHandler = errorHandler;
         }
 
         /// <summary>
@@ -27,39 +39,161 @@ namespace Unity.Services.CloudSave
         /// <returns>A list of keys stored in the server for the logged in player.</returns>
         /// <exception cref="CloudSaveException">Thrown if request is unsuccessful.</exception>
         /// <exception cref="CloudSaveValidationException">Thrown if the service returned validation error.</exception>
-        public static async Task<List<string>> RetrieveAllKeysAsync()
+        /// <exception cref="CloudSaveRateLimitedException">Thrown if the service returned rate limited error.</exception>
+        public async Task<List<string>> RetrieveAllKeysAsync()
         {
-            return await _saveData.RetrieveAllKeysAsync();
+            try
+            {
+                if (_mErrorHandler.IsRateLimited)
+                {
+                    throw _mErrorHandler.CreateFakeRateLimitException();
+                }
+
+                List<string> returnSet = new List<string>();
+                Response<GetKeysResponse> response;
+                string lastAddedKey = null;
+                do
+                {
+                    response = await _mApiClient.RetrieveKeysAsync(lastAddedKey);
+                    List<KeyMetadata> items = response.Result.Results;
+                    if (items.Count > 0)
+                    {
+                        foreach (var item in items)
+                        {
+                            returnSet.Add(item.Key);
+                        }
+
+                        lastAddedKey = items[items.Count - 1].Key;
+                    }
+                }
+                while (!string.IsNullOrEmpty(response.Result.Links.Next));
+
+                return returnSet;
+            }
+            catch (HttpException<BasicErrorResponse> e)
+            {
+                throw _mErrorHandler.HandleBasicResponseException(e);
+            }
+            catch (HttpException<ValidationErrorResponse> e)
+            {
+                throw _mErrorHandler.HandleValidationResponseException(e);
+            }
+            catch (ResponseDeserializationException e)
+            {
+                throw _mErrorHandler.HandleDeserializationException(e);
+            }
+            catch (HttpException e)
+            {
+                throw _mErrorHandler.HandleHttpException(e);
+            }
+            catch (Exception e)
+            {
+                if (e is CloudSaveException)
+                {
+                    throw;
+                }
+
+                throw _mErrorHandler.HandleException(e);
+            }
         }
 
         /// <summary>
         /// Upload one or more key-value pairs to the Cloud Save service, overwriting any values
         /// that are currently stored under the given keys.
         /// Throws a CloudSaveException with a reason code and explanation of what happened.
-        /// 
+        ///
         /// <code>Dictionary</code> as a parameter ensures the uniqueness of given keys.
         /// There is no client validation in place, which means the API can be called regardless if data is incorrect and/or missing.
         /// </summary>
         /// <param name="data">The dictionary of keys and corresponding values to upload</param>
         /// <exception cref="CloudSaveException">Thrown if request is unsuccessful.</exception>
         /// <exception cref="CloudSaveValidationException">Thrown if the service returned validation error.</exception>
-        public static async Task ForceSaveAsync(Dictionary<string, object> data)
+        /// <exception cref="CloudSaveRateLimitedException">Thrown if the service returned rate limited error.</exception>
+        public async Task ForceSaveAsync(Dictionary<string, object> data)
         {
-            await _saveData.ForceSaveAsync(data);
+            try
+            {
+                if (data.Count > 0)
+                {
+                    if (_mErrorHandler.IsRateLimited)
+                    {
+                        throw _mErrorHandler.CreateFakeRateLimitException();
+                    }
+                    await _mApiClient.ForceSaveAsync(data);
+                }
+            }
+            catch (HttpException<BasicErrorResponse> e)
+            {
+                throw _mErrorHandler.HandleBasicResponseException(e);
+            }
+            catch (HttpException<BatchValidationErrorResponse> e)
+            {
+                throw _mErrorHandler.HandleBatchValidationResponseException(e);
+            }
+            catch (ResponseDeserializationException e)
+            {
+                throw _mErrorHandler.HandleDeserializationException(e);
+            }
+            catch (HttpException e)
+            {
+                throw _mErrorHandler.HandleHttpException(e);
+            }
+            catch (Exception e)
+            {
+                if (e is CloudSaveException)
+                {
+                    throw;
+                }
+
+                throw _mErrorHandler.HandleException(e);
+            }
         }
 
         /// <summary>
-        /// Removes one key at the time. If a given key doesn't exist, there is no feedback in place to inform a developer about it. 
+        /// Removes one key at the time. If a given key doesn't exist, there is no feedback in place to inform a developer about it.
         /// There is no client validation implemented for this method.
         /// Throws a CloudSaveException with a reason code and explanation of what happened.
-        /// 
+        ///
         /// </summary>
         /// <param name="key">The key to be removed from the server</param>
         /// <exception cref="CloudSaveException">Thrown if request is unsuccessful.</exception>
         /// <exception cref="CloudSaveValidationException">Thrown if the service returned validation error.</exception>
-        public static async Task ForceDeleteAsync(string key)
+        /// <exception cref="CloudSaveRateLimitedException">Thrown if the service returned rate limited error.</exception>
+        public async Task ForceDeleteAsync(string key)
         {
-            await _saveData.ForceDeleteAsync(key);
+            try
+            {
+                if (_mErrorHandler.IsRateLimited)
+                {
+                    throw _mErrorHandler.CreateFakeRateLimitException();
+                }
+                await _mApiClient.ForceDeleteAsync(key);
+            }
+            catch (HttpException<BasicErrorResponse> e)
+            {
+                throw _mErrorHandler.HandleBasicResponseException(e);
+            }
+            catch (HttpException<ValidationErrorResponse> e)
+            {
+                throw _mErrorHandler.HandleValidationResponseException(e);
+            }
+            catch (ResponseDeserializationException e)
+            {
+                throw _mErrorHandler.HandleDeserializationException(e);
+            }
+            catch (HttpException e)
+            {
+                throw _mErrorHandler.HandleHttpException(e);
+            }
+            catch (Exception e)
+            {
+                if (e is CloudSaveException)
+                {
+                    throw;
+                }
+
+                throw _mErrorHandler.HandleException(e);
+            }
         }
 
         /// <summary>
@@ -73,11 +207,64 @@ namespace Unity.Services.CloudSave
         /// <returns>The dictionary of key-value pairs that represents the current state of data on the server</returns>
         /// <exception cref="CloudSaveException">Thrown if request is unsuccessful.</exception>
         /// <exception cref="CloudSaveValidationException">Thrown if the service returned validation error.</exception>
-        public static async Task<Dictionary<string, string>> LoadAsync(HashSet<string> keys)
+        /// <exception cref="CloudSaveRateLimitedException">Thrown if the service returned rate limited error.</exception>
+        public async Task<Dictionary<string, string>> LoadAsync(HashSet<string> keys = null)
         {
-            return await _saveData.LoadAsync(keys);
+            var result = new Dictionary<string, string>();
+            try
+            {
+                if (_mErrorHandler.IsRateLimited)
+                {
+                    throw _mErrorHandler.CreateFakeRateLimitException();
+                }
+
+                Response<GetItemsResponse> response;
+                string lastAddedKey = null;
+                do
+                {
+                    response = await _mApiClient.LoadAsync(keys, lastAddedKey);
+                    List<Item> items = response.Result.Results;
+                    if (items.Count > 0)
+                    {
+                        foreach (var item in items)
+                        {
+                            result[item.Key] = item.Value.GetAsString();
+                        }
+
+                        lastAddedKey = items[items.Count - 1].Key;
+                    }
+                }
+                while (!string.IsNullOrEmpty(response.Result.Links.Next));
+
+                return result;
+            }
+            catch (HttpException<BasicErrorResponse> e)
+            {
+                throw _mErrorHandler.HandleBasicResponseException(e);
+            }
+            catch (HttpException<ValidationErrorResponse> e)
+            {
+                throw _mErrorHandler.HandleValidationResponseException(e);
+            }
+            catch (ResponseDeserializationException e)
+            {
+                throw _mErrorHandler.HandleDeserializationException(e);
+            }
+            catch (HttpException e)
+            {
+                throw _mErrorHandler.HandleHttpException(e);
+            }
+            catch (Exception e)
+            {
+                if (e is CloudSaveException)
+                {
+                    throw;
+                }
+
+                throw _mErrorHandler.HandleException(e);
+            }
         }
-        
+
         /// <summary>
         /// Downloads all data from Cloud Save.
         /// There is no client validation in place.
@@ -87,9 +274,10 @@ namespace Unity.Services.CloudSave
         /// <returns>The dictionary of all key-value pairs that represents the current state of data on the server</returns>
         /// <exception cref="CloudSaveException">Thrown if request is unsuccessful.</exception>
         /// <exception cref="CloudSaveValidationException">Thrown if the service returned validation error.</exception>
-        public static async Task<Dictionary<string, string>> LoadAllAsync()
+        /// <exception cref="CloudSaveRateLimitedException">Thrown if the service returned rate limited error.</exception>
+        public async Task<Dictionary<string, string>> LoadAllAsync()
         {
-            return await _saveData.LoadAsync();
+            return await LoadAsync();
         }
     }
 }

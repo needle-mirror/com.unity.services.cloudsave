@@ -1,0 +1,77 @@
+// This file is generated. Do not modify by hand.
+// XML documentation file not found. To check if public methods have XML comments,
+// make sure the XML doc file is present and located next to the scraped dll
+namespace Unity.Services.CloudSave
+{
+    [UnityEngine.Scripting.Preserve] public class CloudSaveException : Unity.Services.Core.RequestFailedException
+    {
+        [UnityEngine.Scripting.Preserve] public Unity.Services.CloudSave.CloudSaveExceptionReason Reason { get; }
+    }
+
+    [UnityEngine.Scripting.Preserve] public enum CloudSaveExceptionReason
+    {
+        public const Unity.Services.CloudSave.CloudSaveExceptionReason AccessTokenMissing = 4;
+        public const Unity.Services.CloudSave.CloudSaveExceptionReason InvalidArgument = 5;
+        public const Unity.Services.CloudSave.CloudSaveExceptionReason KeyLimitExceeded = 7;
+        public const Unity.Services.CloudSave.CloudSaveExceptionReason NoInternetConnection = 1;
+        public const Unity.Services.CloudSave.CloudSaveExceptionReason NotFound = 8;
+        public const Unity.Services.CloudSave.CloudSaveExceptionReason PlayerIdMissing = 3;
+        public const Unity.Services.CloudSave.CloudSaveExceptionReason ProjectIdMissing = 2;
+        public const Unity.Services.CloudSave.CloudSaveExceptionReason ServiceUnavailable = 10;
+        public const Unity.Services.CloudSave.CloudSaveExceptionReason TooManyRequests = 9;
+        public const Unity.Services.CloudSave.CloudSaveExceptionReason Unauthorized = 6;
+        public const Unity.Services.CloudSave.CloudSaveExceptionReason Unknown = 0;
+        public int value__;
+    }
+
+    public class CloudSaveRateLimitedException : Unity.Services.CloudSave.CloudSaveException
+    {
+        public float RetryAfter { get; set; }
+    }
+
+    public static class CloudSaveService
+    {
+        public static Unity.Services.CloudSave.ICloudSaveService Instance { get; }
+    }
+
+    public class CloudSaveServiceInstance : Unity.Services.CloudSave.ICloudSaveService
+    {
+        public virtual Unity.Services.CloudSave.ICloudSaveDataClient Data { get; }
+    }
+
+    [UnityEngine.Scripting.Preserve] public class CloudSaveValidationErrorDetail
+    {
+        [UnityEngine.Scripting.Preserve] public string Field { get; }
+        [UnityEngine.Scripting.Preserve] public string Key { get; }
+        [UnityEngine.Scripting.Preserve] public System.Collections.Generic.List<string> Messages { get; }
+        [UnityEngine.Scripting.Preserve] public CloudSaveValidationErrorDetail(string field, System.Collections.Generic.List<string> messages, string key = default(string)) {}
+    }
+
+    [UnityEngine.Scripting.Preserve] public class CloudSaveValidationException : Unity.Services.CloudSave.CloudSaveException
+    {
+        [UnityEngine.Scripting.Preserve] public System.Collections.Generic.List<Unity.Services.CloudSave.CloudSaveValidationErrorDetail> Details { get; }
+    }
+
+    public interface ICloudSaveDataClient
+    {
+        public abstract System.Threading.Tasks.Task ForceDeleteAsync(string key);
+        public abstract System.Threading.Tasks.Task ForceSaveAsync(System.Collections.Generic.Dictionary<string, object> data);
+        public abstract System.Threading.Tasks.Task<System.Collections.Generic.Dictionary<string, string>> LoadAllAsync();
+        public abstract System.Threading.Tasks.Task<System.Collections.Generic.Dictionary<string, string>> LoadAsync(System.Collections.Generic.HashSet<string> keys = default(System.Collections.Generic.HashSet<string>));
+        public abstract System.Threading.Tasks.Task<System.Collections.Generic.List<string>> RetrieveAllKeysAsync();
+    }
+
+    public interface ICloudSaveService
+    {
+        public abstract Unity.Services.CloudSave.ICloudSaveDataClient Data { get; }
+    }
+
+    [System.Obsolete(@"The interface provided by SaveData has moved to CloudSaveService.Instance.Data, and should be accessed from there instead. This API will be removed in an upcoming release.", false)] public static class SaveData
+    {
+        [System.Diagnostics.DebuggerStepThrough] [System.Obsolete(@"The interface provided by SaveData.ForceDeleteAsync(string) has been replaced by CloudSaveService.Instance.Data.ForceDeleteAsync(string), and should be accessed from there instead. This API will be removed in an upcoming release.", false)] [System.Runtime.CompilerServices.AsyncStateMachine(typeof(Unity.Services.CloudSave.SaveData.<ForceDeleteAsync>d__2))] public static System.Threading.Tasks.Task ForceDeleteAsync(string key);
+        [System.Diagnostics.DebuggerStepThrough] [System.Obsolete(@"The interface provided by SaveData.ForceSaveAsync(Dictionary<string, object>) has been replaced by CloudSaveService.Instance.Data.ForceSaveAsync(Dictionary<string, object>), and should be accessed from there instead. This API will be removed in an upcoming release.", false)] [System.Runtime.CompilerServices.AsyncStateMachine(typeof(Unity.Services.CloudSave.SaveData.<ForceSaveAsync>d__1))] public static System.Threading.Tasks.Task ForceSaveAsync(System.Collections.Generic.Dictionary<string, object> data);
+        [System.Diagnostics.DebuggerStepThrough] [System.Obsolete(@"The interface provided by SaveData.LoadAllAsync() has been replaced by CloudSaveService.Instance.Data.LoadAllAsync(), and should be accessed from there instead. This API will be removed in an upcoming release.", false)] [System.Runtime.CompilerServices.AsyncStateMachine(typeof(Unity.Services.CloudSave.SaveData.<LoadAllAsync>d__4))] public static System.Threading.Tasks.Task<System.Collections.Generic.Dictionary<string, string>> LoadAllAsync();
+        [System.Diagnostics.DebuggerStepThrough] [System.Obsolete(@"The interface provided by SaveData.LoadAsync(HashSet<string>) has been replaced by CloudSaveService.Instance.Data.LoadAsync(HashSet<string>), and should be accessed from there instead. This API will be removed in an upcoming release.", false)] [System.Runtime.CompilerServices.AsyncStateMachine(typeof(Unity.Services.CloudSave.SaveData.<LoadAsync>d__3))] public static System.Threading.Tasks.Task<System.Collections.Generic.Dictionary<string, string>> LoadAsync(System.Collections.Generic.HashSet<string> keys = default(System.Collections.Generic.HashSet<string>));
+        [System.Diagnostics.DebuggerStepThrough] [System.Obsolete(@"The interface provided by SaveData.RetrieveAllKeysAsync() has been replaced by CloudSaveService.Instance.Data.RetrieveAllKeysAsync(), and should be accessed from there instead. This API will be removed in an upcoming release.", false)] [System.Runtime.CompilerServices.AsyncStateMachine(typeof(Unity.Services.CloudSave.SaveData.<RetrieveAllKeysAsync>d__0))] public static System.Threading.Tasks.Task<System.Collections.Generic.List<string>> RetrieveAllKeysAsync();
+    }
+}
