@@ -4,6 +4,9 @@ All notable changes to this package will be documented in this file.
 The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/)
 and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.html).
 
+## [2.0.0] - 2022-05-12
+* The Cloud Save SDK is no longer pre-release!
+
 ## [2.0.0-pre.2] - 2022-05-06
 
 * **Breaking Change:** Code in the `Unity.Services.CloudSave.Editor.Settings` namespace has been made internal as it was never meant to be public.

@@ -1,7 +1,7 @@
 {
   "name": "com.unity.services.cloudsave",
   "displayName": "Cloud Save",
-  "version": "2.0.0-pre.2",
+  "version": "2.0.0",
   "unity": "2020.3",
   "description": "Build better player experiences with seamless game data stored securely in the cloud.\n\nUse Cloud Save to store your players’ progress and preferences, by doing so you can share this data between all the players’ devices and any game backend services.",
   "dependencies": {
@@ -16,17 +16,17 @@
     }
   ],
   "_upm": {
-    "changelog": "* **Breaking Change:** Code in the `Unity.Services.CloudSave.Editor.Settings` namespace has been made internal as it was never meant to be public.\n* Updated dependencies."
+    "changelog": "* The Cloud Save SDK is no longer pre-release!"
   },
   "relatedPackages": {
-    "com.unity.services.cloudsave.tests": "2.0.0-pre.2"
+    "com.unity.services.cloudsave.tests": "2.0.0"
   },
   "upmCi": {
-    "footprint": "8a7f7d87cffd3d6b54257329f8bb1c27d7ba8c7c"
+    "footprint": "855576405e4263d149bd6d79702c99e1f2a55dd9"
   },
   "repository": {
     "url": "https://github.cds.internal.unity3d.com/unity/operate-services-sdk.git",
     "type": "git",
-    "revision": "b080a5b32cb6f036c4b06d905fb86238a84a1926"
+    "revision": "72ca20dc20fb0e19f2e58cff8bf64548f74e82d0"
   }
 }
