@@ -4,8 +4,16 @@ All notable changes to this package will be documented in this file.
 The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/)
 and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.html).
 
+## [2.2.1] - 2023-04-27
+* Cloud Save Files support, including write lock support for all appropriate methods.
+  * ListAllAsync lists all files belonging to the signed in player with metadata
+  * GetMetadataAsync returns the metadata for a given file
+  * SaveAsync will upload a given file to Cloud Save Files storage for the player, supports either a Stream or a byte[]
+  * LoadStreamAsync will download a given file from Cloud Save Files storage for the player, and returns a Stream object containing the file data
+  * LoadBytesAsync will download a given file from Cloud Save Files storage for the player, and returns a byte[] object containing the file data
+
 ## [2.0.1] - 2022-06-10
-* Added missing XmlDoc to public ICloudSaveDataClient interface and CloudSaveService static class.
+* Added missing XmlDoc to public `ICloudSaveDataClient` interface and `CloudSaveService` static class.
 
 ## [2.0.0] - 2022-05-12
 * The Cloud Save SDK is no longer pre-release!

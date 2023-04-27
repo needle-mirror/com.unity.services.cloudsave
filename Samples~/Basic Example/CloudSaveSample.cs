@@ -1,5 +1,7 @@
 using System;
 using System.Collections.Generic;
+using System.IO;
+using System.Text;
 using System.Threading.Tasks;
 using Unity.Services.Authentication;
 using Unity.Services.CloudSave;
@@ -27,6 +29,8 @@ namespace CloudSaveSample
 
             Debug.Log("Signed in?");
 
+            // Data
+
             await ForceSaveSingleData("primitive_key", "value!");
 
             SampleObject outgoingSample = new SampleObject
@@ -42,6 +46,28 @@ namespace CloudSaveSample
             await ForceDeleteSpecificData("object_key");
             await ListAllKeys();
             await RetrieveEverything();
+
+            // Files
+
+            var inputBytes = Encoding.UTF8.GetBytes("test content for file bytes");
+            var inputStream = new MemoryStream(Encoding.UTF8.GetBytes("test content for file stream"));
+
+            await SaveFileBytes("bytes-test-file", inputBytes);
+            await SaveFileStream("stream-test-file", inputStream);
+
+            await ListAllFiles();
+            await GetFileMetadata("bytes-test-file");
+            await GetFileMetadata("stream-test-file");
+
+            var fileBytes = await LoadFileBytes("bytes-test-file");
+            Debug.Log($"Loaded sample file containing content: {Encoding.UTF8.GetString(fileBytes)}");
+
+            using var fileStream = await LoadFileStream("stream-test-file");
+            using var streamReader = new StreamReader(fileStream);
+            Debug.Log($"Loaded sample file containing content: {await streamReader.ReadToEndAsync()}");
+
+            await DeleteFile("bytes-test-file");
+            await DeleteFile("stream-test-file");
         }
 
         private async Task ListAllKeys()
@@ -201,6 +227,175 @@ namespace CloudSaveSample
                 await CloudSaveService.Instance.Data.ForceDeleteAsync(key);
 
                 Debug.Log($"Successfully deleted {key}");
+            }
+            catch (CloudSaveValidationException e)
+            {
+                Debug.LogError(e);
+            }
+            catch (CloudSaveRateLimitedException e)
+            {
+                Debug.LogError(e);
+            }
+            catch (CloudSaveException e)
+            {
+                Debug.LogError(e);
+            }
+        }
+
+        private async Task ListAllFiles()
+        {
+            try
+            {
+                var results = await CloudSaveService.Instance.Files.ListAllAsync();
+
+                Debug.Log("Metadata loaded for all files!");
+
+                foreach (var element in results)
+                {
+                    Debug.Log($"Key: {element.Key}, File Size: {element.Size}");
+                }
+            }
+            catch (CloudSaveValidationException e)
+            {
+                Debug.LogError(e);
+            }
+            catch (CloudSaveRateLimitedException e)
+            {
+                Debug.LogError(e);
+            }
+            catch (CloudSaveException e)
+            {
+                Debug.LogError(e);
+            }
+        }
+
+        private async Task GetFileMetadata(string key)
+        {
+            try
+            {
+                var results = await CloudSaveService.Instance.Files.GetMetadataAsync(key);
+
+                Debug.Log("File metadata loaded!");
+
+                Debug.Log($"Key: {results.Key}, File Size: {results.Size}");
+            }
+            catch (CloudSaveValidationException e)
+            {
+                Debug.LogError(e);
+            }
+            catch (CloudSaveRateLimitedException e)
+            {
+                Debug.LogError(e);
+            }
+            catch (CloudSaveException e)
+            {
+                Debug.LogError(e);
+            }
+        }
+
+        private async Task SaveFileBytes(string key, byte[] bytes)
+        {
+            try
+            {
+                await CloudSaveService.Instance.Files.SaveAsync(key, bytes);
+
+                Debug.Log("File saved!");
+            }
+            catch (CloudSaveValidationException e)
+            {
+                Debug.LogError(e);
+            }
+            catch (CloudSaveRateLimitedException e)
+            {
+                Debug.LogError(e);
+            }
+            catch (CloudSaveException e)
+            {
+                Debug.LogError(e);
+            }
+        }
+
+        private async Task SaveFileStream(string key, Stream stream)
+        {
+            try
+            {
+                await CloudSaveService.Instance.Files.SaveAsync(key, stream);
+
+                Debug.Log("File saved!");
+            }
+            catch (CloudSaveValidationException e)
+            {
+                Debug.LogError(e);
+            }
+            catch (CloudSaveRateLimitedException e)
+            {
+                Debug.LogError(e);
+            }
+            catch (CloudSaveException e)
+            {
+                Debug.LogError(e);
+            }
+        }
+
+        private async Task<byte[]> LoadFileBytes(string key)
+        {
+            try
+            {
+                var results = await CloudSaveService.Instance.Files.LoadBytesAsync(key);
+
+                Debug.Log("File loaded!");
+
+                return results;
+            }
+            catch (CloudSaveValidationException e)
+            {
+                Debug.LogError(e);
+            }
+            catch (CloudSaveRateLimitedException e)
+            {
+                Debug.LogError(e);
+            }
+            catch (CloudSaveException e)
+            {
+                Debug.LogError(e);
+            }
+
+            return null;
+        }
+
+        private async Task<Stream> LoadFileStream(string key)
+        {
+            try
+            {
+                var results = await CloudSaveService.Instance.Files.LoadStreamAsync(key);
+
+                Debug.Log("File loaded!");
+
+                return results;
+            }
+            catch (CloudSaveValidationException e)
+            {
+                Debug.LogError(e);
+            }
+            catch (CloudSaveRateLimitedException e)
+            {
+                Debug.LogError(e);
+            }
+            catch (CloudSaveException e)
+            {
+                Debug.LogError(e);
+            }
+
+            return null;
+        }
+
+        private async Task DeleteFile(string key)
+        {
+            try
+            {
+                await CloudSaveService.Instance.Files.DeleteAsync(key);
+
+                Debug.Log("File deleted!");
             }
             catch (CloudSaveValidationException e)
             {

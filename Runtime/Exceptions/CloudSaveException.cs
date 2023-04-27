@@ -20,7 +20,8 @@ namespace Unity.Services.CloudSave
         KeyLimitExceeded,
         NotFound,
         TooManyRequests,
-        ServiceUnavailable
+        ServiceUnavailable,
+        Conflict
     }
 
     /// <summary>

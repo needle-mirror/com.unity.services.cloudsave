@@ -1,11 +1,11 @@
 {
   "name": "com.unity.services.cloudsave",
   "displayName": "Cloud Save",
-  "version": "2.0.1",
+  "version": "2.2.1",
   "unity": "2020.3",
   "description": "Build better player experiences with seamless game data stored securely in the cloud.\n\nUse Cloud Save to store your players’ progress and preferences, by doing so you can share this data between all the players’ devices and any game backend services.",
   "dependencies": {
-    "com.unity.services.authentication": "2.0.0",
+    "com.unity.services.authentication": "2.2.0",
     "com.unity.services.core": "1.4.0"
   },
   "samples": [
@@ -16,17 +16,31 @@
     }
   ],
   "_upm": {
-    "changelog": "* Added missing XmlDoc to public ICloudSaveDataClient interface and CloudSaveService static class."
+    "gameService": {
+      "projectDashboardUrl": "https://dashboard.unity3d.com/organizations/{0}/projects/{1}/cloud-save/about",
+      "projectDashboardUrlType": "OrganizationKeyAndProjectGuid"
+    },
+    "supportedPlatforms": [
+      "Android",
+      "iOS",
+      "Linux",
+      "Mac",
+      "PC",
+      "Windows 8 Universal",
+      "Windows 10 Universal"
+    ],
+    "changelog": "* Cloud Save Files support, including write lock support for all appropriate methods.\n  * ListAllAsync lists all files belonging to the signed in player with metadata\n  * GetMetadataAsync returns the metadata for a given file\n  * SaveAsync will upload a given file to Cloud Save Files storage for the player, supports either a Stream or a byte[]\n  * LoadStreamAsync will download a given file from Cloud Save Files storage for the player, and returns a Stream object containing the file data\n  * LoadBytesAsync will download a given file from Cloud Save Files storage for the player, and returns a byte[] object containing the file data"
   },
   "relatedPackages": {
-    "com.unity.services.cloudsave.tests": "2.0.1"
+    "com.unity.services.cloudsave.tests": "2.2.1"
   },
   "upmCi": {
-    "footprint": "fe03ffda64f6d12ed41184ff094436d3498bdeaa"
+    "footprint": "60fdeab247344250ad7f50d4385dd3eaadfdb3b4"
   },
+  "documentationUrl": "https://docs.unity3d.com/Packages/com.unity.services.cloudsave@2.2/manual/index.html",
   "repository": {
     "url": "https://github.cds.internal.unity3d.com/unity/operate-services-sdk.git",
     "type": "git",
-    "revision": "d09ddf585f4d43d29caf510aa9706d940d7a27f6"
+    "revision": "c0389ba82d939156b88dddb36c4be5cd48055eb8"
   }
 }

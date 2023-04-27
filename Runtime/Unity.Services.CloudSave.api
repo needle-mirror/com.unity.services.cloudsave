@@ -3,6 +3,18 @@
 // make sure the XML doc file is present and located next to the scraped dll
 namespace Unity.Services.CloudSave
 {
+    [UnityEngine.Scripting.Preserve] public class CloudSaveConflictErrorDetail
+    {
+        [UnityEngine.Scripting.Preserve] public string AttemptedWriteLock { get; }
+        [UnityEngine.Scripting.Preserve] public string ExistingWriteLock { get; }
+        [UnityEngine.Scripting.Preserve] public string Key { get; }
+    }
+
+    [UnityEngine.Scripting.Preserve] public class CloudSaveConflictException : Unity.Services.CloudSave.CloudSaveException
+    {
+        [UnityEngine.Scripting.Preserve] public System.Collections.Generic.List<Unity.Services.CloudSave.CloudSaveConflictErrorDetail> Details { get; }
+    }
+
     [UnityEngine.Scripting.Preserve] public class CloudSaveException : Unity.Services.Core.RequestFailedException
     {
         [UnityEngine.Scripting.Preserve] public Unity.Services.CloudSave.CloudSaveExceptionReason Reason { get; }
@@ -11,6 +23,7 @@ namespace Unity.Services.CloudSave
     [UnityEngine.Scripting.Preserve] public enum CloudSaveExceptionReason
     {
         public const Unity.Services.CloudSave.CloudSaveExceptionReason AccessTokenMissing = 4;
+        public const Unity.Services.CloudSave.CloudSaveExceptionReason Conflict = 11;
         public const Unity.Services.CloudSave.CloudSaveExceptionReason InvalidArgument = 5;
         public const Unity.Services.CloudSave.CloudSaveExceptionReason KeyLimitExceeded = 7;
         public const Unity.Services.CloudSave.CloudSaveExceptionReason NoInternetConnection = 1;
@@ -37,6 +50,7 @@ namespace Unity.Services.CloudSave
     public class CloudSaveServiceInstance : Unity.Services.CloudSave.ICloudSaveService
     {
         public virtual Unity.Services.CloudSave.ICloudSaveDataClient Data { get; }
+        public virtual Unity.Services.CloudSave.ICloudSaveFilesClient Files { get; }
     }
 
     [UnityEngine.Scripting.Preserve] public class CloudSaveValidationErrorDetail
@@ -52,6 +66,11 @@ namespace Unity.Services.CloudSave
         [UnityEngine.Scripting.Preserve] public System.Collections.Generic.List<Unity.Services.CloudSave.CloudSaveValidationErrorDetail> Details { get; }
     }
 
+    public class DeleteOptions : Unity.Services.CloudSave.WriteLockOptions
+    {
+        public DeleteOptions() {}
+    }
+
     public interface ICloudSaveDataClient
     {
         public abstract System.Threading.Tasks.Task ForceDeleteAsync(string key);
@@ -61,17 +80,108 @@ namespace Unity.Services.CloudSave
         public abstract System.Threading.Tasks.Task<System.Collections.Generic.List<string>> RetrieveAllKeysAsync();
     }
 
+    public interface ICloudSaveFilesClient
+    {
+        public abstract System.Threading.Tasks.Task DeleteAsync(string key, Unity.Services.CloudSave.DeleteOptions options = default(Unity.Services.CloudSave.DeleteOptions));
+        public abstract System.Threading.Tasks.Task<Unity.Services.CloudSave.Models.FileItem> GetMetadataAsync(string key);
+        public abstract System.Threading.Tasks.Task<System.Collections.Generic.List<Unity.Services.CloudSave.Models.FileItem>> ListAllAsync();
+        public abstract System.Threading.Tasks.Task<byte[]> LoadBytesAsync(string key);
+        public abstract System.Threading.Tasks.Task<System.IO.Stream> LoadStreamAsync(string key);
+        public abstract System.Threading.Tasks.Task SaveAsync(string key, byte[] bytes, Unity.Services.CloudSave.SaveOptions options = default(Unity.Services.CloudSave.SaveOptions));
+        public abstract System.Threading.Tasks.Task SaveAsync(string key, System.IO.Stream stream, Unity.Services.CloudSave.SaveOptions options = default(Unity.Services.CloudSave.SaveOptions));
+    }
+
     public interface ICloudSaveService
     {
         public abstract Unity.Services.CloudSave.ICloudSaveDataClient Data { get; }
+        public abstract Unity.Services.CloudSave.ICloudSaveFilesClient Files { get; }
+    }
+
+    public class Item
+    {
+        public Unity.Services.CloudSave.Internal.Http.IDeserializable Value { get; }
+        public string WriteLock { get; }
+        public Item(Unity.Services.CloudSave.Internal.Http.IDeserializable value, string writeLock) {}
     }
 
     [System.Obsolete(@"The interface provided by SaveData has moved to CloudSaveService.Instance.Data, and should be accessed from there instead. This API will be removed in an upcoming release.", false)] public static class SaveData
     {
-        [System.Diagnostics.DebuggerStepThrough] [System.Obsolete(@"The interface provided by SaveData.ForceDeleteAsync(string) has been replaced by CloudSaveService.Instance.Data.ForceDeleteAsync(string), and should be accessed from there instead. This API will be removed in an upcoming release.", false)] [System.Runtime.CompilerServices.AsyncStateMachine(typeof(Unity.Services.CloudSave.SaveData.<ForceDeleteAsync>d__2))] public static System.Threading.Tasks.Task ForceDeleteAsync(string key);
-        [System.Diagnostics.DebuggerStepThrough] [System.Obsolete(@"The interface provided by SaveData.ForceSaveAsync(Dictionary<string, object>) has been replaced by CloudSaveService.Instance.Data.ForceSaveAsync(Dictionary<string, object>), and should be accessed from there instead. This API will be removed in an upcoming release.", false)] [System.Runtime.CompilerServices.AsyncStateMachine(typeof(Unity.Services.CloudSave.SaveData.<ForceSaveAsync>d__1))] public static System.Threading.Tasks.Task ForceSaveAsync(System.Collections.Generic.Dictionary<string, object> data);
-        [System.Diagnostics.DebuggerStepThrough] [System.Obsolete(@"The interface provided by SaveData.LoadAllAsync() has been replaced by CloudSaveService.Instance.Data.LoadAllAsync(), and should be accessed from there instead. This API will be removed in an upcoming release.", false)] [System.Runtime.CompilerServices.AsyncStateMachine(typeof(Unity.Services.CloudSave.SaveData.<LoadAllAsync>d__4))] public static System.Threading.Tasks.Task<System.Collections.Generic.Dictionary<string, string>> LoadAllAsync();
-        [System.Diagnostics.DebuggerStepThrough] [System.Obsolete(@"The interface provided by SaveData.LoadAsync(HashSet<string>) has been replaced by CloudSaveService.Instance.Data.LoadAsync(HashSet<string>), and should be accessed from there instead. This API will be removed in an upcoming release.", false)] [System.Runtime.CompilerServices.AsyncStateMachine(typeof(Unity.Services.CloudSave.SaveData.<LoadAsync>d__3))] public static System.Threading.Tasks.Task<System.Collections.Generic.Dictionary<string, string>> LoadAsync(System.Collections.Generic.HashSet<string> keys = default(System.Collections.Generic.HashSet<string>));
-        [System.Diagnostics.DebuggerStepThrough] [System.Obsolete(@"The interface provided by SaveData.RetrieveAllKeysAsync() has been replaced by CloudSaveService.Instance.Data.RetrieveAllKeysAsync(), and should be accessed from there instead. This API will be removed in an upcoming release.", false)] [System.Runtime.CompilerServices.AsyncStateMachine(typeof(Unity.Services.CloudSave.SaveData.<RetrieveAllKeysAsync>d__0))] public static System.Threading.Tasks.Task<System.Collections.Generic.List<string>> RetrieveAllKeysAsync();
+        [System.Obsolete(@"The interface provided by SaveData.ForceDeleteAsync(string) has been replaced by CloudSaveService.Instance.Data.ForceDeleteAsync(string), and should be accessed from there instead. This API will be removed in an upcoming release.", false)] [System.Runtime.CompilerServices.AsyncStateMachine(typeof(Unity.Services.CloudSave.SaveData.<ForceDeleteAsync>d__2))] public static System.Threading.Tasks.Task ForceDeleteAsync(string key);
+        [System.Obsolete(@"The interface provided by SaveData.ForceSaveAsync(Dictionary<string, object>) has been replaced by CloudSaveService.Instance.Data.ForceSaveAsync(Dictionary<string, object>), and should be accessed from there instead. This API will be removed in an upcoming release.", false)] [System.Runtime.CompilerServices.AsyncStateMachine(typeof(Unity.Services.CloudSave.SaveData.<ForceSaveAsync>d__1))] public static System.Threading.Tasks.Task ForceSaveAsync(System.Collections.Generic.Dictionary<string, object> data);
+        [System.Obsolete(@"The interface provided by SaveData.LoadAllAsync() has been replaced by CloudSaveService.Instance.Data.LoadAllAsync(), and should be accessed from there instead. This API will be removed in an upcoming release.", false)] [System.Runtime.CompilerServices.AsyncStateMachine(typeof(Unity.Services.CloudSave.SaveData.<LoadAllAsync>d__4))] public static System.Threading.Tasks.Task<System.Collections.Generic.Dictionary<string, string>> LoadAllAsync();
+        [System.Obsolete(@"The interface provided by SaveData.LoadAsync(HashSet<string>) has been replaced by CloudSaveService.Instance.Data.LoadAsync(HashSet<string>), and should be accessed from there instead. This API will be removed in an upcoming release.", false)] [System.Runtime.CompilerServices.AsyncStateMachine(typeof(Unity.Services.CloudSave.SaveData.<LoadAsync>d__3))] public static System.Threading.Tasks.Task<System.Collections.Generic.Dictionary<string, string>> LoadAsync(System.Collections.Generic.HashSet<string> keys = default(System.Collections.Generic.HashSet<string>));
+        [System.Obsolete(@"The interface provided by SaveData.RetrieveAllKeysAsync() has been replaced by CloudSaveService.Instance.Data.RetrieveAllKeysAsync(), and should be accessed from there instead. This API will be removed in an upcoming release.", false)] [System.Runtime.CompilerServices.AsyncStateMachine(typeof(Unity.Services.CloudSave.SaveData.<RetrieveAllKeysAsync>d__0))] public static System.Threading.Tasks.Task<System.Collections.Generic.List<string>> RetrieveAllKeysAsync();
+    }
+
+    public class SaveItem
+    {
+        public object Value { get; }
+        public string WriteLock { get; }
+        public SaveItem(object value, string writeLock) {}
+    }
+
+    public class SaveOptions : Unity.Services.CloudSave.WriteLockOptions
+    {
+        public SaveOptions() {}
+    }
+
+    public class WriteLockOptions
+    {
+        public string WriteLock { get; set; }
+        public WriteLockOptions() {}
+    }
+}
+
+namespace Unity.Services.CloudSave.Internal.Http
+{
+    public class DeserializationSettings
+    {
+        public Unity.Services.CloudSave.Internal.Http.MissingMemberHandling MissingMemberHandling;
+        public DeserializationSettings() {}
+    }
+
+    [Newtonsoft.Json.JsonConverter(typeof(Unity.Services.CloudSave.Internal.Http.JsonObjectConverter))] [UnityEngine.Scripting.Preserve] public interface IDeserializable
+    {
+        public abstract T GetAs<T>(Unity.Services.CloudSave.Internal.Http.DeserializationSettings deserializationSettings = default(Unity.Services.CloudSave.Internal.Http.DeserializationSettings));
+        public abstract string GetAsString();
+    }
+
+    public enum MissingMemberHandling
+    {
+        public const Unity.Services.CloudSave.Internal.Http.MissingMemberHandling Error = 0;
+        public const Unity.Services.CloudSave.Internal.Http.MissingMemberHandling Ignore = 1;
+        public int value__;
+    }
+}
+
+namespace Unity.Services.CloudSave.Internal.Models
+{
+    [System.Runtime.Serialization.DataContract(Name = @"BasicErrorResponse")] [System.Xml.Serialization.XmlType(@"Error")] [UnityEngine.Scripting.Preserve] public class GCSErrorResponse
+    {
+        [System.Runtime.Serialization.DataMember(EmitDefaultValue = true, IsRequired = true, Name = @"Code")] [System.Xml.Serialization.XmlElement(@"Code")] [UnityEngine.Scripting.Preserve] public string Code { get; set; }
+        [System.Runtime.Serialization.DataMember(EmitDefaultValue = false, IsRequired = false, Name = @"Code")] [System.Xml.Serialization.XmlElement(@"Details")] [UnityEngine.Scripting.Preserve] public string Details { get; set; }
+        [System.Runtime.Serialization.DataMember(EmitDefaultValue = true, IsRequired = true, Name = @"Message")] [System.Xml.Serialization.XmlElement(@"Message")] [UnityEngine.Scripting.Preserve] public string Message { get; set; }
+        public GCSErrorResponse() {}
+        public GCSErrorResponse(string code, string message, string details = default(string)) {}
+    }
+}
+
+namespace Unity.Services.CloudSave.Models
+{
+    [System.Runtime.Serialization.DataContract(Name = @"file-item")] [UnityEngine.Scripting.Preserve] public class FileItem
+    {
+        [System.Runtime.Serialization.DataMember(EmitDefaultValue = true, IsRequired = true, Name = @"contentType")] [UnityEngine.Scripting.Preserve] public string ContentType { get; }
+        [System.Runtime.Serialization.DataMember(EmitDefaultValue = true, IsRequired = true, Name = @"created")] [UnityEngine.Scripting.Preserve] public Unity.Services.CloudSave.Models.ModifiedMetadata Created { get; }
+        [System.Runtime.Serialization.DataMember(EmitDefaultValue = false, Name = @"key")] [UnityEngine.Scripting.Preserve] public string Key { get; }
+        [System.Runtime.Serialization.DataMember(EmitDefaultValue = true, IsRequired = true, Name = @"modified")] [UnityEngine.Scripting.Preserve] public Unity.Services.CloudSave.Models.ModifiedMetadata Modified { get; }
+        [System.Runtime.Serialization.DataMember(EmitDefaultValue = true, IsRequired = true, Name = @"size")] [UnityEngine.Scripting.Preserve] public long Size { get; }
+        [System.Runtime.Serialization.DataMember(EmitDefaultValue = true, IsRequired = true, Name = @"writeLock")] [UnityEngine.Scripting.Preserve] public string WriteLock { get; }
+        [UnityEngine.Scripting.Preserve] public FileItem(long size, Unity.Services.CloudSave.Models.ModifiedMetadata created, Unity.Services.CloudSave.Models.ModifiedMetadata modified, string writeLock, string contentType, string key = default(string)) {}
+    }
+
+    [System.Runtime.Serialization.DataContract(Name = @"ModifiedMetadata")] [UnityEngine.Scripting.Preserve] public class ModifiedMetadata
+    {
+        [System.Runtime.Serialization.DataMember(EmitDefaultValue = true, IsRequired = true, Name = @"date")] [UnityEngine.Scripting.Preserve] public System.Nullable<System.DateTime> Date { get; }
+        [UnityEngine.Scripting.Preserve] public ModifiedMetadata(System.Nullable<System.DateTime> date) {}
     }
 }

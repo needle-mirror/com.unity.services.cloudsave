@@ -1,12 +1,9 @@
 using System;
 using System.Collections.Generic;
-using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
 using Unity.Services.CloudSave.Internal;
 using Unity.Services.CloudSave.Internal.Http;
 using Unity.Services.CloudSave.Internal.Models;
-
-[assembly: InternalsVisibleTo("DynamicProxyGenAssembly2")]
 
 namespace Unity.Services.CloudSave
 {
@@ -79,10 +76,10 @@ namespace Unity.Services.CloudSave
 
     internal class SaveDataInternal : ICloudSaveDataClient
     {
-        readonly IApiClient _mApiClient;
+        readonly IDataApiClient _mApiClient;
         readonly ICloudSaveApiErrorHandler _mErrorHandler;
 
-        internal SaveDataInternal(IApiClient apiClient, ICloudSaveApiErrorHandler errorHandler)
+        internal SaveDataInternal(IDataApiClient apiClient, ICloudSaveApiErrorHandler errorHandler)
         {
             _mApiClient = apiClient;
             _mErrorHandler = errorHandler;
@@ -237,7 +234,7 @@ namespace Unity.Services.CloudSave
                 do
                 {
                     response = await _mApiClient.LoadAsync(keys, lastAddedKey);
-                    List<Item> items = response.Result.Results;
+                    List<Internal.Models.Item> items = response.Result.Results;
                     if (items.Count > 0)
                     {
                         foreach (var item in items)
