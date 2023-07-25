@@ -26,7 +26,9 @@ namespace Unity.Services.CloudSave.Internal.Http
     /// </summary>
     internal class HttpClient : IHttpClient
     {
+
         /// <summary>Default Constructor.</summary>
+        
         public HttpClient()
         {
         }
@@ -50,6 +52,12 @@ namespace Unity.Services.CloudSave.Internal.Http
         private async Task<HttpClientResponse> CreateWebRequestAsync(string method, string url, byte[] body,
             IDictionary<string, string> headers, int requestTimeout)
         {
+            return await CreateHttpClientResponse(method, url, body, headers, requestTimeout);
+        }
+
+        private async Task<HttpClientResponse> CreateHttpClientResponse(string method, string url, byte[] body, IDictionary<string, string> headers,
+            int requestTimeout)
+        {
             var result = await await Task.Factory.StartNew(async () =>
                 {
                     using (var request = new UnityWebRequest(url, method))
@@ -61,8 +69,8 @@ namespace Unity.Services.CloudSave.Internal.Http
 
                         request.timeout = requestTimeout;
                         if (body != null && (method == UnityWebRequest.kHttpVerbPOST ||
-                                            method == UnityWebRequest.kHttpVerbPUT ||
-                                            method == "PATCH"))
+                                             method == UnityWebRequest.kHttpVerbPUT ||
+                                             method == "PATCH"))
                         {
                             request.uploadHandler = new UploadHandlerRaw(body);
                         }
@@ -70,7 +78,6 @@ namespace Unity.Services.CloudSave.Internal.Http
                         request.downloadHandler = new DownloadHandlerBuffer();
                         return await SendWebRequest(request);
                     }
-
                 }, CancellationToken.None, TaskCreationOptions.None,
                 Scheduler.ThreadHelper.TaskScheduler);
             return result;

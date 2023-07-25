@@ -45,7 +45,7 @@ namespace Unity.Services.CloudSave.Internal.Http
         /// <returns>The data deserialized to type T.</returns>
         public static T TryDeserializeResponse<T>(HttpClientResponse response)
         {
-            var responseString = GetUTF8ResponseString(response.Data);
+            var responseString = GetDeserializedJson(response.Data);
 
             var settings = new JsonSerializerSettings
             {
@@ -61,7 +61,7 @@ namespace Unity.Services.CloudSave.Internal.Http
                 }
                 else
                 {
-                    var deserializedJson = GetUTF8ResponseString(response.Data);
+                    var deserializedJson = GetDeserializedJson(response.Data);
                     return JsonConvert.DeserializeObject<T>(deserializedJson, settings);
                 }
             }
@@ -80,7 +80,7 @@ namespace Unity.Services.CloudSave.Internal.Http
         /// <returns>The data as a deserialized raw object.</returns>
         public static object TryDeserializeResponse(HttpClientResponse response, Type type)
         {
-            var responseString = GetUTF8ResponseString(response.Data);
+            var responseString = GetDeserializedJson(response.Data);
 
             try
             {
@@ -95,7 +95,7 @@ namespace Unity.Services.CloudSave.Internal.Http
                         MissingMemberHandling = Newtonsoft.Json.MissingMemberHandling.Ignore,
                         ReferenceLoopHandling = Newtonsoft.Json.ReferenceLoopHandling.Ignore
                     };
-                    return JsonConvert.DeserializeObject(GetUTF8ResponseString(response.Data), type, settings);
+                    return JsonConvert.DeserializeObject(GetDeserializedJson(response.Data), type, settings);
 
                 }
             }
@@ -105,9 +105,9 @@ namespace Unity.Services.CloudSave.Internal.Http
             }
         }
 
-        private static string GetUTF8ResponseString(byte[] data)
+        private static string GetDeserializedJson(byte[] data)
         {
-            return Encoding.UTF8.GetString(data);
+            return data == null ? null : Encoding.UTF8.GetString(data);
         }
 
         /// <summary>
@@ -247,7 +247,11 @@ namespace Unity.Services.CloudSave.Internal.Http
 
             try
             {
-                if (statusCodeToTypeMap[response.StatusCode.ToString()] == typeof(System.IO.Stream))
+                if (statusCodeToTypeMap[response.StatusCode.ToString()] == typeof(string))
+                {
+                    return (response.Data == null ? null : Encoding.UTF8.GetString(response.Data)) as T;
+                }
+                else if (statusCodeToTypeMap[response.StatusCode.ToString()] == typeof(System.IO.Stream))
                 {
                     return (response.Data == null ? new MemoryStream() : new MemoryStream(response.Data)) as T;
                 }

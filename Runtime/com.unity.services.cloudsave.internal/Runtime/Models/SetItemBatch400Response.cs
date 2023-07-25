@@ -25,12 +25,12 @@ using Newtonsoft.Json.Linq;
 namespace Unity.Services.CloudSave.Internal.Models
 {
     /// <summary>
-    /// GetItems400OneOf model
+    /// SetItemBatch400Response model
     /// </summary>
     [Preserve]
-    [JsonConverter(typeof(GetItems400OneOfJsonConverter))]
-    [DataContract(Name = "GetItems400OneOf")]
-    internal class GetItems400OneOf : IOneOf
+    [JsonConverter(typeof(SetItemBatch400ResponseJsonConverter))]
+    [DataContract(Name = "SetItemBatch400Response")]
+    internal class SetItemBatch400Response : IOneOf
     {
         /// <summary> Value </summary>
         public object Value { get; }
@@ -38,10 +38,10 @@ namespace Unity.Services.CloudSave.Internal.Models
         public Type Type { get; }
         private const string DiscriminatorKey = "type";
 
-        /// <summary>GetItems400OneOf Constructor</summary>
-        /// <param name="value">The value as an object for GetItems400OneOf</param>
-        /// <param name="type">The type for GetItems400OneOf</param>
-        public GetItems400OneOf(object value, Type type)
+        /// <summary>SetItemBatch400Response Constructor</summary>
+        /// <param name="value">The value as an object for SetItemBatch400Response</param>
+        /// <param name="type">The type for SetItemBatch400Response</param>
+        public SetItemBatch400Response(object value, Type type)
         {
             this.Value = value;
             this.Type = type;
@@ -50,12 +50,16 @@ namespace Unity.Services.CloudSave.Internal.Models
         private static Dictionary<string, Type> TypeLookup = new Dictionary<string, Type>()
         {
             { "problems/basic", typeof(BasicErrorResponse) },
+            { "problems/batch-basic", typeof(BatchBasicErrorResponse) },
+            { "problems/batch-validation", typeof(BatchValidationErrorResponse) },
             { "problems/validation", typeof(ValidationErrorResponse) },
             { "BasicErrorResponse", typeof(BasicErrorResponse) }, 
+            { "BatchBasicErrorResponse", typeof(BatchBasicErrorResponse) }, 
+            { "BatchValidationErrorResponse", typeof(BatchValidationErrorResponse) }, 
             { "ValidationErrorResponse", typeof(ValidationErrorResponse) }
             
         };
-        private static List<Type> PossibleTypes = new List<Type>(){ typeof(BasicErrorResponse) , typeof(ValidationErrorResponse)  };
+        private static List<Type> PossibleTypes = new List<Type>(){ typeof(BasicErrorResponse) , typeof(BatchBasicErrorResponse) , typeof(BatchValidationErrorResponse) , typeof(ValidationErrorResponse)  };
 
         private static Type GetConcreteType(string type)
         {
@@ -71,11 +75,11 @@ namespace Unity.Services.CloudSave.Internal.Models
         }
 
         /// <summary>
-        /// Converts the JSON string into an instance of GetItems400OneOf
+        /// Converts the JSON string into an instance of SetItemBatch400Response
         /// </summary>
         /// <param name="jsonString">JSON string</param>
-        /// <returns>An instance of GetItems400OneOf</returns>
-        public static GetItems400OneOf FromJson(string jsonString)
+        /// <returns>An instance of SetItemBatch400Response</returns>
+        public static SetItemBatch400Response FromJson(string jsonString)
         {
             if (jsonString == null)
             {
@@ -91,7 +95,7 @@ namespace Unity.Services.CloudSave.Internal.Models
                 var parsedJson = JObject.Parse(jsonString);
                 if (!parsedJson.ContainsKey(DiscriminatorKey))
                 {
-                    throw new MissingFieldException("GetItems400OneOf", DiscriminatorKey);
+                    throw new MissingFieldException("SetItemBatch400Response", DiscriminatorKey);
                 }
                 string discriminatorValue = parsedJson[DiscriminatorKey].ToString();
 
@@ -99,7 +103,7 @@ namespace Unity.Services.CloudSave.Internal.Models
             }
         }
 
-        private static GetItems400OneOf DeserializeIntoActualObject(string discriminatorValue, string jsonString)
+        private static SetItemBatch400Response DeserializeIntoActualObject(string discriminatorValue, string jsonString)
         {
             object actualObject = null;
             Type concreteType = GetConcreteType(discriminatorValue);
@@ -110,19 +114,19 @@ namespace Unity.Services.CloudSave.Internal.Models
                 throw new InvalidDataException("Failed to lookup discriminator value for " + discriminatorValue + ". Possible values: " + possibleValues);
             }
 
-            actualObject = JsonConvert.DeserializeObject(jsonString, concreteType);
+            actualObject = IsolatedJsonConvert.DeserializeObject(jsonString, concreteType);
 
-            return new GetItems400OneOf(actualObject, concreteType);
+            return new SetItemBatch400Response(actualObject, concreteType);
         }
 
-        private static GetItems400OneOf DeserializeIntoActualObject(string jsonString)
+        private static SetItemBatch400Response DeserializeIntoActualObject(string jsonString)
         {
             var results = new List<(object ActualObject, Type ActualType)>();
             foreach (Type t in PossibleTypes)
             {
                 try
                 {
-                    var deserializedClass = JsonConvert.DeserializeObject(jsonString, t);
+                    var deserializedClass = IsolatedJsonConvert.DeserializeObject(jsonString, t);
                     results.Add((deserializedClass, t));
                 }
                 catch (Exception)
@@ -143,15 +147,15 @@ namespace Unity.Services.CloudSave.Internal.Models
                 throw new ResponseDeserializationException(message);
             }
 
-            return new GetItems400OneOf(results.First().ActualObject, results.First().ActualType);
+            return new SetItemBatch400Response(results.First().ActualObject, results.First().ActualType);
         }
     }
 
     /// <summary>
-    /// Custom JSON converter for GetItems400OneOf to allow for deserialization into OneOf type
+    /// Custom JSON converter for SetItemBatch400Response to allow for deserialization into OneOf type
     /// </summary>
     [Preserve]
-    internal class GetItems400OneOfJsonConverter : JsonConverter
+    internal class SetItemBatch400ResponseJsonConverter : JsonConverter
     {
         public override void WriteJson(JsonWriter writer, object value, JsonSerializer serializer)
         {
@@ -162,7 +166,7 @@ namespace Unity.Services.CloudSave.Internal.Models
         {
             if(reader.TokenType != JsonToken.Null)
             {
-                return GetItems400OneOf.FromJson(JObject.Load(reader).ToString(Formatting.None));
+                return SetItemBatch400Response.FromJson(JObject.Load(reader).ToString(Formatting.None));
             }
             return null;
         }

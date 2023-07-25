@@ -1,6 +1,7 @@
+using System;
 using Unity.Services.CloudSave.Internal.Http;
 
-namespace Unity.Services.CloudSave
+namespace Unity.Services.CloudSave.Models
 {
     /// <summary>
     /// Response type for a Data Item stored in the Cloud Save service.
@@ -10,13 +11,19 @@ namespace Unity.Services.CloudSave
         /// <summary>
         /// Response type for a Data Item stored in the Cloud Save service.
         /// </summary>
-        /// <param name="value">Any JSON serializable structure</param>
-        /// <param name="writeLock">Enforces conflict checking when updating an existing data item. This field should be omitted when creating a new data item. When updating an existing item, omitting this field ignores write conflicts. When present, an error response will be returned if the writeLock in the request does not match the stored writeLock.</param>
-        public Item(IDeserializable value, string writeLock)
+        internal Item(Internal.Models.Item item)
         {
-            Value = value;
-            WriteLock = writeLock;
+            Key = item.Key;
+            Value = item.Value;
+            Created = item.Created?.Date;
+            Modified = item.Modified?.Date;
+            WriteLock = item.WriteLock;
         }
+
+        /// <summary>
+        /// The key against which the data is stored
+        /// </summary>
+        public string Key { get; }
 
         /// <summary>
         /// Any JSON serializable structure
@@ -24,8 +31,18 @@ namespace Unity.Services.CloudSave
         public IDeserializable Value { get; }
 
         /// <summary>
-        /// Enforces conflict checking when updating an existing data item. This field should be omitted when creating a new data item. When updating an existing item, omitting this field ignores write conflicts. When present, an error response will be returned if the writeLock in the request does not match the stored writeLock.
+        /// The write lock value for the data, used for enforcing conflict checking when updating an existing data item
         /// </summary>
         public string WriteLock { get; }
+
+        /// <summary>
+        /// The datetime when the value was last modified
+        /// </summary>
+        public DateTime? Modified { get; }
+
+        /// <summary>
+        /// The datetime when the value was initially created
+        /// </summary>
+        public DateTime? Created { get; }
     }
 }

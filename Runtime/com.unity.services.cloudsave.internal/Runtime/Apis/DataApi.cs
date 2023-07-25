@@ -10,12 +10,10 @@
 
 using System.Threading.Tasks;
 using System.Collections.Generic;
-using Newtonsoft.Json;
 using Unity.Services.CloudSave.Internal.Models;
 using Unity.Services.CloudSave.Internal.Http;
 using Unity.Services.Authentication.Internal;
 using Unity.Services.CloudSave.Internal.Data;
-using UnityEngine;
 
 namespace Unity.Services.CloudSave.Internal.Apis.Data
 {
@@ -26,7 +24,7 @@ namespace Unity.Services.CloudSave.Internal.Apis.Data
     {
             /// <summary>
             /// Async Operation.
-            /// Delete Item.
+            /// Delete Player Item.
             /// </summary>
             /// <param name="request">Request object for DeleteItem.</param>
             /// <param name="operationConfiguration">Configuration for DeleteItem.</param>
@@ -36,7 +34,7 @@ namespace Unity.Services.CloudSave.Internal.Apis.Data
 
             /// <summary>
             /// Async Operation.
-            /// Delete Items.
+            /// Delete Player Items.
             /// </summary>
             /// <param name="request">Request object for DeleteItems.</param>
             /// <param name="operationConfiguration">Configuration for DeleteItems.</param>
@@ -46,7 +44,7 @@ namespace Unity.Services.CloudSave.Internal.Apis.Data
 
             /// <summary>
             /// Async Operation.
-            /// Get Items.
+            /// Get Player Items.
             /// </summary>
             /// <param name="request">Request object for GetItems.</param>
             /// <param name="operationConfiguration">Configuration for GetItems.</param>
@@ -56,7 +54,7 @@ namespace Unity.Services.CloudSave.Internal.Apis.Data
 
             /// <summary>
             /// Async Operation.
-            /// Get Keys.
+            /// Get Player Keys.
             /// </summary>
             /// <param name="request">Request object for GetKeys.</param>
             /// <param name="operationConfiguration">Configuration for GetKeys.</param>
@@ -66,7 +64,7 @@ namespace Unity.Services.CloudSave.Internal.Apis.Data
 
             /// <summary>
             /// Async Operation.
-            /// Set Item.
+            /// Set Player Item.
             /// </summary>
             /// <param name="request">Request object for SetItem.</param>
             /// <param name="operationConfiguration">Configuration for SetItem.</param>
@@ -76,13 +74,33 @@ namespace Unity.Services.CloudSave.Internal.Apis.Data
 
             /// <summary>
             /// Async Operation.
-            /// Set Item Batch.
+            /// Set Player Item Batch.
             /// </summary>
             /// <param name="request">Request object for SetItemBatch.</param>
             /// <param name="operationConfiguration">Configuration for SetItemBatch.</param>
             /// <returns>Task for a Response object containing status code, headers, and Models.SetItemBatchResponse object.</returns>
             /// <exception cref="Unity.Services.CloudSave.Internal.Http.HttpException">An exception containing the HttpClientResponse with headers, response code, and string of error.</exception>
             Task<Response<Models.SetItemBatchResponse>> SetItemBatchAsync(Unity.Services.CloudSave.Internal.Data.SetItemBatchRequest request, Configuration operationConfiguration = null);
+
+            /// <summary>
+            /// Async Operation.
+            /// Get Custom Items.
+            /// </summary>
+            /// <param name="request">Request object for GetCustomItems.</param>
+            /// <param name="operationConfiguration">Configuration for GetCustomItems.</param>
+            /// <returns>Task for a Response object containing status code, headers, and Models.GetItemsResponse object.</returns>
+            /// <exception cref="Unity.Services.CloudSave.Internal.Http.HttpException">An exception containing the HttpClientResponse with headers, response code, and string of error.</exception>
+            Task<Response<Models.GetItemsResponse>> GetCustomItemsAsync(Unity.Services.CloudSave.Internal.Data.GetCustomItemsRequest request, Configuration operationConfiguration = null);
+
+            /// <summary>
+            /// Async Operation.
+            /// Get Custom Keys.
+            /// </summary>
+            /// <param name="request">Request object for GetCustomKeys.</param>
+            /// <param name="operationConfiguration">Configuration for GetCustomKeys.</param>
+            /// <returns>Task for a Response object containing status code, headers, and Models.GetKeysResponse object.</returns>
+            /// <exception cref="Unity.Services.CloudSave.Internal.Http.HttpException">An exception containing the HttpClientResponse with headers, response code, and string of error.</exception>
+            Task<Response<Models.GetKeysResponse>> GetCustomKeysAsync(Unity.Services.CloudSave.Internal.Data.GetCustomKeysRequest request, Configuration operationConfiguration = null);
 
     }
 
@@ -111,11 +129,11 @@ namespace Unity.Services.CloudSave.Internal.Apis.Data
         }
 
         /// <summary>
-        /// DataApiClient Constructor.
+        /// PlayerDataApiClient Constructor.
         /// </summary>
-        /// <param name="httpClient">The HttpClient for DataApiClient.</param>
+        /// <param name="httpClient">The HttpClient for PlayerDataApiClient.</param>
         /// <param name="accessToken">The Authentication token for the client.</param>
-        /// <param name="configuration"> DataApiClient Configuration object.</param>
+        /// <param name="configuration"> PlayerDataApiClient Configuration object.</param>
         public DataApiClient(IHttpClient httpClient,
             IAccessToken accessToken,
             Configuration configuration = null) : base(httpClient)
@@ -130,7 +148,7 @@ namespace Unity.Services.CloudSave.Internal.Apis.Data
 
         /// <summary>
         /// Async Operation.
-        /// Delete Item.
+        /// Delete Player Item.
         /// </summary>
         /// <param name="request">Request object for DeleteItem.</param>
         /// <param name="operationConfiguration">Configuration for DeleteItem.</param>
@@ -139,7 +157,7 @@ namespace Unity.Services.CloudSave.Internal.Apis.Data
         public async Task<Response> DeleteItemAsync(Unity.Services.CloudSave.Internal.Data.DeleteItemRequest request,
             Configuration operationConfiguration = null)
         {
-            var statusCodeToTypeMap = new Dictionary<string, System.Type>() { {"200",  null },{"400", typeof(GetItems400OneOf)   },{"401", typeof(Models.BasicErrorResponse)   },{"403", typeof(Models.BasicErrorResponse)   },{"409", typeof(Models.DeleteConflictErrorResponse)   },{"429", typeof(Models.BasicErrorResponse)   },{"500", typeof(Models.BasicErrorResponse)   },{"503", typeof(Models.BasicErrorResponse)   } };
+            var statusCodeToTypeMap = new Dictionary<string, System.Type>() { {"200",  null },{"400", typeof(GetItems400Response)   },{"401", typeof(Models.BasicErrorResponse)   },{"403", typeof(Models.BasicErrorResponse)   },{"409", typeof(Models.DeleteConflictErrorResponse)   },{"429", typeof(Models.BasicErrorResponse)   },{"500", typeof(Models.BasicErrorResponse)   },{"503", typeof(Models.BasicErrorResponse)   } };
 
             // Merge the operation/request level configuration with the client level configuration.
             var finalConfiguration = Configuration.MergeConfigurations(operationConfiguration, Configuration);
@@ -157,7 +175,7 @@ namespace Unity.Services.CloudSave.Internal.Apis.Data
 
         /// <summary>
         /// Async Operation.
-        /// Delete Items.
+        /// Delete Player Items.
         /// </summary>
         /// <param name="request">Request object for DeleteItems.</param>
         /// <param name="operationConfiguration">Configuration for DeleteItems.</param>
@@ -166,7 +184,7 @@ namespace Unity.Services.CloudSave.Internal.Apis.Data
         public async Task<Response> DeleteItemsAsync(Unity.Services.CloudSave.Internal.Data.DeleteItemsRequest request,
             Configuration operationConfiguration = null)
         {
-            var statusCodeToTypeMap = new Dictionary<string, System.Type>() { {"200",  null },{"400", typeof(GetItems400OneOf)   },{"401", typeof(Models.BasicErrorResponse)   },{"403", typeof(Models.BasicErrorResponse)   },{"429", typeof(Models.BasicErrorResponse)   },{"500", typeof(Models.BasicErrorResponse)   },{"503", typeof(Models.BasicErrorResponse)   } };
+            var statusCodeToTypeMap = new Dictionary<string, System.Type>() { {"200",  null },{"400", typeof(GetItems400Response)   },{"401", typeof(Models.BasicErrorResponse)   },{"403", typeof(Models.BasicErrorResponse)   },{"429", typeof(Models.BasicErrorResponse)   },{"500", typeof(Models.BasicErrorResponse)   },{"503", typeof(Models.BasicErrorResponse)   } };
 
             // Merge the operation/request level configuration with the client level configuration.
             var finalConfiguration = Configuration.MergeConfigurations(operationConfiguration, Configuration);
@@ -184,7 +202,7 @@ namespace Unity.Services.CloudSave.Internal.Apis.Data
 
         /// <summary>
         /// Async Operation.
-        /// Get Items.
+        /// Get Player Items.
         /// </summary>
         /// <param name="request">Request object for GetItems.</param>
         /// <param name="operationConfiguration">Configuration for GetItems.</param>
@@ -193,7 +211,7 @@ namespace Unity.Services.CloudSave.Internal.Apis.Data
         public async Task<Response<Models.GetItemsResponse>> GetItemsAsync(Unity.Services.CloudSave.Internal.Data.GetItemsRequest request,
             Configuration operationConfiguration = null)
         {
-            var statusCodeToTypeMap = new Dictionary<string, System.Type>() { {"200", typeof(Models.GetItemsResponse)   },{"400", typeof(GetItems400OneOf)   },{"401", typeof(Models.BasicErrorResponse)   },{"403", typeof(Models.BasicErrorResponse)   },{"404", typeof(Models.BasicErrorResponse)   },{"429", typeof(Models.BasicErrorResponse)   },{"500", typeof(Models.BasicErrorResponse)   },{"503", typeof(Models.BasicErrorResponse)   } };
+            var statusCodeToTypeMap = new Dictionary<string, System.Type>() { {"200", typeof(Models.GetItemsResponse)   },{"400", typeof(GetItems400Response)   },{"401", typeof(Models.BasicErrorResponse)   },{"403", typeof(Models.BasicErrorResponse)   },{"404", typeof(Models.BasicErrorResponse)   },{"429", typeof(Models.BasicErrorResponse)   },{"500", typeof(Models.BasicErrorResponse)   },{"503", typeof(Models.BasicErrorResponse)   } };
 
             // Merge the operation/request level configuration with the client level configuration.
             var finalConfiguration = Configuration.MergeConfigurations(operationConfiguration, Configuration);
@@ -211,7 +229,7 @@ namespace Unity.Services.CloudSave.Internal.Apis.Data
 
         /// <summary>
         /// Async Operation.
-        /// Get Keys.
+        /// Get Player Keys.
         /// </summary>
         /// <param name="request">Request object for GetKeys.</param>
         /// <param name="operationConfiguration">Configuration for GetKeys.</param>
@@ -220,7 +238,7 @@ namespace Unity.Services.CloudSave.Internal.Apis.Data
         public async Task<Response<Models.GetKeysResponse>> GetKeysAsync(Unity.Services.CloudSave.Internal.Data.GetKeysRequest request,
             Configuration operationConfiguration = null)
         {
-            var statusCodeToTypeMap = new Dictionary<string, System.Type>() { {"200", typeof(Models.GetKeysResponse)   },{"400", typeof(GetItems400OneOf)   },{"401", typeof(Models.BasicErrorResponse)   },{"403", typeof(Models.BasicErrorResponse)   },{"404", typeof(Models.BasicErrorResponse)   },{"429", typeof(Models.BasicErrorResponse)   },{"500", typeof(Models.BasicErrorResponse)   },{"503", typeof(Models.BasicErrorResponse)   } };
+            var statusCodeToTypeMap = new Dictionary<string, System.Type>() { {"200", typeof(Models.GetKeysResponse)   },{"400", typeof(GetItems400Response)   },{"401", typeof(Models.BasicErrorResponse)   },{"403", typeof(Models.BasicErrorResponse)   },{"404", typeof(Models.BasicErrorResponse)   },{"429", typeof(Models.BasicErrorResponse)   },{"500", typeof(Models.BasicErrorResponse)   },{"503", typeof(Models.BasicErrorResponse)   } };
 
             // Merge the operation/request level configuration with the client level configuration.
             var finalConfiguration = Configuration.MergeConfigurations(operationConfiguration, Configuration);
@@ -238,7 +256,7 @@ namespace Unity.Services.CloudSave.Internal.Apis.Data
 
         /// <summary>
         /// Async Operation.
-        /// Set Item.
+        /// Set Player Item.
         /// </summary>
         /// <param name="request">Request object for SetItem.</param>
         /// <param name="operationConfiguration">Configuration for SetItem.</param>
@@ -247,7 +265,7 @@ namespace Unity.Services.CloudSave.Internal.Apis.Data
         public async Task<Response<Models.SetItemResponse>> SetItemAsync(Unity.Services.CloudSave.Internal.Data.SetItemRequest request,
             Configuration operationConfiguration = null)
         {
-            var statusCodeToTypeMap = new Dictionary<string, System.Type>() { {"200", typeof(Models.SetItemResponse)   },{"400", typeof(GetItems400OneOf)   },{"401", typeof(Models.BasicErrorResponse)   },{"403", typeof(Models.BasicErrorResponse)   },{"409", typeof(Models.ConflictErrorResponse)   },{"429", typeof(Models.BasicErrorResponse)   },{"500", typeof(Models.BasicErrorResponse)   },{"503", typeof(Models.BasicErrorResponse)   } };
+            var statusCodeToTypeMap = new Dictionary<string, System.Type>() { {"200", typeof(Models.SetItemResponse)   },{"400", typeof(GetItems400Response)   },{"401", typeof(Models.BasicErrorResponse)   },{"403", typeof(Models.BasicErrorResponse)   },{"409", typeof(Models.ConflictErrorResponse)   },{"429", typeof(Models.BasicErrorResponse)   },{"500", typeof(Models.BasicErrorResponse)   },{"503", typeof(Models.BasicErrorResponse)   } };
 
             // Merge the operation/request level configuration with the client level configuration.
             var finalConfiguration = Configuration.MergeConfigurations(operationConfiguration, Configuration);
@@ -265,7 +283,7 @@ namespace Unity.Services.CloudSave.Internal.Apis.Data
 
         /// <summary>
         /// Async Operation.
-        /// Set Item Batch.
+        /// Set Player Item Batch.
         /// </summary>
         /// <param name="request">Request object for SetItemBatch.</param>
         /// <param name="operationConfiguration">Configuration for SetItemBatch.</param>
@@ -274,7 +292,7 @@ namespace Unity.Services.CloudSave.Internal.Apis.Data
         public async Task<Response<Models.SetItemBatchResponse>> SetItemBatchAsync(Unity.Services.CloudSave.Internal.Data.SetItemBatchRequest request,
             Configuration operationConfiguration = null)
         {
-            var statusCodeToTypeMap = new Dictionary<string, System.Type>() { {"200", typeof(Models.SetItemBatchResponse)   },{"400", typeof(SetItemBatch400OneOf)   },{"401", typeof(Models.BasicErrorResponse)   },{"403", typeof(Models.BasicErrorResponse)   },{"409", typeof(Models.BatchConflictErrorResponse)   },{"429", typeof(Models.BasicErrorResponse)   },{"500", typeof(Models.BasicErrorResponse)   },{"503", typeof(Models.BasicErrorResponse)   } };
+            var statusCodeToTypeMap = new Dictionary<string, System.Type>() { {"200", typeof(Models.SetItemBatchResponse)   },{"400", typeof(SetItemBatch400Response)   },{"401", typeof(Models.BasicErrorResponse)   },{"403", typeof(Models.BasicErrorResponse)   },{"409", typeof(Models.BatchConflictErrorResponse)   },{"429", typeof(Models.BasicErrorResponse)   },{"500", typeof(Models.BasicErrorResponse)   },{"503", typeof(Models.BasicErrorResponse)   } };
 
             // Merge the operation/request level configuration with the client level configuration.
             var finalConfiguration = Configuration.MergeConfigurations(operationConfiguration, Configuration);
@@ -287,6 +305,59 @@ namespace Unity.Services.CloudSave.Internal.Apis.Data
 
             var handledResponse = ResponseHandler.HandleAsyncResponse<Models.SetItemBatchResponse>(response, statusCodeToTypeMap);
             return new Response<Models.SetItemBatchResponse>(response, handledResponse);
+        }
+
+        /// <summary>
+        /// Async Operation.
+        /// Get Custom Items.
+        /// </summary>
+        /// <param name="request">Request object for GetCustomItems.</param>
+        /// <param name="operationConfiguration">Configuration for GetCustomItems.</param>
+        /// <returns>Task for a Response object containing status code, headers, and Models.GetItemsResponse object.</returns>
+        /// <exception cref="Unity.Services.CloudSave.Internal.Http.HttpException">An exception containing the HttpClientResponse with headers, response code, and string of error.</exception>
+        public async Task<Response<Models.GetItemsResponse>> GetCustomItemsAsync(Unity.Services.CloudSave.Internal.Data.GetCustomItemsRequest request,
+            Configuration operationConfiguration = null)
+        {
+            var statusCodeToTypeMap = new Dictionary<string, System.Type>() { {"200", typeof(Models.GetItemsResponse)   },{"400", typeof(GetItems400Response)   },{"401", typeof(Models.BasicErrorResponse)   },{"403", typeof(Models.BasicErrorResponse)   },{"404", typeof(Models.BasicErrorResponse)   },{"429", typeof(Models.BasicErrorResponse)   },{"500", typeof(Models.BasicErrorResponse)   },{"503", typeof(Models.BasicErrorResponse)   } };
+
+            // Merge the operation/request level configuration with the client level configuration.
+            var finalConfiguration = Configuration.MergeConfigurations(operationConfiguration, Configuration);
+
+            var response = await HttpClient.MakeRequestAsync("GET",
+                request.ConstructUrl(finalConfiguration.BasePath),
+                request.ConstructBody(),
+                request.ConstructHeaders(_accessToken, finalConfiguration),
+                finalConfiguration.RequestTimeout ?? _baseTimeout);
+
+            var handledResponse = ResponseHandler.HandleAsyncResponse<Models.GetItemsResponse>(response, statusCodeToTypeMap);
+            return new Response<Models.GetItemsResponse>(response, handledResponse);
+        }
+
+
+        /// <summary>
+        /// Async Operation.
+        /// Get Custom Keys.
+        /// </summary>
+        /// <param name="request">Request object for GetCustomKeys.</param>
+        /// <param name="operationConfiguration">Configuration for GetCustomKeys.</param>
+        /// <returns>Task for a Response object containing status code, headers, and Models.GetKeysResponse object.</returns>
+        /// <exception cref="Unity.Services.CloudSave.Internal.Http.HttpException">An exception containing the HttpClientResponse with headers, response code, and string of error.</exception>
+        public async Task<Response<Models.GetKeysResponse>> GetCustomKeysAsync(Unity.Services.CloudSave.Internal.Data.GetCustomKeysRequest request,
+            Configuration operationConfiguration = null)
+        {
+            var statusCodeToTypeMap = new Dictionary<string, System.Type>() { {"200", typeof(Models.GetKeysResponse)   },{"400", typeof(GetItems400Response)   },{"401", typeof(Models.BasicErrorResponse)   },{"403", typeof(Models.BasicErrorResponse)   },{"404", typeof(Models.BasicErrorResponse)   },{"429", typeof(Models.BasicErrorResponse)   },{"500", typeof(Models.BasicErrorResponse)   },{"503", typeof(Models.BasicErrorResponse)   } };
+
+            // Merge the operation/request level configuration with the client level configuration.
+            var finalConfiguration = Configuration.MergeConfigurations(operationConfiguration, Configuration);
+
+            var response = await HttpClient.MakeRequestAsync("GET",
+                request.ConstructUrl(finalConfiguration.BasePath),
+                request.ConstructBody(),
+                request.ConstructHeaders(_accessToken, finalConfiguration),
+                finalConfiguration.RequestTimeout ?? _baseTimeout);
+
+            var handledResponse = ResponseHandler.HandleAsyncResponse<Models.GetKeysResponse>(response, statusCodeToTypeMap);
+            return new Response<Models.GetKeysResponse>(response, handledResponse);
         }
 
     }

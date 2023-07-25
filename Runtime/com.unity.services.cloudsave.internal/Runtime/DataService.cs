@@ -1,14 +1,17 @@
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
-using Unity.Services.CloudSave.Internal;
 using Unity.Services.CloudSave.Internal.Http;
 using Unity.Services.CloudSave.Internal.Models;
 
-namespace Unity.Services.CloudSave
+namespace Unity.Services.CloudSave.Internal
 {
-    public interface ICloudSaveDataClient
+    public interface IDataService
     {
+        public IPlayerDataService Player { get; }
+        public ICustomDataService Custom { get; }
+
+        #region Deprecated, pre v3.0.0
         /// <summary>
         /// Returns all keys stored in Cloud Save for the logged in player.
         /// Throws a CloudSaveException with a reason code and explanation of what happened.
@@ -19,6 +22,7 @@ namespace Unity.Services.CloudSave
         /// <exception cref="CloudSaveException">Thrown if request is unsuccessful.</exception>
         /// <exception cref="CloudSaveValidationException">Thrown if the service returned validation error.</exception>
         /// <exception cref="CloudSaveRateLimitedException">Thrown if the service returned rate limited error.</exception>
+        [Obsolete("This method will be removed in an upcoming release. In order to retrieve keys, call: Task<List<ItemKey>> CloudSaveService.Instance.Data.Player.ListAllKeysAsync() and use ItemKey.Key to get the string value for each key", false)]
         Task<List<string>> RetrieveAllKeysAsync();
 
         /// <summary>
@@ -33,6 +37,7 @@ namespace Unity.Services.CloudSave
         /// <exception cref="CloudSaveException">Thrown if request is unsuccessful.</exception>
         /// <exception cref="CloudSaveValidationException">Thrown if the service returned validation error.</exception>
         /// <exception cref="CloudSaveRateLimitedException">Thrown if the service returned rate limited error.</exception>
+        [Obsolete("This method will be removed in an upcoming release. In order to save data without write lock validation, call: Task CloudSaveService.Instance.Data.Player.SaveAsync(Dictionary<string, object> data)", false)]
         Task ForceSaveAsync(Dictionary<string, object> data);
 
         /// <summary>
@@ -45,6 +50,7 @@ namespace Unity.Services.CloudSave
         /// <exception cref="CloudSaveException">Thrown if request is unsuccessful.</exception>
         /// <exception cref="CloudSaveValidationException">Thrown if the service returned validation error.</exception>
         /// <exception cref="CloudSaveRateLimitedException">Thrown if the service returned rate limited error.</exception>
+        [Obsolete("This method will be removed in an upcoming release. In order to delete a key without write lock validation, call: Task CloudSaveService.Instance.Data.Player.DeleteAsync(string key)", false)]
         Task ForceDeleteAsync(string key);
 
         /// <summary>
@@ -59,6 +65,7 @@ namespace Unity.Services.CloudSave
         /// <exception cref="CloudSaveException">Thrown if request is unsuccessful.</exception>
         /// <exception cref="CloudSaveValidationException">Thrown if the service returned validation error.</exception>
         /// <exception cref="CloudSaveRateLimitedException">Thrown if the service returned rate limited error.</exception>
+        [Obsolete("This method will be removed in an upcoming release. In order to get a serialized object value, call: Task<Dictionary<string, Item>> CloudSaveService.Instance.Data.Player.LoadAsync(ISet<string> keys) and use the GetAsString() method provided by IDeserializable on Item.Value", false)]
         Task<Dictionary<string, string>> LoadAsync(HashSet<string> keys = null);
 
         /// <summary>
@@ -71,36 +78,46 @@ namespace Unity.Services.CloudSave
         /// <exception cref="CloudSaveException">Thrown if request is unsuccessful.</exception>
         /// <exception cref="CloudSaveValidationException">Thrown if the service returned validation error.</exception>
         /// <exception cref="CloudSaveRateLimitedException">Thrown if the service returned rate limited error.</exception>
+        [Obsolete("This method will be removed in an upcoming release. In order to get all serialized object values, call: Task<Dictionary<string, Item>> CloudSaveService.Instance.Data.Player.LoadAllAsync() and use the GetAsString() method provided by IDeserializable on Item.Value", false)]
         Task<Dictionary<string, string>> LoadAllAsync();
+        #endregion
     }
 
-    internal class SaveDataInternal : ICloudSaveDataClient
+    class DataService : IDataService
     {
-        readonly IDataApiClient _mApiClient;
-        readonly ICloudSaveApiErrorHandler _mErrorHandler;
+        readonly IPlayerDataApiClient m_playerDataApiClient;
+        readonly ICloudSaveApiErrorHandlerDepr m_ErrorHandlerDepr;
 
-        internal SaveDataInternal(IDataApiClient apiClient, ICloudSaveApiErrorHandler errorHandler)
+        internal DataService(IPlayerDataApiClient playerDataClient, ICloudSaveApiErrorHandlerDepr errorHandlerDepr, IPlayerDataService playerDataService, ICustomDataService customDataService)
         {
-            _mApiClient = apiClient;
-            _mErrorHandler = errorHandler;
+            Player = playerDataService;
+            Custom = customDataService;
+
+            // API client and error handlers for deprecated endpoints, pre v3.0.0
+            m_playerDataApiClient = playerDataClient;
+            m_ErrorHandlerDepr = errorHandlerDepr;
         }
 
+        public IPlayerDataService Player { get; }
+        public ICustomDataService Custom { get; }
+
+        #region Deprecated, pre v3.0.0
         public async Task<List<string>> RetrieveAllKeysAsync()
         {
             try
             {
-                if (_mErrorHandler.IsRateLimited)
+                if (m_ErrorHandlerDepr.IsRateLimited)
                 {
-                    throw _mErrorHandler.CreateFakeRateLimitException();
+                    throw m_ErrorHandlerDepr.CreateFakeRateLimitException();
                 }
 
-                List<string> returnSet = new List<string>();
+                var returnSet = new List<string>();
                 Response<GetKeysResponse> response;
                 string lastAddedKey = null;
                 do
                 {
-                    response = await _mApiClient.RetrieveKeysAsync(lastAddedKey);
-                    List<KeyMetadata> items = response.Result.Results;
+                    response = await m_playerDataApiClient.ListKeysAsync(lastAddedKey);
+                    var items = response.Result.Results;
                     if (items.Count > 0)
                     {
                         foreach (var item in items)
@@ -117,19 +134,19 @@ namespace Unity.Services.CloudSave
             }
             catch (HttpException<BasicErrorResponse> e)
             {
-                throw _mErrorHandler.HandleBasicResponseException(e);
+                throw m_ErrorHandlerDepr.HandleBasicResponseException(e);
             }
             catch (HttpException<ValidationErrorResponse> e)
             {
-                throw _mErrorHandler.HandleValidationResponseException(e);
+                throw m_ErrorHandlerDepr.HandleValidationResponseException(e);
             }
             catch (ResponseDeserializationException e)
             {
-                throw _mErrorHandler.HandleDeserializationException(e);
+                throw m_ErrorHandlerDepr.HandleDeserializationException(e);
             }
             catch (HttpException e)
             {
-                throw _mErrorHandler.HandleHttpException(e);
+                throw m_ErrorHandlerDepr.HandleHttpException(e);
             }
             catch (Exception e)
             {
@@ -138,7 +155,7 @@ namespace Unity.Services.CloudSave
                     throw;
                 }
 
-                throw _mErrorHandler.HandleException(e);
+                throw m_ErrorHandlerDepr.HandleException(e);
             }
         }
 
@@ -148,28 +165,29 @@ namespace Unity.Services.CloudSave
             {
                 if (data.Count > 0)
                 {
-                    if (_mErrorHandler.IsRateLimited)
+                    if (m_ErrorHandlerDepr.IsRateLimited)
                     {
-                        throw _mErrorHandler.CreateFakeRateLimitException();
+                        throw m_ErrorHandlerDepr.CreateFakeRateLimitException();
                     }
-                    await _mApiClient.ForceSaveAsync(data);
+
+                    await m_playerDataApiClient.ForceSaveAsync(data);
                 }
             }
             catch (HttpException<BasicErrorResponse> e)
             {
-                throw _mErrorHandler.HandleBasicResponseException(e);
+                throw m_ErrorHandlerDepr.HandleBasicResponseException(e);
             }
             catch (HttpException<BatchValidationErrorResponse> e)
             {
-                throw _mErrorHandler.HandleBatchValidationResponseException(e);
+                throw m_ErrorHandlerDepr.HandleBatchValidationResponseException(e);
             }
             catch (ResponseDeserializationException e)
             {
-                throw _mErrorHandler.HandleDeserializationException(e);
+                throw m_ErrorHandlerDepr.HandleDeserializationException(e);
             }
             catch (HttpException e)
             {
-                throw _mErrorHandler.HandleHttpException(e);
+                throw m_ErrorHandlerDepr.HandleHttpException(e);
             }
             catch (Exception e)
             {
@@ -178,7 +196,7 @@ namespace Unity.Services.CloudSave
                     throw;
                 }
 
-                throw _mErrorHandler.HandleException(e);
+                throw m_ErrorHandlerDepr.HandleException(e);
             }
         }
 
@@ -186,27 +204,27 @@ namespace Unity.Services.CloudSave
         {
             try
             {
-                if (_mErrorHandler.IsRateLimited)
+                if (m_ErrorHandlerDepr.IsRateLimited)
                 {
-                    throw _mErrorHandler.CreateFakeRateLimitException();
+                    throw m_ErrorHandlerDepr.CreateFakeRateLimitException();
                 }
-                await _mApiClient.ForceDeleteAsync(key);
+                await m_playerDataApiClient.DeleteAsync(key);
             }
             catch (HttpException<BasicErrorResponse> e)
             {
-                throw _mErrorHandler.HandleBasicResponseException(e);
+                throw m_ErrorHandlerDepr.HandleBasicResponseException(e);
             }
             catch (HttpException<ValidationErrorResponse> e)
             {
-                throw _mErrorHandler.HandleValidationResponseException(e);
+                throw m_ErrorHandlerDepr.HandleValidationResponseException(e);
             }
             catch (ResponseDeserializationException e)
             {
-                throw _mErrorHandler.HandleDeserializationException(e);
+                throw m_ErrorHandlerDepr.HandleDeserializationException(e);
             }
             catch (HttpException e)
             {
-                throw _mErrorHandler.HandleHttpException(e);
+                throw m_ErrorHandlerDepr.HandleHttpException(e);
             }
             catch (Exception e)
             {
@@ -215,7 +233,7 @@ namespace Unity.Services.CloudSave
                     throw;
                 }
 
-                throw _mErrorHandler.HandleException(e);
+                throw m_ErrorHandlerDepr.HandleException(e);
             }
         }
 
@@ -224,17 +242,17 @@ namespace Unity.Services.CloudSave
             var result = new Dictionary<string, string>();
             try
             {
-                if (_mErrorHandler.IsRateLimited)
+                if (m_ErrorHandlerDepr.IsRateLimited)
                 {
-                    throw _mErrorHandler.CreateFakeRateLimitException();
+                    throw m_ErrorHandlerDepr.CreateFakeRateLimitException();
                 }
 
                 Response<GetItemsResponse> response;
                 string lastAddedKey = null;
                 do
                 {
-                    response = await _mApiClient.LoadAsync(keys, lastAddedKey);
-                    List<Internal.Models.Item> items = response.Result.Results;
+                    response = await m_playerDataApiClient.LoadAsync(keys, lastAddedKey);
+                    var items = response.Result.Results;
                     if (items.Count > 0)
                     {
                         foreach (var item in items)
@@ -251,19 +269,19 @@ namespace Unity.Services.CloudSave
             }
             catch (HttpException<BasicErrorResponse> e)
             {
-                throw _mErrorHandler.HandleBasicResponseException(e);
+                throw m_ErrorHandlerDepr.HandleBasicResponseException(e);
             }
             catch (HttpException<ValidationErrorResponse> e)
             {
-                throw _mErrorHandler.HandleValidationResponseException(e);
+                throw m_ErrorHandlerDepr.HandleValidationResponseException(e);
             }
             catch (ResponseDeserializationException e)
             {
-                throw _mErrorHandler.HandleDeserializationException(e);
+                throw m_ErrorHandlerDepr.HandleDeserializationException(e);
             }
             catch (HttpException e)
             {
-                throw _mErrorHandler.HandleHttpException(e);
+                throw m_ErrorHandlerDepr.HandleHttpException(e);
             }
             catch (Exception e)
             {
@@ -272,7 +290,7 @@ namespace Unity.Services.CloudSave
                     throw;
                 }
 
-                throw _mErrorHandler.HandleException(e);
+                throw m_ErrorHandlerDepr.HandleException(e);
             }
         }
 
@@ -280,5 +298,6 @@ namespace Unity.Services.CloudSave
         {
             return await LoadAsync();
         }
+        #endregion
     }
 }

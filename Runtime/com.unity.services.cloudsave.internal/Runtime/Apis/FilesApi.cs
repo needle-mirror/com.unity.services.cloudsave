@@ -143,11 +143,11 @@ namespace Unity.Services.CloudSave.Internal.Apis.Files
         }
 
         /// <summary>
-        /// FilesApiClient Constructor.
+        /// PlayerFilesApiClient Constructor.
         /// </summary>
-        /// <param name="httpClient">The HttpClient for FilesApiClient.</param>
+        /// <param name="httpClient">The HttpClient for PlayerFilesApiClient.</param>
         /// <param name="accessToken">The Authentication token for the client.</param>
-        /// <param name="configuration"> FilesApiClient Configuration object.</param>
+        /// <param name="configuration"> PlayerFilesApiClient Configuration object.</param>
         public FilesApiClient(IHttpClient httpClient,
             IAccessToken accessToken,
             Configuration configuration = null) : base(httpClient)

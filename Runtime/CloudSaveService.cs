@@ -1,3 +1,4 @@
+using Unity.Services.CloudSave.Internal;
 using Unity.Services.Core;
 
 namespace Unity.Services.CloudSave
@@ -32,10 +33,10 @@ namespace Unity.Services.CloudSave
 
     public class CloudSaveServiceInstance : ICloudSaveService
     {
-        public ICloudSaveDataClient Data { get; internal set; }
-        public ICloudSaveFilesClient Files { get; internal set; }
+        public IDataService Data { get; }
+        public IFilesService Files { get; }
 
-        internal CloudSaveServiceInstance(ICloudSaveDataClient data, ICloudSaveFilesClient files)
+        internal CloudSaveServiceInstance(IDataService data, IFilesService files)
         {
             Data = data;
             Files = files;
@@ -44,7 +45,7 @@ namespace Unity.Services.CloudSave
 
     public interface ICloudSaveService
     {
-        ICloudSaveDataClient Data { get; }
-        ICloudSaveFilesClient Files { get; }
+        IDataService Data { get; }
+        IFilesService Files { get; }
     }
 }

@@ -29,7 +29,7 @@ namespace Unity.Services.CloudSave.Internal.Models
         public string Message { get; set; }
 
         [Preserve]
-        [DataMember(Name = "Code", IsRequired = false, EmitDefaultValue = false)]
+        [DataMember(Name = "Details", IsRequired = false, EmitDefaultValue = false)]
         [XmlElement("Details")]
         public string Details { get; set; }
     }

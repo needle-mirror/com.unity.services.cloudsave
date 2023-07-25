@@ -39,7 +39,7 @@ namespace Unity.Services.CloudSave.Internal.Http
                 return;
             }
 
-            JToken t = JToken.FromObject(jobj.obj);
+            JToken t = JToken.FromObject(jobj.obj, serializer);
             t.WriteTo(writer);
         }
 
@@ -91,7 +91,21 @@ namespace Unity.Services.CloudSave.Internal.Http
         /// <summary>Convert a JsonObject to JToken.</summary>
         public override void WriteJson(JsonWriter writer, object value, JsonSerializer serializer)
         {
-            List<JsonObject> jobjCollection = (List<JsonObject>) value;
+            var jobjCollection = value;
+            var type = value.GetType();
+
+            if (type == typeof(Dictionary<string, IDeserializable>))
+            {
+                jobjCollection = (Dictionary<string, IDeserializable>) value;
+            }
+            else if (type == typeof(List<IDeserializable>))
+            {
+                jobjCollection = (List<IDeserializable>) value;
+            }
+            else if (type == typeof(List<List<IDeserializable>>))
+            {
+                jobjCollection = (List<List<IDeserializable>>) value;
+            }
 
             if (jobjCollection == null)
             {

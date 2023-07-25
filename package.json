@@ -1,24 +1,26 @@
 {
   "name": "com.unity.services.cloudsave",
   "displayName": "Cloud Save",
-  "version": "2.2.1",
+  "version": "3.0.0",
   "unity": "2020.3",
   "description": "Build better player experiences with seamless game data stored securely in the cloud.\n\nUse Cloud Save to store your players’ progress and preferences, by doing so you can share this data between all the players’ devices and any game backend services.",
   "dependencies": {
-    "com.unity.services.authentication": "2.2.0",
-    "com.unity.services.core": "1.4.0"
+    "com.unity.services.authentication": "2.6.1",
+    "com.unity.services.core": "1.4.3"
   },
   "samples": [
     {
-      "displayName": "CloudSave Sample Scene",
-      "description": "Example scripts with UI elements demonstrating the Cloud Save package.",
+      "displayName": "Cloud Save Sample Script",
+      "description": "Example script demonstrating the Cloud Save package.",
       "path": "Samples~/Basic Example"
     }
   ],
   "_upm": {
     "gameService": {
+      "genericDashboardUrl": "https://dashboard.unity3d.com/gaming/cloud-save",
       "projectDashboardUrl": "https://dashboard.unity3d.com/organizations/{0}/projects/{1}/cloud-save/about",
-      "projectDashboardUrlType": "OrganizationKeyAndProjectGuid"
+      "projectDashboardUrlType": "OrganizationKeyAndProjectGuid",
+      "groupId": "game-backend"
     },
     "supportedPlatforms": [
       "Android",
@@ -29,18 +31,18 @@
       "Windows 8 Universal",
       "Windows 10 Universal"
     ],
-    "changelog": "* Cloud Save Files support, including write lock support for all appropriate methods.\n  * ListAllAsync lists all files belonging to the signed in player with metadata\n  * GetMetadataAsync returns the metadata for a given file\n  * SaveAsync will upload a given file to Cloud Save Files storage for the player, supports either a Stream or a byte[]\n  * LoadStreamAsync will download a given file from Cloud Save Files storage for the player, and returns a Stream object containing the file data\n  * LoadBytesAsync will download a given file from Cloud Save Files storage for the player, and returns a byte[] object containing the file data"
+    "changelog": "### Changed\n* All existing methods have been marked as obsolete. They have mostly been replicated in new namespaces with some additional changes:\n  * Methods in the namespace `CloudSaveService.Instance.Files` have been replicated in the namespace `CloudSaveService.Instance.Files.Player` without additional changes.\n  * Methods in the namespace `CloudSaveService.Instance.Data` have been replicated in the namespace `CloudSaveService.Instance.Data.Player` with some additional changes:\n    * `RetrieveAllKeysAsync` has been renamed to `ListAllKeysAsync` and now returns a `Task<List<ItemKey>>` where `ItemKey` includes additional metadata alongside the key: The write lock value, and modified date-time.\n    * `LoadAsync` and `LoadAllAsync` now return a `Task<Dictionary<string, Item>>`, where `Item` includes additional metadata alongside the value: The write lock value, modified date-time, and created date-time.\n    * `ForceSaveAsync` has been removed in favour of `SaveAsync(IDictionary<string, object> data)`, or `SaveAsync(IDictionary<string, SaveItem> data)` without specifying the write lock on the `SaveItem`.\n    * `ForceDeleteAsync` has been removed in favour of `DeleteAsync` without specifying the write lock option.\n\n### Added\n* Support for reading data from custom IDs stored with Game State for Cloud Save Data. This data is read-only from the SDK and the following methods are available from the namespace `CloudSaveService.Instance.Data.Custom.*`\n  * `ListAllKeysAsync` will list all keys for a given custom data ID with their metadata\n  * `LoadAsync` will load the data for the specified keys for a given custom data ID\n  * `LoadAllAsync` will load all the data for a given custom data ID\n* Support for reading and enforcing write locks on player data writes:\n  * Added `SaveAsync(IDictionary<string, SaveItem> data)` which will fail for the given item if the supplied write lock on the `SaveItem` does not match the server state\n  * `SaveAsync` returns a `Dictionary<string, string>` with the saved keys and their updated write locks\n  * Added `DeleteAsync` with an optional `DeleteOptions` parameter which will fail if the specified write lock option does not match the server state"
   },
   "relatedPackages": {
-    "com.unity.services.cloudsave.tests": "2.2.1"
+    "com.unity.services.cloudsave.tests": "3.0.0"
   },
   "upmCi": {
-    "footprint": "60fdeab247344250ad7f50d4385dd3eaadfdb3b4"
+    "footprint": "1df8e5c1693cd5e050191f916969b2f0d7e9834a"
   },
-  "documentationUrl": "https://docs.unity3d.com/Packages/com.unity.services.cloudsave@2.2/manual/index.html",
+  "documentationUrl": "https://docs.unity3d.com/Packages/com.unity.services.cloudsave@3.0/manual/index.html",
   "repository": {
     "url": "https://github.cds.internal.unity3d.com/unity/operate-services-sdk.git",
     "type": "git",
-    "revision": "c0389ba82d939156b88dddb36c4be5cd48055eb8"
+    "revision": "ff9099cf219ef2a2dbd8ef87aadd60dd00631db9"
   }
 }

@@ -15,7 +15,7 @@ using Unity.Services.Core.Configuration.Internal;
 
 namespace Unity.Services.CloudSave.Internal
 {
-    interface IFilesApiClient
+    interface IPlayerFilesApiClient
     {
         Task<Response<FileList>> ListAsync(string afterKey);
 
@@ -38,7 +38,7 @@ namespace Unity.Services.CloudSave.Internal
         Task DeleteAsync(string key, string writeLock = null);
     }
 
-    class FilesApiClient : IFilesApiClient
+    class PlayerFilesApiClient : IPlayerFilesApiClient
     {
         readonly ICloudProjectId m_CloudProjectId;
         readonly Internal.Apis.Files.IFilesApiClient m_FilesClient;
@@ -47,7 +47,7 @@ namespace Unity.Services.CloudSave.Internal
         const int k_keyMaxLength = 255;
         const string k_keyRegex = "^[A-Za-z0-9-_][A-Za-z0-9-_.]{0,254}$";
 
-        internal FilesApiClient(ICloudProjectId cloudProjectId, IAuthentication authentication, Internal.Apis.Files.IFilesApiClient filesClient)
+        internal PlayerFilesApiClient(ICloudProjectId cloudProjectId, IAuthentication authentication, Internal.Apis.Files.IFilesApiClient filesClient)
         {
             m_CloudProjectId = cloudProjectId;
             m_FilesClient = filesClient;
@@ -63,7 +63,7 @@ namespace Unity.Services.CloudSave.Internal
                 ValidateKey(afterKey);
             }
 
-            ListFilesRequest request = new ListFilesRequest(m_CloudProjectId.GetCloudProjectId(),
+            var request = new ListFilesRequest(m_CloudProjectId.GetCloudProjectId(),
                 m_Authentication.GetPlayerId(), afterKey);
 
             return await m_FilesClient.ListFilesAsync(request);
@@ -75,7 +75,7 @@ namespace Unity.Services.CloudSave.Internal
 
             ValidateKey(key);
 
-            GetFileMetadataRequest request = new GetFileMetadataRequest(m_CloudProjectId.GetCloudProjectId(),
+            var request = new GetFileMetadataRequest(m_CloudProjectId.GetCloudProjectId(),
                 m_Authentication.GetPlayerId(), key);
 
             return await m_FilesClient.GetFileMetadataAsync(request);
@@ -99,7 +99,7 @@ namespace Unity.Services.CloudSave.Internal
                 stream.Position = 0;
             }
 
-            GetUploadUrlRequest request = new GetUploadUrlRequest(key,
+            var request = new GetUploadUrlRequest(key,
                 m_CloudProjectId.GetCloudProjectId(),
                 m_Authentication.GetPlayerId(), new FileDetails(MediaTypeNames.Application.Octet, stream.Length, md5Hash, writeLock));
 
@@ -119,7 +119,7 @@ namespace Unity.Services.CloudSave.Internal
                 md5Hash = Convert.ToBase64String(md5Bytes);
             }
 
-            GetUploadUrlRequest request = new GetUploadUrlRequest(key,
+            var request = new GetUploadUrlRequest(key,
                 m_CloudProjectId.GetCloudProjectId(),
                 m_Authentication.GetPlayerId(), new FileDetails(MediaTypeNames.Application.Octet, bytes.Length, md5Hash, writeLock));
 
@@ -132,7 +132,7 @@ namespace Unity.Services.CloudSave.Internal
 
             ValidateKey(key);
 
-            GetDownloadUrlRequest request = new GetDownloadUrlRequest(key,
+            var request = new GetDownloadUrlRequest(key,
                 m_CloudProjectId.GetCloudProjectId(),
                 m_Authentication.GetPlayerId());
 
@@ -172,7 +172,7 @@ namespace Unity.Services.CloudSave.Internal
             ValidateKey(key);
 
             ValidateRequiredDependencies();
-            DeleteFileRequest request = new DeleteFileRequest(key,
+            var request = new DeleteFileRequest(key,
                 m_CloudProjectId.GetCloudProjectId(),
                 m_Authentication.GetPlayerId(),
                 writeLock);
@@ -214,19 +214,19 @@ namespace Unity.Services.CloudSave.Internal
 
         void ValidateRequiredDependencies()
         {
-            if (String.IsNullOrEmpty(m_CloudProjectId.GetCloudProjectId()))
+            if (string.IsNullOrEmpty(m_CloudProjectId.GetCloudProjectId()))
             {
                 throw new CloudSaveException(CloudSaveExceptionReason.ProjectIdMissing, CommonErrorCodes.Unknown,
                     "Project ID is missing - make sure the project is correctly linked to your game and try again.", null);
             }
 
-            if (String.IsNullOrEmpty(m_Authentication.GetPlayerId()))
+            if (string.IsNullOrEmpty(m_Authentication.GetPlayerId()))
             {
                 throw new CloudSaveException(CloudSaveExceptionReason.PlayerIdMissing, CommonErrorCodes.Unknown,
                     "Player ID is missing - ensure you are signed in through the Authentication SDK and try again.", null);
             }
 
-            if (String.IsNullOrEmpty(m_Authentication.GetAccessToken()))
+            if (string.IsNullOrEmpty(m_Authentication.GetAccessToken()))
             {
                 throw new CloudSaveException(CloudSaveExceptionReason.AccessTokenMissing, CommonErrorCodes.InvalidToken,
                     "Access token is missing - ensure you are signed in through the Authentication SDK and try again.", null);

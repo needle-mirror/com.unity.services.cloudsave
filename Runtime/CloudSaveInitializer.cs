@@ -1,6 +1,8 @@
 using System.Threading.Tasks;
 using Unity.Services.Authentication.Internal;
 using Unity.Services.CloudSave.Internal;
+using Unity.Services.CloudSave.Internal.Apis.Data;
+using Unity.Services.CloudSave.Internal.Apis.Files;
 using Unity.Services.CloudSave.Internal.Http;
 using Unity.Services.Core.Internal;
 using Unity.Services.Core.Device.Internal;
@@ -30,26 +32,37 @@ namespace Unity.Services.CloudSave
             var cloudProjectId = registry.GetServiceComponent<ICloudProjectId>();
             var accessToken = registry.GetServiceComponent<IAccessToken>();
             var playerId = registry.GetServiceComponent<IPlayerId>();
+            var config = new Configuration(GetHost(projectConfiguration), null, null, null);
 
-            Internal.Apis.Data.IDataApiClient internalDataApiClient = new Internal.Apis.Data.DataApiClient(new HttpClient(), accessToken,
-                new Configuration(GetHost(projectConfiguration), null, null, null));
-            Internal.Apis.Files.IFilesApiClient internalFilesApiClient = new Internal.Apis.Files.FilesApiClient(new HttpClient(), accessToken,
-                new Configuration(GetHost(projectConfiguration), null, null, null));
+            var dataApiClient = new DataApiClient(new HttpClient(), accessToken, config);
+            var filesApiClient = new FilesApiClient(new HttpClient(), accessToken, config);
 
-            IAuthentication authentication = new AuthenticationWrapper(playerId, accessToken);
+            var authentication = new AuthenticationWrapper(playerId, accessToken);
 
-            IDataApiClient dataApiClient = new DataApiClient(cloudProjectId, authentication, internalDataApiClient);
-            IFilesApiClient filesApiClient =
-                new FilesApiClient(cloudProjectId, authentication, internalFilesApiClient);
+            var internalPlayerDataApiClient =
+                new PlayerDataApiClient(cloudProjectId, authentication, dataApiClient);
+            var internalCustomDataApiClient =
+                new CustomDataApiClient(cloudProjectId, authentication, dataApiClient);
+            var internalFilesApiClient =
+                new PlayerFilesApiClient(cloudProjectId, authentication, filesApiClient);
 
-            CloudSaveService.instance = new CloudSaveServiceInstance(
-                new SaveDataInternal(dataApiClient, new CloudSaveApiErrorHandler(new RateLimiter())),
-                new SaveFilesInternal(filesApiClient, new CloudSaveApiErrorHandlerV2(new RateLimiter())));
+            var dataService = new DataService(
+                internalPlayerDataApiClient,
+                new CloudSaveApiErrorHandlerDepr(new RateLimiter()),
+                new PlayerDataService(internalPlayerDataApiClient, new ApiErrorHandler(new RateLimiter())),
+                new CustomDataService(internalCustomDataApiClient, new ApiErrorHandler(new RateLimiter()))
+            );
+
+            var filesService = new FilesService(
+                new PlayerFilesService(internalFilesApiClient, new ApiErrorHandler(new RateLimiter()))
+            );
+
+            CloudSaveService.instance = new CloudSaveServiceInstance(dataService, filesService);
 
             return Task.CompletedTask;
         }
 
-        string GetHost(IProjectConfiguration projectConfiguration)
+        static string GetHost(IProjectConfiguration projectConfiguration)
         {
             var cloudEnvironment = projectConfiguration?.GetString(k_CloudEnvironmentKey);
 
