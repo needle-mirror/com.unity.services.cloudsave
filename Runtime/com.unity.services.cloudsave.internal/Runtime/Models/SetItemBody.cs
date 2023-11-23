@@ -31,8 +31,8 @@ namespace Unity.Services.CloudSave.Internal.Models
         /// <summary>
         /// Request type for a Data Item to store in the Cloud Save service.
         /// </summary>
-        /// <param name="key">The key will be created if it does not exist, provided the item limit has not been reached for this entity.</param>
-        /// <param name="value">Any JSON serializable structure</param>
+        /// <param name="key">The key will be created if it does not exist, provided the item limit of 2000 keys has not been reached for this entity.</param>
+        /// <param name="value">Any JSON serializable structure with a maximum size of 5 MB.</param>
         /// <param name="writeLock">Enforces conflict checking when updating an existing data item. This field should be omitted when creating a new data item. When updating an existing item, omitting this field ignores write conflicts. When present, an error response will be returned if the writeLock in the request does not match the stored writeLock.</param>
         [Preserve]
         public SetItemBody(string key, object value, string writeLock = default)
@@ -43,14 +43,14 @@ namespace Unity.Services.CloudSave.Internal.Models
         }
 
         /// <summary>
-        /// The key will be created if it does not exist, provided the item limit has not been reached for this entity.
+        /// The key will be created if it does not exist, provided the item limit of 2000 keys has not been reached for this entity.
         /// </summary>
         [Preserve]
         [DataMember(Name = "key", IsRequired = true, EmitDefaultValue = true)]
         public string Key{ get; }
         
         /// <summary>
-        /// Any JSON serializable structure
+        /// Any JSON serializable structure with a maximum size of 5 MB.
         /// </summary>
         [Preserve][JsonConverter(typeof(JsonObjectConverter))]
         [DataMember(Name = "value", IsRequired = true, EmitDefaultValue = true)]

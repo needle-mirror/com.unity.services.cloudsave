@@ -33,8 +33,7 @@ namespace Unity.Services.CloudSave.Internal.Data
 
         public static string SerializeToString<T>(T obj)
         {
-            return IsolatedJsonConvert.SerializeObject(obj,
-                new JsonSerializerSettings { ReferenceLoopHandling = Newtonsoft.Json.ReferenceLoopHandling.Ignore });
+            return IsolatedJsonConvert.SerializeObject(obj, new JsonSerializerSettings{ReferenceLoopHandling = Newtonsoft.Json.ReferenceLoopHandling.Ignore});
         }
     }
 
@@ -74,12 +73,11 @@ namespace Unity.Services.CloudSave.Internal.Data
         /// <param name="explode">True if query params should be escaped and added separately.</param>
         /// <returns>Returns a `List/<string/>`</returns>
         [Preserve]
-        public List<string> AddParamsToQueryParams(List<string> queryParams, string key, List<string> values,
-            string style, bool explode)
+        public List<string> AddParamsToQueryParams(List<string> queryParams, string key, List<string> values, string style, bool explode)
         {
             if (explode)
             {
-                foreach (var value in values)
+                foreach(var value in values)
                 {
                     string escapedValue = UnityWebRequest.EscapeURL(value);
                     queryParams.Add($"{UnityWebRequest.EscapeURL(key)}={escapedValue}");
@@ -88,11 +86,10 @@ namespace Unity.Services.CloudSave.Internal.Data
             else
             {
                 string paramString = $"{UnityWebRequest.EscapeURL(key)}=";
-                foreach (var value in values)
+                foreach(var value in values)
                 {
                     paramString += UnityWebRequest.EscapeURL(value) + ",";
                 }
-
                 paramString = paramString.Remove(paramString.Length - 1);
                 queryParams.Add(paramString);
             }
@@ -110,7 +107,7 @@ namespace Unity.Services.CloudSave.Internal.Data
         [Preserve]
         public List<string> AddParamsToQueryParams(List<string> queryParams, Dictionary<string, string> modelVars)
         {
-            foreach (var key in modelVars.Keys)
+            foreach(var key in modelVars.Keys)
             {
                 string escapedValue = UnityWebRequest.EscapeURL(modelVars[key]);
                 queryParams.Add($"{UnityWebRequest.EscapeURL(key)}={escapedValue}");
@@ -151,11 +148,10 @@ namespace Unity.Services.CloudSave.Internal.Data
         public string GetPathParamString(List<string> pathParam)
         {
             string paramString = "";
-            foreach (var value in pathParam)
+            foreach(var value in pathParam)
             {
                 paramString += UnityWebRequest.EscapeURL(value) + ",";
             }
-
             paramString = paramString.Remove(paramString.Length - 1);
             return paramString;
         }
@@ -175,7 +171,6 @@ namespace Unity.Services.CloudSave.Internal.Data
                     return ms.ToArray();
                 }
             }
-
             return null;
         }
 
@@ -210,7 +205,6 @@ namespace Unity.Services.CloudSave.Internal.Data
             {
                 return null;
             }
-
             for (int i = 0; i < accepts.Length; ++i)
             {
                 if (string.Equals(accepts[i], "application/json", System.StringComparison.OrdinalIgnoreCase))
@@ -218,12 +212,10 @@ namespace Unity.Services.CloudSave.Internal.Data
                     return "application/json";
                 }
             }
-
             return string.Join(", ", accepts);
         }
 
-        private static readonly Regex JsonRegex =
-            new Regex(@"application\/json(;\s)?((charset=utf8|q=[0-1]\.\d)(\s)?)*");
+        private static readonly Regex JsonRegex = new Regex(@"application\/json(;\s)?((charset=utf8|q=[0-1]\.\d)(\s)?)*");
 
         /// <summary>
         /// Generate Content Type Header.
@@ -237,14 +229,13 @@ namespace Unity.Services.CloudSave.Internal.Data
                 return null;
             }
 
-            for (int i = 0; i < contentTypes.Length; ++i)
+            for(int i = 0; i < contentTypes.Length; ++i)
             {
                 if (!string.IsNullOrWhiteSpace(contentTypes[i]) && JsonRegex.IsMatch(contentTypes[i]))
                 {
                     return contentTypes[i];
                 }
             }
-
             return contentTypes[0];
         }
 
@@ -255,11 +246,9 @@ namespace Unity.Services.CloudSave.Internal.Data
         /// <param name="stream">The file stream to use.</param>
         /// <param name="contentType">The content type.</param>
         /// <returns>Returns a multipart form section.</returns>
-        public IMultipartFormSection GenerateMultipartFormFileSection(string paramName, System.IO.FileStream stream,
-            string contentType)
+        public IMultipartFormSection GenerateMultipartFormFileSection(string paramName, System.IO.FileStream stream, string contentType)
         {
-            return new MultipartFormFileSection(paramName, ConstructBody(stream), GetFileName(stream.Name),
-                contentType);
+            return new MultipartFormFileSection(paramName, ConstructBody(stream), GetFileName(stream.Name), contentType);
         }
 
         /// <summary>
@@ -269,11 +258,9 @@ namespace Unity.Services.CloudSave.Internal.Data
         /// <param name="stream">The IO stream to use.</param>
         /// <param name="contentType">The content type.</param>
         /// <returns>Returns a multipart form section.</returns>
-        public IMultipartFormSection GenerateMultipartFormFileSection(string paramName, System.IO.Stream stream,
-            string contentType)
+        public IMultipartFormSection GenerateMultipartFormFileSection(string paramName, System.IO.Stream stream, string contentType)
         {
-            return new MultipartFormFileSection(paramName, ConstructBody(stream), Guid.NewGuid().ToString(),
-                contentType);
+            return new MultipartFormFileSection(paramName, ConstructBody(stream), Guid.NewGuid().ToString(), contentType);
         }
 
         private string GetFileName(string filePath)
@@ -283,57 +270,52 @@ namespace Unity.Services.CloudSave.Internal.Data
     }
 
     /// <summary>
-    /// DeleteItemRequest
-    /// Delete Player Item
+    /// DeleteCustomItemRequest
+    /// Delete Custom Item
     /// </summary>
     [Preserve]
-    internal class DeleteItemRequest : DataApiBaseRequest
+    internal class DeleteCustomItemRequest : DataApiBaseRequest
     {
         /// <summary>Accessor for key </summary>
         [Preserve]
         public string Key { get; }
-
         /// <summary>Accessor for projectId </summary>
         [Preserve]
         public string ProjectId { get; }
-
-        /// <summary>Accessor for playerId </summary>
+        /// <summary>Accessor for customId </summary>
         [Preserve]
-        public string PlayerId { get; }
-
+        public string CustomId { get; }
         /// <summary>Accessor for writeLock </summary>
         [Preserve]
         public string WriteLock { get; }
-
         string PathAndQueryParams;
 
         /// <summary>
-        /// DeleteItem Request Object.
-        /// Delete Player Item
+        /// DeleteCustomItem Request Object.
+        /// Delete Custom Item
         /// </summary>
         /// <param name="key">Item key.</param>
         /// <param name="projectId">ID of the project.</param>
-        /// <param name="playerId">The player ID supplied by the Authorization service.</param>
+        /// <param name="customId">The custom data ID specified by the user. Must be between 1 and 50 characters long and contain only alphanumeric characters, underscores, and hyphens.</param>
         /// <param name="writeLock">Enforces conflict checking when deleting an existing data item. Omitting this field ignores write conflicts. When present, an error response will be returned if the writeLock in the request does not match the stored writeLock.</param>
         [Preserve]
-        public DeleteItemRequest(string key, string projectId, string playerId, string writeLock = default(string))
+        public DeleteCustomItemRequest(string key, string projectId, string customId, string writeLock = default(string))
         {
             Key = key;
 
             ProjectId = projectId;
 
-            PlayerId = playerId;
+            CustomId = customId;
 
             WriteLock = writeLock;
-            PathAndQueryParams = $"/v1/data/projects/{projectId}/players/{playerId}/items/{key}";
+            PathAndQueryParams = $"/v1/data/projects/{projectId}/custom/{customId}/items/{key}";
 
             List<string> queryParams = new List<string>();
 
-            if (!string.IsNullOrEmpty(WriteLock))
+            if(!string.IsNullOrEmpty(WriteLock))
             {
                 queryParams = AddParamsToQueryParams(queryParams, "writeLock", WriteLock);
             }
-
             if (queryParams.Count > 0)
             {
                 PathAndQueryParams = $"{PathAndQueryParams}?{string.Join("&", queryParams)}";
@@ -370,7 +352,7 @@ namespace Unity.Services.CloudSave.Internal.Data
             Configuration operationConfiguration = null)
         {
             var headers = new Dictionary<string, string>();
-            if (!string.IsNullOrEmpty(accessToken.AccessToken))
+            if(!string.IsNullOrEmpty(accessToken.AccessToken))
             {
                 headers.Add("authorization", "Bearer " + accessToken.AccessToken);
             }
@@ -379,16 +361,18 @@ namespace Unity.Services.CloudSave.Internal.Data
             headers.Add("Unity-Client-Version", Application.unityVersion);
             headers.Add("Unity-Client-Mode", Scheduler.EngineStateHelper.IsPlaying ? "play" : "edit");
 
-            string[] contentTypes = { };
+            string[] contentTypes = {
+            };
 
-            string[] accepts = { "application/problem+json" };
+            string[] accepts = {
+                "application/problem+json"
+            };
 
             var acceptHeader = GenerateAcceptHeader(accepts);
             if (!string.IsNullOrEmpty(acceptHeader))
             {
                 headers.Add("Accept", acceptHeader);
             }
-
             var httpMethod = "DELETE";
             var contentTypeHeader = GenerateContentTypeHeader(contentTypes);
             if (!string.IsNullOrEmpty(contentTypeHeader))
@@ -414,7 +398,244 @@ namespace Unity.Services.CloudSave.Internal.Data
             return headers;
         }
     }
+    /// <summary>
+    /// DeleteCustomItemsRequest
+    /// Delete Custom Items
+    /// </summary>
+    [Preserve]
+    internal class DeleteCustomItemsRequest : DataApiBaseRequest
+    {
+        /// <summary>Accessor for projectId </summary>
+        [Preserve]
+        public string ProjectId { get; }
+        /// <summary>Accessor for customId </summary>
+        [Preserve]
+        public string CustomId { get; }
+        string PathAndQueryParams;
 
+        /// <summary>
+        /// DeleteCustomItems Request Object.
+        /// Delete Custom Items
+        /// </summary>
+        /// <param name="projectId">ID of the project.</param>
+        /// <param name="customId">The custom data ID specified by the user. Must be between 1 and 50 characters long and contain only alphanumeric characters, underscores, and hyphens.</param>
+        [Preserve]
+        public DeleteCustomItemsRequest(string projectId, string customId)
+        {
+            ProjectId = projectId;
+
+            CustomId = customId;
+
+            PathAndQueryParams = $"/v1/data/projects/{projectId}/custom/{customId}/items";
+
+
+        }
+
+        /// <summary>
+        /// Helper function for constructing URL from request base path and
+        /// query params.
+        /// </summary>
+        /// <param name="requestBasePath"></param>
+        /// <returns></returns>
+        public string ConstructUrl(string requestBasePath)
+        {
+            return requestBasePath + PathAndQueryParams;
+        }
+
+        /// <summary>
+        /// Helper for constructing the request body.
+        /// </summary>
+        /// <returns>A list of IMultipartFormSection representing the request body.</returns>
+        public byte[] ConstructBody()
+        {
+            return null;
+        }
+
+        /// <summary>
+        /// Helper function for constructing the headers.
+        /// </summary>
+        /// <param name="accessToken">The auth access token to use.</param>
+        /// <param name="operationConfiguration">The operation configuration to use.</param>
+        /// <returns>A dictionary representing the request headers.</returns>
+        public Dictionary<string, string> ConstructHeaders(IAccessToken accessToken,
+            Configuration operationConfiguration = null)
+        {
+            var headers = new Dictionary<string, string>();
+            if(!string.IsNullOrEmpty(accessToken.AccessToken))
+            {
+                headers.Add("authorization", "Bearer " + accessToken.AccessToken);
+            }
+
+            // Analytics headers
+            headers.Add("Unity-Client-Version", Application.unityVersion);
+            headers.Add("Unity-Client-Mode", Scheduler.EngineStateHelper.IsPlaying ? "play" : "edit");
+
+            string[] contentTypes = {
+            };
+
+            string[] accepts = {
+                "application/problem+json"
+            };
+
+            var acceptHeader = GenerateAcceptHeader(accepts);
+            if (!string.IsNullOrEmpty(acceptHeader))
+            {
+                headers.Add("Accept", acceptHeader);
+            }
+            var httpMethod = "DELETE";
+            var contentTypeHeader = GenerateContentTypeHeader(contentTypes);
+            if (!string.IsNullOrEmpty(contentTypeHeader))
+            {
+                headers.Add("Content-Type", contentTypeHeader);
+            }
+            else if (httpMethod == "POST" || httpMethod == "PATCH")
+            {
+                headers.Add("Content-Type", "application/json");
+            }
+
+
+            // We also check if there are headers that are defined as part of
+            // the request configuration.
+            if (operationConfiguration != null && operationConfiguration.Headers != null)
+            {
+                foreach (var pair in operationConfiguration.Headers)
+                {
+                    headers[pair.Key] = pair.Value;
+                }
+            }
+
+            return headers;
+        }
+    }
+    /// <summary>
+    /// DeleteItemRequest
+    /// Delete Player Item
+    /// </summary>
+    [Preserve]
+    internal class DeleteItemRequest : DataApiBaseRequest
+    {
+        /// <summary>Accessor for key </summary>
+        [Preserve]
+        public string Key { get; }
+        /// <summary>Accessor for projectId </summary>
+        [Preserve]
+        public string ProjectId { get; }
+        /// <summary>Accessor for playerId </summary>
+        [Preserve]
+        public string PlayerId { get; }
+        /// <summary>Accessor for writeLock </summary>
+        [Preserve]
+        public string WriteLock { get; }
+        string PathAndQueryParams;
+
+        /// <summary>
+        /// DeleteItem Request Object.
+        /// Delete Player Item
+        /// </summary>
+        /// <param name="key">Item key.</param>
+        /// <param name="projectId">ID of the project.</param>
+        /// <param name="playerId">The player ID supplied by the Authorization service.</param>
+        /// <param name="writeLock">Enforces conflict checking when deleting an existing data item. Omitting this field ignores write conflicts. When present, an error response will be returned if the writeLock in the request does not match the stored writeLock.</param>
+        [Preserve]
+        public DeleteItemRequest(string key, string projectId, string playerId, string writeLock = default(string))
+        {
+            Key = key;
+
+            ProjectId = projectId;
+
+            PlayerId = playerId;
+
+            WriteLock = writeLock;
+            PathAndQueryParams = $"/v1/data/projects/{projectId}/players/{playerId}/items/{key}";
+
+            List<string> queryParams = new List<string>();
+
+            if(!string.IsNullOrEmpty(WriteLock))
+            {
+                queryParams = AddParamsToQueryParams(queryParams, "writeLock", WriteLock);
+            }
+            if (queryParams.Count > 0)
+            {
+                PathAndQueryParams = $"{PathAndQueryParams}?{string.Join("&", queryParams)}";
+            }
+        }
+
+        /// <summary>
+        /// Helper function for constructing URL from request base path and
+        /// query params.
+        /// </summary>
+        /// <param name="requestBasePath"></param>
+        /// <returns></returns>
+        public string ConstructUrl(string requestBasePath)
+        {
+            return requestBasePath + PathAndQueryParams;
+        }
+
+        /// <summary>
+        /// Helper for constructing the request body.
+        /// </summary>
+        /// <returns>A list of IMultipartFormSection representing the request body.</returns>
+        public byte[] ConstructBody()
+        {
+            return null;
+        }
+
+        /// <summary>
+        /// Helper function for constructing the headers.
+        /// </summary>
+        /// <param name="accessToken">The auth access token to use.</param>
+        /// <param name="operationConfiguration">The operation configuration to use.</param>
+        /// <returns>A dictionary representing the request headers.</returns>
+        public Dictionary<string, string> ConstructHeaders(IAccessToken accessToken,
+            Configuration operationConfiguration = null)
+        {
+            var headers = new Dictionary<string, string>();
+            if(!string.IsNullOrEmpty(accessToken.AccessToken))
+            {
+                headers.Add("authorization", "Bearer " + accessToken.AccessToken);
+            }
+
+            // Analytics headers
+            headers.Add("Unity-Client-Version", Application.unityVersion);
+            headers.Add("Unity-Client-Mode", Scheduler.EngineStateHelper.IsPlaying ? "play" : "edit");
+
+            string[] contentTypes = {
+            };
+
+            string[] accepts = {
+                "application/problem+json"
+            };
+
+            var acceptHeader = GenerateAcceptHeader(accepts);
+            if (!string.IsNullOrEmpty(acceptHeader))
+            {
+                headers.Add("Accept", acceptHeader);
+            }
+            var httpMethod = "DELETE";
+            var contentTypeHeader = GenerateContentTypeHeader(contentTypes);
+            if (!string.IsNullOrEmpty(contentTypeHeader))
+            {
+                headers.Add("Content-Type", contentTypeHeader);
+            }
+            else if (httpMethod == "POST" || httpMethod == "PATCH")
+            {
+                headers.Add("Content-Type", "application/json");
+            }
+
+
+            // We also check if there are headers that are defined as part of
+            // the request configuration.
+            if (operationConfiguration != null && operationConfiguration.Headers != null)
+            {
+                foreach (var pair in operationConfiguration.Headers)
+                {
+                    headers[pair.Key] = pair.Value;
+                }
+            }
+
+            return headers;
+        }
+    }
     /// <summary>
     /// DeleteItemsRequest
     /// Delete Player Items
@@ -425,11 +646,9 @@ namespace Unity.Services.CloudSave.Internal.Data
         /// <summary>Accessor for projectId </summary>
         [Preserve]
         public string ProjectId { get; }
-
         /// <summary>Accessor for playerId </summary>
         [Preserve]
         public string PlayerId { get; }
-
         string PathAndQueryParams;
 
         /// <summary>
@@ -480,7 +699,7 @@ namespace Unity.Services.CloudSave.Internal.Data
             Configuration operationConfiguration = null)
         {
             var headers = new Dictionary<string, string>();
-            if (!string.IsNullOrEmpty(accessToken.AccessToken))
+            if(!string.IsNullOrEmpty(accessToken.AccessToken))
             {
                 headers.Add("authorization", "Bearer " + accessToken.AccessToken);
             }
@@ -489,16 +708,18 @@ namespace Unity.Services.CloudSave.Internal.Data
             headers.Add("Unity-Client-Version", Application.unityVersion);
             headers.Add("Unity-Client-Mode", Scheduler.EngineStateHelper.IsPlaying ? "play" : "edit");
 
-            string[] contentTypes = { };
+            string[] contentTypes = {
+            };
 
-            string[] accepts = { "application/problem+json" };
+            string[] accepts = {
+                "application/problem+json"
+            };
 
             var acceptHeader = GenerateAcceptHeader(accepts);
             if (!string.IsNullOrEmpty(acceptHeader))
             {
                 headers.Add("Accept", acceptHeader);
             }
-
             var httpMethod = "DELETE";
             var contentTypeHeader = GenerateContentTypeHeader(contentTypes);
             if (!string.IsNullOrEmpty(contentTypeHeader))
@@ -524,65 +745,53 @@ namespace Unity.Services.CloudSave.Internal.Data
             return headers;
         }
     }
-
     /// <summary>
-    /// GetItemsRequest
-    /// Get Player Items
+    /// DeletePrivateCustomItemRequest
+    /// Delete Private Custom Item
     /// </summary>
     [Preserve]
-    internal class GetItemsRequest : DataApiBaseRequest
+    internal class DeletePrivateCustomItemRequest : DataApiBaseRequest
     {
+        /// <summary>Accessor for key </summary>
+        [Preserve]
+        public string Key { get; }
         /// <summary>Accessor for projectId </summary>
         [Preserve]
         public string ProjectId { get; }
-
-        /// <summary>Accessor for playerId </summary>
+        /// <summary>Accessor for customId </summary>
         [Preserve]
-        public string PlayerId { get; }
-
-        /// <summary>Accessor for keys </summary>
+        public string CustomId { get; }
+        /// <summary>Accessor for writeLock </summary>
         [Preserve]
-        public List<string> Keys { get; }
-
-        /// <summary>Accessor for after </summary>
-        [Preserve]
-        public string After { get; }
-
+        public string WriteLock { get; }
         string PathAndQueryParams;
 
         /// <summary>
-        /// GetItems Request Object.
-        /// Get Player Items
+        /// DeletePrivateCustomItem Request Object.
+        /// Delete Private Custom Item
         /// </summary>
+        /// <param name="key">Item key.</param>
         /// <param name="projectId">ID of the project.</param>
-        /// <param name="playerId">The player ID supplied by the Authorization service.</param>
-        /// <param name="keys">The keys to retrieve, in exploded form style, e.g. `keys=KEY1&keys=KEY2&keys=KEY3`.</param>
-        /// <param name="after">The key after which to retrieve the next page of keys.</param>
+        /// <param name="customId">The custom data ID specified by the user. Must be between 1 and 50 characters long and contain only alphanumeric characters, underscores, and hyphens.</param>
+        /// <param name="writeLock">Enforces conflict checking when deleting an existing data item. Omitting this field ignores write conflicts. When present, an error response will be returned if the writeLock in the request does not match the stored writeLock.</param>
         [Preserve]
-        public GetItemsRequest(string projectId, string playerId, List<string> keys = default(List<string>),
-            string after = default(string))
+        public DeletePrivateCustomItemRequest(string key, string projectId, string customId, string writeLock = default(string))
         {
+            Key = key;
+
             ProjectId = projectId;
 
-            PlayerId = playerId;
+            CustomId = customId;
 
-            Keys = keys;
-            After = after;
-            PathAndQueryParams = $"/v1/data/projects/{projectId}/players/{playerId}/items";
+            WriteLock = writeLock;
+            PathAndQueryParams = $"/v1/data/projects/{projectId}/custom/{customId}/private/items/{key}";
 
             List<string> queryParams = new List<string>();
 
-            if (Keys != null)
+            if(!string.IsNullOrEmpty(WriteLock))
             {
-                var keysStringValues = Keys.Select(v => v.ToString()).ToList();
-                queryParams = AddParamsToQueryParams(queryParams, "keys", keysStringValues, "form", true);
+                queryParams = AddParamsToQueryParams(queryParams, "writeLock", WriteLock);
             }
-
-            if (!string.IsNullOrEmpty(After))
-            {
-                queryParams = AddParamsToQueryParams(queryParams, "after", After);
-            }
-
             if (queryParams.Count > 0)
             {
                 PathAndQueryParams = $"{PathAndQueryParams}?{string.Join("&", queryParams)}";
@@ -619,7 +828,7 @@ namespace Unity.Services.CloudSave.Internal.Data
             Configuration operationConfiguration = null)
         {
             var headers = new Dictionary<string, string>();
-            if (!string.IsNullOrEmpty(accessToken.AccessToken))
+            if(!string.IsNullOrEmpty(accessToken.AccessToken))
             {
                 headers.Add("authorization", "Bearer " + accessToken.AccessToken);
             }
@@ -628,16 +837,737 @@ namespace Unity.Services.CloudSave.Internal.Data
             headers.Add("Unity-Client-Version", Application.unityVersion);
             headers.Add("Unity-Client-Mode", Scheduler.EngineStateHelper.IsPlaying ? "play" : "edit");
 
-            string[] contentTypes = { };
+            string[] contentTypes = {
+            };
 
-            string[] accepts = { "application/json", "application/problem+json" };
+            string[] accepts = {
+                "application/problem+json"
+            };
 
             var acceptHeader = GenerateAcceptHeader(accepts);
             if (!string.IsNullOrEmpty(acceptHeader))
             {
                 headers.Add("Accept", acceptHeader);
             }
+            var httpMethod = "DELETE";
+            var contentTypeHeader = GenerateContentTypeHeader(contentTypes);
+            if (!string.IsNullOrEmpty(contentTypeHeader))
+            {
+                headers.Add("Content-Type", contentTypeHeader);
+            }
+            else if (httpMethod == "POST" || httpMethod == "PATCH")
+            {
+                headers.Add("Content-Type", "application/json");
+            }
 
+
+            // We also check if there are headers that are defined as part of
+            // the request configuration.
+            if (operationConfiguration != null && operationConfiguration.Headers != null)
+            {
+                foreach (var pair in operationConfiguration.Headers)
+                {
+                    headers[pair.Key] = pair.Value;
+                }
+            }
+
+            return headers;
+        }
+    }
+    /// <summary>
+    /// DeletePrivateCustomItemsRequest
+    /// Delete Private Custom Items
+    /// </summary>
+    [Preserve]
+    internal class DeletePrivateCustomItemsRequest : DataApiBaseRequest
+    {
+        /// <summary>Accessor for projectId </summary>
+        [Preserve]
+        public string ProjectId { get; }
+        /// <summary>Accessor for customId </summary>
+        [Preserve]
+        public string CustomId { get; }
+        string PathAndQueryParams;
+
+        /// <summary>
+        /// DeletePrivateCustomItems Request Object.
+        /// Delete Private Custom Items
+        /// </summary>
+        /// <param name="projectId">ID of the project.</param>
+        /// <param name="customId">The custom data ID specified by the user. Must be between 1 and 50 characters long and contain only alphanumeric characters, underscores, and hyphens.</param>
+        [Preserve]
+        public DeletePrivateCustomItemsRequest(string projectId, string customId)
+        {
+            ProjectId = projectId;
+
+            CustomId = customId;
+
+            PathAndQueryParams = $"/v1/data/projects/{projectId}/custom/{customId}/private/items";
+
+
+        }
+
+        /// <summary>
+        /// Helper function for constructing URL from request base path and
+        /// query params.
+        /// </summary>
+        /// <param name="requestBasePath"></param>
+        /// <returns></returns>
+        public string ConstructUrl(string requestBasePath)
+        {
+            return requestBasePath + PathAndQueryParams;
+        }
+
+        /// <summary>
+        /// Helper for constructing the request body.
+        /// </summary>
+        /// <returns>A list of IMultipartFormSection representing the request body.</returns>
+        public byte[] ConstructBody()
+        {
+            return null;
+        }
+
+        /// <summary>
+        /// Helper function for constructing the headers.
+        /// </summary>
+        /// <param name="accessToken">The auth access token to use.</param>
+        /// <param name="operationConfiguration">The operation configuration to use.</param>
+        /// <returns>A dictionary representing the request headers.</returns>
+        public Dictionary<string, string> ConstructHeaders(IAccessToken accessToken,
+            Configuration operationConfiguration = null)
+        {
+            var headers = new Dictionary<string, string>();
+            if(!string.IsNullOrEmpty(accessToken.AccessToken))
+            {
+                headers.Add("authorization", "Bearer " + accessToken.AccessToken);
+            }
+
+            // Analytics headers
+            headers.Add("Unity-Client-Version", Application.unityVersion);
+            headers.Add("Unity-Client-Mode", Scheduler.EngineStateHelper.IsPlaying ? "play" : "edit");
+
+            string[] contentTypes = {
+            };
+
+            string[] accepts = {
+                "application/problem+json"
+            };
+
+            var acceptHeader = GenerateAcceptHeader(accepts);
+            if (!string.IsNullOrEmpty(acceptHeader))
+            {
+                headers.Add("Accept", acceptHeader);
+            }
+            var httpMethod = "DELETE";
+            var contentTypeHeader = GenerateContentTypeHeader(contentTypes);
+            if (!string.IsNullOrEmpty(contentTypeHeader))
+            {
+                headers.Add("Content-Type", contentTypeHeader);
+            }
+            else if (httpMethod == "POST" || httpMethod == "PATCH")
+            {
+                headers.Add("Content-Type", "application/json");
+            }
+
+
+            // We also check if there are headers that are defined as part of
+            // the request configuration.
+            if (operationConfiguration != null && operationConfiguration.Headers != null)
+            {
+                foreach (var pair in operationConfiguration.Headers)
+                {
+                    headers[pair.Key] = pair.Value;
+                }
+            }
+
+            return headers;
+        }
+    }
+    /// <summary>
+    /// DeleteProtectedItemRequest
+    /// Delete Protected Player Item
+    /// </summary>
+    [Preserve]
+    internal class DeleteProtectedItemRequest : DataApiBaseRequest
+    {
+        /// <summary>Accessor for key </summary>
+        [Preserve]
+        public string Key { get; }
+        /// <summary>Accessor for projectId </summary>
+        [Preserve]
+        public string ProjectId { get; }
+        /// <summary>Accessor for playerId </summary>
+        [Preserve]
+        public string PlayerId { get; }
+        /// <summary>Accessor for writeLock </summary>
+        [Preserve]
+        public string WriteLock { get; }
+        string PathAndQueryParams;
+
+        /// <summary>
+        /// DeleteProtectedItem Request Object.
+        /// Delete Protected Player Item
+        /// </summary>
+        /// <param name="key">Item key.</param>
+        /// <param name="projectId">ID of the project.</param>
+        /// <param name="playerId">The player ID supplied by the Authorization service.</param>
+        /// <param name="writeLock">Enforces conflict checking when deleting an existing data item. Omitting this field ignores write conflicts. When present, an error response will be returned if the writeLock in the request does not match the stored writeLock.</param>
+        [Preserve]
+        public DeleteProtectedItemRequest(string key, string projectId, string playerId, string writeLock = default(string))
+        {
+            Key = key;
+
+            ProjectId = projectId;
+
+            PlayerId = playerId;
+
+            WriteLock = writeLock;
+            PathAndQueryParams = $"/v1/data/projects/{projectId}/players/{playerId}/protected/items/{key}";
+
+            List<string> queryParams = new List<string>();
+
+            if(!string.IsNullOrEmpty(WriteLock))
+            {
+                queryParams = AddParamsToQueryParams(queryParams, "writeLock", WriteLock);
+            }
+            if (queryParams.Count > 0)
+            {
+                PathAndQueryParams = $"{PathAndQueryParams}?{string.Join("&", queryParams)}";
+            }
+        }
+
+        /// <summary>
+        /// Helper function for constructing URL from request base path and
+        /// query params.
+        /// </summary>
+        /// <param name="requestBasePath"></param>
+        /// <returns></returns>
+        public string ConstructUrl(string requestBasePath)
+        {
+            return requestBasePath + PathAndQueryParams;
+        }
+
+        /// <summary>
+        /// Helper for constructing the request body.
+        /// </summary>
+        /// <returns>A list of IMultipartFormSection representing the request body.</returns>
+        public byte[] ConstructBody()
+        {
+            return null;
+        }
+
+        /// <summary>
+        /// Helper function for constructing the headers.
+        /// </summary>
+        /// <param name="accessToken">The auth access token to use.</param>
+        /// <param name="operationConfiguration">The operation configuration to use.</param>
+        /// <returns>A dictionary representing the request headers.</returns>
+        public Dictionary<string, string> ConstructHeaders(IAccessToken accessToken,
+            Configuration operationConfiguration = null)
+        {
+            var headers = new Dictionary<string, string>();
+            if(!string.IsNullOrEmpty(accessToken.AccessToken))
+            {
+                headers.Add("authorization", "Bearer " + accessToken.AccessToken);
+            }
+
+            // Analytics headers
+            headers.Add("Unity-Client-Version", Application.unityVersion);
+            headers.Add("Unity-Client-Mode", Scheduler.EngineStateHelper.IsPlaying ? "play" : "edit");
+
+            string[] contentTypes = {
+            };
+
+            string[] accepts = {
+                "application/problem+json"
+            };
+
+            var acceptHeader = GenerateAcceptHeader(accepts);
+            if (!string.IsNullOrEmpty(acceptHeader))
+            {
+                headers.Add("Accept", acceptHeader);
+            }
+            var httpMethod = "DELETE";
+            var contentTypeHeader = GenerateContentTypeHeader(contentTypes);
+            if (!string.IsNullOrEmpty(contentTypeHeader))
+            {
+                headers.Add("Content-Type", contentTypeHeader);
+            }
+            else if (httpMethod == "POST" || httpMethod == "PATCH")
+            {
+                headers.Add("Content-Type", "application/json");
+            }
+
+
+            // We also check if there are headers that are defined as part of
+            // the request configuration.
+            if (operationConfiguration != null && operationConfiguration.Headers != null)
+            {
+                foreach (var pair in operationConfiguration.Headers)
+                {
+                    headers[pair.Key] = pair.Value;
+                }
+            }
+
+            return headers;
+        }
+    }
+    /// <summary>
+    /// DeleteProtectedItemsRequest
+    /// Delete Protected Player Items
+    /// </summary>
+    [Preserve]
+    internal class DeleteProtectedItemsRequest : DataApiBaseRequest
+    {
+        /// <summary>Accessor for projectId </summary>
+        [Preserve]
+        public string ProjectId { get; }
+        /// <summary>Accessor for playerId </summary>
+        [Preserve]
+        public string PlayerId { get; }
+        string PathAndQueryParams;
+
+        /// <summary>
+        /// DeleteProtectedItems Request Object.
+        /// Delete Protected Player Items
+        /// </summary>
+        /// <param name="projectId">ID of the project.</param>
+        /// <param name="playerId">The player ID supplied by the Authorization service.</param>
+        [Preserve]
+        public DeleteProtectedItemsRequest(string projectId, string playerId)
+        {
+            ProjectId = projectId;
+
+            PlayerId = playerId;
+
+            PathAndQueryParams = $"/v1/data/projects/{projectId}/players/{playerId}/protected/items";
+
+
+        }
+
+        /// <summary>
+        /// Helper function for constructing URL from request base path and
+        /// query params.
+        /// </summary>
+        /// <param name="requestBasePath"></param>
+        /// <returns></returns>
+        public string ConstructUrl(string requestBasePath)
+        {
+            return requestBasePath + PathAndQueryParams;
+        }
+
+        /// <summary>
+        /// Helper for constructing the request body.
+        /// </summary>
+        /// <returns>A list of IMultipartFormSection representing the request body.</returns>
+        public byte[] ConstructBody()
+        {
+            return null;
+        }
+
+        /// <summary>
+        /// Helper function for constructing the headers.
+        /// </summary>
+        /// <param name="accessToken">The auth access token to use.</param>
+        /// <param name="operationConfiguration">The operation configuration to use.</param>
+        /// <returns>A dictionary representing the request headers.</returns>
+        public Dictionary<string, string> ConstructHeaders(IAccessToken accessToken,
+            Configuration operationConfiguration = null)
+        {
+            var headers = new Dictionary<string, string>();
+            if(!string.IsNullOrEmpty(accessToken.AccessToken))
+            {
+                headers.Add("authorization", "Bearer " + accessToken.AccessToken);
+            }
+
+            // Analytics headers
+            headers.Add("Unity-Client-Version", Application.unityVersion);
+            headers.Add("Unity-Client-Mode", Scheduler.EngineStateHelper.IsPlaying ? "play" : "edit");
+
+            string[] contentTypes = {
+            };
+
+            string[] accepts = {
+                "application/problem+json"
+            };
+
+            var acceptHeader = GenerateAcceptHeader(accepts);
+            if (!string.IsNullOrEmpty(acceptHeader))
+            {
+                headers.Add("Accept", acceptHeader);
+            }
+            var httpMethod = "DELETE";
+            var contentTypeHeader = GenerateContentTypeHeader(contentTypes);
+            if (!string.IsNullOrEmpty(contentTypeHeader))
+            {
+                headers.Add("Content-Type", contentTypeHeader);
+            }
+            else if (httpMethod == "POST" || httpMethod == "PATCH")
+            {
+                headers.Add("Content-Type", "application/json");
+            }
+
+
+            // We also check if there are headers that are defined as part of
+            // the request configuration.
+            if (operationConfiguration != null && operationConfiguration.Headers != null)
+            {
+                foreach (var pair in operationConfiguration.Headers)
+                {
+                    headers[pair.Key] = pair.Value;
+                }
+            }
+
+            return headers;
+        }
+    }
+    /// <summary>
+    /// DeletePublicItemRequest
+    /// Delete Public Player Item
+    /// </summary>
+    [Preserve]
+    internal class DeletePublicItemRequest : DataApiBaseRequest
+    {
+        /// <summary>Accessor for key </summary>
+        [Preserve]
+        public string Key { get; }
+        /// <summary>Accessor for projectId </summary>
+        [Preserve]
+        public string ProjectId { get; }
+        /// <summary>Accessor for playerId </summary>
+        [Preserve]
+        public string PlayerId { get; }
+        /// <summary>Accessor for writeLock </summary>
+        [Preserve]
+        public string WriteLock { get; }
+        string PathAndQueryParams;
+
+        /// <summary>
+        /// DeletePublicItem Request Object.
+        /// Delete Public Player Item
+        /// </summary>
+        /// <param name="key">Item key.</param>
+        /// <param name="projectId">ID of the project.</param>
+        /// <param name="playerId">The player ID supplied by the Authorization service.</param>
+        /// <param name="writeLock">Enforces conflict checking when deleting an existing data item. Omitting this field ignores write conflicts. When present, an error response will be returned if the writeLock in the request does not match the stored writeLock.</param>
+        [Preserve]
+        public DeletePublicItemRequest(string key, string projectId, string playerId, string writeLock = default(string))
+        {
+            Key = key;
+
+            ProjectId = projectId;
+
+            PlayerId = playerId;
+
+            WriteLock = writeLock;
+            PathAndQueryParams = $"/v1/data/projects/{projectId}/players/{playerId}/public/items/{key}";
+
+            List<string> queryParams = new List<string>();
+
+            if(!string.IsNullOrEmpty(WriteLock))
+            {
+                queryParams = AddParamsToQueryParams(queryParams, "writeLock", WriteLock);
+            }
+            if (queryParams.Count > 0)
+            {
+                PathAndQueryParams = $"{PathAndQueryParams}?{string.Join("&", queryParams)}";
+            }
+        }
+
+        /// <summary>
+        /// Helper function for constructing URL from request base path and
+        /// query params.
+        /// </summary>
+        /// <param name="requestBasePath"></param>
+        /// <returns></returns>
+        public string ConstructUrl(string requestBasePath)
+        {
+            return requestBasePath + PathAndQueryParams;
+        }
+
+        /// <summary>
+        /// Helper for constructing the request body.
+        /// </summary>
+        /// <returns>A list of IMultipartFormSection representing the request body.</returns>
+        public byte[] ConstructBody()
+        {
+            return null;
+        }
+
+        /// <summary>
+        /// Helper function for constructing the headers.
+        /// </summary>
+        /// <param name="accessToken">The auth access token to use.</param>
+        /// <param name="operationConfiguration">The operation configuration to use.</param>
+        /// <returns>A dictionary representing the request headers.</returns>
+        public Dictionary<string, string> ConstructHeaders(IAccessToken accessToken,
+            Configuration operationConfiguration = null)
+        {
+            var headers = new Dictionary<string, string>();
+            if(!string.IsNullOrEmpty(accessToken.AccessToken))
+            {
+                headers.Add("authorization", "Bearer " + accessToken.AccessToken);
+            }
+
+            // Analytics headers
+            headers.Add("Unity-Client-Version", Application.unityVersion);
+            headers.Add("Unity-Client-Mode", Scheduler.EngineStateHelper.IsPlaying ? "play" : "edit");
+
+            string[] contentTypes = {
+            };
+
+            string[] accepts = {
+                "application/problem+json"
+            };
+
+            var acceptHeader = GenerateAcceptHeader(accepts);
+            if (!string.IsNullOrEmpty(acceptHeader))
+            {
+                headers.Add("Accept", acceptHeader);
+            }
+            var httpMethod = "DELETE";
+            var contentTypeHeader = GenerateContentTypeHeader(contentTypes);
+            if (!string.IsNullOrEmpty(contentTypeHeader))
+            {
+                headers.Add("Content-Type", contentTypeHeader);
+            }
+            else if (httpMethod == "POST" || httpMethod == "PATCH")
+            {
+                headers.Add("Content-Type", "application/json");
+            }
+
+
+            // We also check if there are headers that are defined as part of
+            // the request configuration.
+            if (operationConfiguration != null && operationConfiguration.Headers != null)
+            {
+                foreach (var pair in operationConfiguration.Headers)
+                {
+                    headers[pair.Key] = pair.Value;
+                }
+            }
+
+            return headers;
+        }
+    }
+    /// <summary>
+    /// DeletePublicItemsRequest
+    /// Delete Public Player Items
+    /// </summary>
+    [Preserve]
+    internal class DeletePublicItemsRequest : DataApiBaseRequest
+    {
+        /// <summary>Accessor for projectId </summary>
+        [Preserve]
+        public string ProjectId { get; }
+        /// <summary>Accessor for playerId </summary>
+        [Preserve]
+        public string PlayerId { get; }
+        string PathAndQueryParams;
+
+        /// <summary>
+        /// DeletePublicItems Request Object.
+        /// Delete Public Player Items
+        /// </summary>
+        /// <param name="projectId">ID of the project.</param>
+        /// <param name="playerId">The player ID supplied by the Authorization service.</param>
+        [Preserve]
+        public DeletePublicItemsRequest(string projectId, string playerId)
+        {
+            ProjectId = projectId;
+
+            PlayerId = playerId;
+
+            PathAndQueryParams = $"/v1/data/projects/{projectId}/players/{playerId}/public/items";
+
+
+        }
+
+        /// <summary>
+        /// Helper function for constructing URL from request base path and
+        /// query params.
+        /// </summary>
+        /// <param name="requestBasePath"></param>
+        /// <returns></returns>
+        public string ConstructUrl(string requestBasePath)
+        {
+            return requestBasePath + PathAndQueryParams;
+        }
+
+        /// <summary>
+        /// Helper for constructing the request body.
+        /// </summary>
+        /// <returns>A list of IMultipartFormSection representing the request body.</returns>
+        public byte[] ConstructBody()
+        {
+            return null;
+        }
+
+        /// <summary>
+        /// Helper function for constructing the headers.
+        /// </summary>
+        /// <param name="accessToken">The auth access token to use.</param>
+        /// <param name="operationConfiguration">The operation configuration to use.</param>
+        /// <returns>A dictionary representing the request headers.</returns>
+        public Dictionary<string, string> ConstructHeaders(IAccessToken accessToken,
+            Configuration operationConfiguration = null)
+        {
+            var headers = new Dictionary<string, string>();
+            if(!string.IsNullOrEmpty(accessToken.AccessToken))
+            {
+                headers.Add("authorization", "Bearer " + accessToken.AccessToken);
+            }
+
+            // Analytics headers
+            headers.Add("Unity-Client-Version", Application.unityVersion);
+            headers.Add("Unity-Client-Mode", Scheduler.EngineStateHelper.IsPlaying ? "play" : "edit");
+
+            string[] contentTypes = {
+            };
+
+            string[] accepts = {
+                "application/problem+json"
+            };
+
+            var acceptHeader = GenerateAcceptHeader(accepts);
+            if (!string.IsNullOrEmpty(acceptHeader))
+            {
+                headers.Add("Accept", acceptHeader);
+            }
+            var httpMethod = "DELETE";
+            var contentTypeHeader = GenerateContentTypeHeader(contentTypes);
+            if (!string.IsNullOrEmpty(contentTypeHeader))
+            {
+                headers.Add("Content-Type", contentTypeHeader);
+            }
+            else if (httpMethod == "POST" || httpMethod == "PATCH")
+            {
+                headers.Add("Content-Type", "application/json");
+            }
+
+
+            // We also check if there are headers that are defined as part of
+            // the request configuration.
+            if (operationConfiguration != null && operationConfiguration.Headers != null)
+            {
+                foreach (var pair in operationConfiguration.Headers)
+                {
+                    headers[pair.Key] = pair.Value;
+                }
+            }
+
+            return headers;
+        }
+    }
+    /// <summary>
+    /// GetCustomItemsRequest
+    /// Get Custom Items
+    /// </summary>
+    [Preserve]
+    internal class GetCustomItemsRequest : DataApiBaseRequest
+    {
+        /// <summary>Accessor for projectId </summary>
+        [Preserve]
+        public string ProjectId { get; }
+        /// <summary>Accessor for customId </summary>
+        [Preserve]
+        public string CustomId { get; }
+        /// <summary>Accessor for keys </summary>
+        [Preserve]
+        public List<string> Keys { get; }
+        /// <summary>Accessor for after </summary>
+        [Preserve]
+        public string After { get; }
+        string PathAndQueryParams;
+
+        /// <summary>
+        /// GetCustomItems Request Object.
+        /// Get Custom Items
+        /// </summary>
+        /// <param name="projectId">ID of the project.</param>
+        /// <param name="customId">The custom data ID specified by the user. Must be between 1 and 50 characters long and contain only alphanumeric characters, underscores, and hyphens.</param>
+        /// <param name="keys">The keys to retrieve, in exploded form style, e.g. `keys=KEY1&keys=KEY2&keys=KEY3`.</param>
+        /// <param name="after">The key after which to retrieve the next page of keys.</param>
+        [Preserve]
+        public GetCustomItemsRequest(string projectId, string customId, List<string> keys = default(List<string>), string after = default(string))
+        {
+            ProjectId = projectId;
+
+            CustomId = customId;
+
+            Keys = keys;
+            After = after;
+            PathAndQueryParams = $"/v1/data/projects/{projectId}/custom/{customId}/items";
+
+            List<string> queryParams = new List<string>();
+
+            if(Keys != null)
+            {
+                var keysStringValues = Keys.Select(v => v.ToString()).ToList();
+                queryParams = AddParamsToQueryParams(queryParams, "keys", keysStringValues, "form", true);
+            }
+            if(!string.IsNullOrEmpty(After))
+            {
+                queryParams = AddParamsToQueryParams(queryParams, "after", After);
+            }
+            if (queryParams.Count > 0)
+            {
+                PathAndQueryParams = $"{PathAndQueryParams}?{string.Join("&", queryParams)}";
+            }
+        }
+
+        /// <summary>
+        /// Helper function for constructing URL from request base path and
+        /// query params.
+        /// </summary>
+        /// <param name="requestBasePath"></param>
+        /// <returns></returns>
+        public string ConstructUrl(string requestBasePath)
+        {
+            return requestBasePath + PathAndQueryParams;
+        }
+
+        /// <summary>
+        /// Helper for constructing the request body.
+        /// </summary>
+        /// <returns>A list of IMultipartFormSection representing the request body.</returns>
+        public byte[] ConstructBody()
+        {
+            return null;
+        }
+
+        /// <summary>
+        /// Helper function for constructing the headers.
+        /// </summary>
+        /// <param name="accessToken">The auth access token to use.</param>
+        /// <param name="operationConfiguration">The operation configuration to use.</param>
+        /// <returns>A dictionary representing the request headers.</returns>
+        public Dictionary<string, string> ConstructHeaders(IAccessToken accessToken,
+            Configuration operationConfiguration = null)
+        {
+            var headers = new Dictionary<string, string>();
+            if(!string.IsNullOrEmpty(accessToken.AccessToken))
+            {
+                headers.Add("authorization", "Bearer " + accessToken.AccessToken);
+            }
+
+            // Analytics headers
+            headers.Add("Unity-Client-Version", Application.unityVersion);
+            headers.Add("Unity-Client-Mode", Scheduler.EngineStateHelper.IsPlaying ? "play" : "edit");
+
+            string[] contentTypes = {
+            };
+
+            string[] accepts = {
+                "application/json",
+                "application/problem+json"
+            };
+
+            var acceptHeader = GenerateAcceptHeader(accepts);
+            if (!string.IsNullOrEmpty(acceptHeader))
+            {
+                headers.Add("Accept", acceptHeader);
+            }
             var httpMethod = "GET";
             var contentTypeHeader = GenerateContentTypeHeader(contentTypes);
             if (!string.IsNullOrEmpty(contentTypeHeader))
@@ -663,7 +1593,264 @@ namespace Unity.Services.CloudSave.Internal.Data
             return headers;
         }
     }
+    /// <summary>
+    /// GetCustomKeysRequest
+    /// Get Custom Keys
+    /// </summary>
+    [Preserve]
+    internal class GetCustomKeysRequest : DataApiBaseRequest
+    {
+        /// <summary>Accessor for projectId </summary>
+        [Preserve]
+        public string ProjectId { get; }
+        /// <summary>Accessor for customId </summary>
+        [Preserve]
+        public string CustomId { get; }
+        /// <summary>Accessor for after </summary>
+        [Preserve]
+        public string After { get; }
+        string PathAndQueryParams;
 
+        /// <summary>
+        /// GetCustomKeys Request Object.
+        /// Get Custom Keys
+        /// </summary>
+        /// <param name="projectId">ID of the project.</param>
+        /// <param name="customId">The custom data ID specified by the user. Must be between 1 and 50 characters long and contain only alphanumeric characters, underscores, and hyphens.</param>
+        /// <param name="after">Returns the page of results after the key specified.</param>
+        [Preserve]
+        public GetCustomKeysRequest(string projectId, string customId, string after = default(string))
+        {
+            ProjectId = projectId;
+
+            CustomId = customId;
+
+            After = after;
+            PathAndQueryParams = $"/v1/data/projects/{projectId}/custom/{customId}/keys";
+
+            List<string> queryParams = new List<string>();
+
+            if(!string.IsNullOrEmpty(After))
+            {
+                queryParams = AddParamsToQueryParams(queryParams, "after", After);
+            }
+            if (queryParams.Count > 0)
+            {
+                PathAndQueryParams = $"{PathAndQueryParams}?{string.Join("&", queryParams)}";
+            }
+        }
+
+        /// <summary>
+        /// Helper function for constructing URL from request base path and
+        /// query params.
+        /// </summary>
+        /// <param name="requestBasePath"></param>
+        /// <returns></returns>
+        public string ConstructUrl(string requestBasePath)
+        {
+            return requestBasePath + PathAndQueryParams;
+        }
+
+        /// <summary>
+        /// Helper for constructing the request body.
+        /// </summary>
+        /// <returns>A list of IMultipartFormSection representing the request body.</returns>
+        public byte[] ConstructBody()
+        {
+            return null;
+        }
+
+        /// <summary>
+        /// Helper function for constructing the headers.
+        /// </summary>
+        /// <param name="accessToken">The auth access token to use.</param>
+        /// <param name="operationConfiguration">The operation configuration to use.</param>
+        /// <returns>A dictionary representing the request headers.</returns>
+        public Dictionary<string, string> ConstructHeaders(IAccessToken accessToken,
+            Configuration operationConfiguration = null)
+        {
+            var headers = new Dictionary<string, string>();
+            if(!string.IsNullOrEmpty(accessToken.AccessToken))
+            {
+                headers.Add("authorization", "Bearer " + accessToken.AccessToken);
+            }
+
+            // Analytics headers
+            headers.Add("Unity-Client-Version", Application.unityVersion);
+            headers.Add("Unity-Client-Mode", Scheduler.EngineStateHelper.IsPlaying ? "play" : "edit");
+
+            string[] contentTypes = {
+            };
+
+            string[] accepts = {
+                "application/json",
+                "application/problem+json"
+            };
+
+            var acceptHeader = GenerateAcceptHeader(accepts);
+            if (!string.IsNullOrEmpty(acceptHeader))
+            {
+                headers.Add("Accept", acceptHeader);
+            }
+            var httpMethod = "GET";
+            var contentTypeHeader = GenerateContentTypeHeader(contentTypes);
+            if (!string.IsNullOrEmpty(contentTypeHeader))
+            {
+                headers.Add("Content-Type", contentTypeHeader);
+            }
+            else if (httpMethod == "POST" || httpMethod == "PATCH")
+            {
+                headers.Add("Content-Type", "application/json");
+            }
+
+
+            // We also check if there are headers that are defined as part of
+            // the request configuration.
+            if (operationConfiguration != null && operationConfiguration.Headers != null)
+            {
+                foreach (var pair in operationConfiguration.Headers)
+                {
+                    headers[pair.Key] = pair.Value;
+                }
+            }
+
+            return headers;
+        }
+    }
+    /// <summary>
+    /// GetItemsRequest
+    /// Get Player Items
+    /// </summary>
+    [Preserve]
+    internal class GetItemsRequest : DataApiBaseRequest
+    {
+        /// <summary>Accessor for projectId </summary>
+        [Preserve]
+        public string ProjectId { get; }
+        /// <summary>Accessor for playerId </summary>
+        [Preserve]
+        public string PlayerId { get; }
+        /// <summary>Accessor for keys </summary>
+        [Preserve]
+        public List<string> Keys { get; }
+        /// <summary>Accessor for after </summary>
+        [Preserve]
+        public string After { get; }
+        string PathAndQueryParams;
+
+        /// <summary>
+        /// GetItems Request Object.
+        /// Get Player Items
+        /// </summary>
+        /// <param name="projectId">ID of the project.</param>
+        /// <param name="playerId">The player ID supplied by the Authorization service.</param>
+        /// <param name="keys">The keys to retrieve, in exploded form style, e.g. `keys=KEY1&keys=KEY2&keys=KEY3`.</param>
+        /// <param name="after">The key after which to retrieve the next page of keys.</param>
+        [Preserve]
+        public GetItemsRequest(string projectId, string playerId, List<string> keys = default(List<string>), string after = default(string))
+        {
+            ProjectId = projectId;
+
+            PlayerId = playerId;
+
+            Keys = keys;
+            After = after;
+            PathAndQueryParams = $"/v1/data/projects/{projectId}/players/{playerId}/items";
+
+            List<string> queryParams = new List<string>();
+
+            if(Keys != null)
+            {
+                var keysStringValues = Keys.Select(v => v.ToString()).ToList();
+                queryParams = AddParamsToQueryParams(queryParams, "keys", keysStringValues, "form", true);
+            }
+            if(!string.IsNullOrEmpty(After))
+            {
+                queryParams = AddParamsToQueryParams(queryParams, "after", After);
+            }
+            if (queryParams.Count > 0)
+            {
+                PathAndQueryParams = $"{PathAndQueryParams}?{string.Join("&", queryParams)}";
+            }
+        }
+
+        /// <summary>
+        /// Helper function for constructing URL from request base path and
+        /// query params.
+        /// </summary>
+        /// <param name="requestBasePath"></param>
+        /// <returns></returns>
+        public string ConstructUrl(string requestBasePath)
+        {
+            return requestBasePath + PathAndQueryParams;
+        }
+
+        /// <summary>
+        /// Helper for constructing the request body.
+        /// </summary>
+        /// <returns>A list of IMultipartFormSection representing the request body.</returns>
+        public byte[] ConstructBody()
+        {
+            return null;
+        }
+
+        /// <summary>
+        /// Helper function for constructing the headers.
+        /// </summary>
+        /// <param name="accessToken">The auth access token to use.</param>
+        /// <param name="operationConfiguration">The operation configuration to use.</param>
+        /// <returns>A dictionary representing the request headers.</returns>
+        public Dictionary<string, string> ConstructHeaders(IAccessToken accessToken,
+            Configuration operationConfiguration = null)
+        {
+            var headers = new Dictionary<string, string>();
+            if(!string.IsNullOrEmpty(accessToken.AccessToken))
+            {
+                headers.Add("authorization", "Bearer " + accessToken.AccessToken);
+            }
+
+            // Analytics headers
+            headers.Add("Unity-Client-Version", Application.unityVersion);
+            headers.Add("Unity-Client-Mode", Scheduler.EngineStateHelper.IsPlaying ? "play" : "edit");
+
+            string[] contentTypes = {
+            };
+
+            string[] accepts = {
+                "application/json",
+                "application/problem+json"
+            };
+
+            var acceptHeader = GenerateAcceptHeader(accepts);
+            if (!string.IsNullOrEmpty(acceptHeader))
+            {
+                headers.Add("Accept", acceptHeader);
+            }
+            var httpMethod = "GET";
+            var contentTypeHeader = GenerateContentTypeHeader(contentTypes);
+            if (!string.IsNullOrEmpty(contentTypeHeader))
+            {
+                headers.Add("Content-Type", contentTypeHeader);
+            }
+            else if (httpMethod == "POST" || httpMethod == "PATCH")
+            {
+                headers.Add("Content-Type", "application/json");
+            }
+
+
+            // We also check if there are headers that are defined as part of
+            // the request configuration.
+            if (operationConfiguration != null && operationConfiguration.Headers != null)
+            {
+                foreach (var pair in operationConfiguration.Headers)
+                {
+                    headers[pair.Key] = pair.Value;
+                }
+            }
+
+            return headers;
+        }
+    }
     /// <summary>
     /// GetKeysRequest
     /// Get Player Keys
@@ -674,15 +1861,12 @@ namespace Unity.Services.CloudSave.Internal.Data
         /// <summary>Accessor for projectId </summary>
         [Preserve]
         public string ProjectId { get; }
-
         /// <summary>Accessor for playerId </summary>
         [Preserve]
         public string PlayerId { get; }
-
         /// <summary>Accessor for after </summary>
         [Preserve]
         public string After { get; }
-
         string PathAndQueryParams;
 
         /// <summary>
@@ -704,11 +1888,10 @@ namespace Unity.Services.CloudSave.Internal.Data
 
             List<string> queryParams = new List<string>();
 
-            if (!string.IsNullOrEmpty(After))
+            if(!string.IsNullOrEmpty(After))
             {
                 queryParams = AddParamsToQueryParams(queryParams, "after", After);
             }
-
             if (queryParams.Count > 0)
             {
                 PathAndQueryParams = $"{PathAndQueryParams}?{string.Join("&", queryParams)}";
@@ -745,7 +1928,7 @@ namespace Unity.Services.CloudSave.Internal.Data
             Configuration operationConfiguration = null)
         {
             var headers = new Dictionary<string, string>();
-            if (!string.IsNullOrEmpty(accessToken.AccessToken))
+            if(!string.IsNullOrEmpty(accessToken.AccessToken))
             {
                 headers.Add("authorization", "Bearer " + accessToken.AccessToken);
             }
@@ -754,16 +1937,19 @@ namespace Unity.Services.CloudSave.Internal.Data
             headers.Add("Unity-Client-Version", Application.unityVersion);
             headers.Add("Unity-Client-Mode", Scheduler.EngineStateHelper.IsPlaying ? "play" : "edit");
 
-            string[] contentTypes = { };
+            string[] contentTypes = {
+            };
 
-            string[] accepts = { "application/json", "application/problem+json" };
+            string[] accepts = {
+                "application/json",
+                "application/problem+json"
+            };
 
             var acceptHeader = GenerateAcceptHeader(accepts);
             if (!string.IsNullOrEmpty(acceptHeader))
             {
                 headers.Add("Accept", acceptHeader);
             }
-
             var httpMethod = "GET";
             var contentTypeHeader = GenerateContentTypeHeader(contentTypes);
             if (!string.IsNullOrEmpty(contentTypeHeader))
@@ -789,49 +1975,57 @@ namespace Unity.Services.CloudSave.Internal.Data
             return headers;
         }
     }
-
     /// <summary>
-    /// SetItemRequest
-    /// Set Player Item
+    /// GetPrivateCustomItemsRequest
+    /// Get Private Custom Items
     /// </summary>
     [Preserve]
-    internal class SetItemRequest : DataApiBaseRequest
+    internal class GetPrivateCustomItemsRequest : DataApiBaseRequest
     {
         /// <summary>Accessor for projectId </summary>
         [Preserve]
         public string ProjectId { get; }
-
-        /// <summary>Accessor for playerId </summary>
+        /// <summary>Accessor for customId </summary>
         [Preserve]
-        public string PlayerId { get; }
-
-        /// <summary>Accessor for setItemBody </summary>
+        public string CustomId { get; }
+        /// <summary>Accessor for keys </summary>
         [Preserve]
-        public Unity.Services.CloudSave.Internal.Models.SetItemBody SetItemBody { get; }
-
+        public List<string> Keys { get; }
+        /// <summary>Accessor for after </summary>
+        [Preserve]
+        public string After { get; }
         string PathAndQueryParams;
 
         /// <summary>
-        /// SetItem Request Object.
-        /// Set Player Item
+        /// GetPrivateCustomItems Request Object.
+        /// Get Private Custom Items
         /// </summary>
         /// <param name="projectId">ID of the project.</param>
-        /// <param name="playerId">The player ID supplied by the Authorization service.</param>
-        /// <param name="setItemBody">Add a data item to store for a player.</param>
+        /// <param name="customId">The custom data ID specified by the user. Must be between 1 and 50 characters long and contain only alphanumeric characters, underscores, and hyphens.</param>
+        /// <param name="keys">The keys to retrieve, in exploded form style, e.g. `keys=KEY1&keys=KEY2&keys=KEY3`.</param>
+        /// <param name="after">The key after which to retrieve the next page of keys.</param>
         [Preserve]
-        public SetItemRequest(string projectId, string playerId,
-            Unity.Services.CloudSave.Internal.Models.SetItemBody setItemBody =
-                default(Unity.Services.CloudSave.Internal.Models.SetItemBody))
+        public GetPrivateCustomItemsRequest(string projectId, string customId, List<string> keys = default(List<string>), string after = default(string))
         {
             ProjectId = projectId;
 
-            PlayerId = playerId;
+            CustomId = customId;
 
-            SetItemBody = setItemBody;
-            PathAndQueryParams = $"/v1/data/projects/{projectId}/players/{playerId}/items";
+            Keys = keys;
+            After = after;
+            PathAndQueryParams = $"/v1/data/projects/{projectId}/custom/{customId}/private/items";
 
             List<string> queryParams = new List<string>();
 
+            if(Keys != null)
+            {
+                var keysStringValues = Keys.Select(v => v.ToString()).ToList();
+                queryParams = AddParamsToQueryParams(queryParams, "keys", keysStringValues, "form", true);
+            }
+            if(!string.IsNullOrEmpty(After))
+            {
+                queryParams = AddParamsToQueryParams(queryParams, "after", After);
+            }
             if (queryParams.Count > 0)
             {
                 PathAndQueryParams = $"{PathAndQueryParams}?{string.Join("&", queryParams)}";
@@ -855,11 +2049,6 @@ namespace Unity.Services.CloudSave.Internal.Data
         /// <returns>A list of IMultipartFormSection representing the request body.</returns>
         public byte[] ConstructBody()
         {
-            if (SetItemBody != null)
-            {
-                return ConstructBody(SetItemBody);
-            }
-
             return null;
         }
 
@@ -873,7 +2062,7 @@ namespace Unity.Services.CloudSave.Internal.Data
             Configuration operationConfiguration = null)
         {
             var headers = new Dictionary<string, string>();
-            if (!string.IsNullOrEmpty(accessToken.AccessToken))
+            if(!string.IsNullOrEmpty(accessToken.AccessToken))
             {
                 headers.Add("authorization", "Bearer " + accessToken.AccessToken);
             }
@@ -882,16 +2071,773 @@ namespace Unity.Services.CloudSave.Internal.Data
             headers.Add("Unity-Client-Version", Application.unityVersion);
             headers.Add("Unity-Client-Mode", Scheduler.EngineStateHelper.IsPlaying ? "play" : "edit");
 
-            string[] contentTypes = { "application/json" };
+            string[] contentTypes = {
+            };
 
-            string[] accepts = { "application/json", "application/problem+json" };
+            string[] accepts = {
+                "application/json",
+                "application/problem+json"
+            };
 
             var acceptHeader = GenerateAcceptHeader(accepts);
             if (!string.IsNullOrEmpty(acceptHeader))
             {
                 headers.Add("Accept", acceptHeader);
             }
+            var httpMethod = "GET";
+            var contentTypeHeader = GenerateContentTypeHeader(contentTypes);
+            if (!string.IsNullOrEmpty(contentTypeHeader))
+            {
+                headers.Add("Content-Type", contentTypeHeader);
+            }
+            else if (httpMethod == "POST" || httpMethod == "PATCH")
+            {
+                headers.Add("Content-Type", "application/json");
+            }
 
+
+            // We also check if there are headers that are defined as part of
+            // the request configuration.
+            if (operationConfiguration != null && operationConfiguration.Headers != null)
+            {
+                foreach (var pair in operationConfiguration.Headers)
+                {
+                    headers[pair.Key] = pair.Value;
+                }
+            }
+
+            return headers;
+        }
+    }
+    /// <summary>
+    /// GetPrivateCustomKeysRequest
+    /// Get Private Custom Keys
+    /// </summary>
+    [Preserve]
+    internal class GetPrivateCustomKeysRequest : DataApiBaseRequest
+    {
+        /// <summary>Accessor for projectId </summary>
+        [Preserve]
+        public string ProjectId { get; }
+        /// <summary>Accessor for customId </summary>
+        [Preserve]
+        public string CustomId { get; }
+        /// <summary>Accessor for after </summary>
+        [Preserve]
+        public string After { get; }
+        string PathAndQueryParams;
+
+        /// <summary>
+        /// GetPrivateCustomKeys Request Object.
+        /// Get Private Custom Keys
+        /// </summary>
+        /// <param name="projectId">ID of the project.</param>
+        /// <param name="customId">The custom data ID specified by the user. Must be between 1 and 50 characters long and contain only alphanumeric characters, underscores, and hyphens.</param>
+        /// <param name="after">Returns the page of results after the key specified.</param>
+        [Preserve]
+        public GetPrivateCustomKeysRequest(string projectId, string customId, string after = default(string))
+        {
+            ProjectId = projectId;
+
+            CustomId = customId;
+
+            After = after;
+            PathAndQueryParams = $"/v1/data/projects/{projectId}/custom/{customId}/private/keys";
+
+            List<string> queryParams = new List<string>();
+
+            if(!string.IsNullOrEmpty(After))
+            {
+                queryParams = AddParamsToQueryParams(queryParams, "after", After);
+            }
+            if (queryParams.Count > 0)
+            {
+                PathAndQueryParams = $"{PathAndQueryParams}?{string.Join("&", queryParams)}";
+            }
+        }
+
+        /// <summary>
+        /// Helper function for constructing URL from request base path and
+        /// query params.
+        /// </summary>
+        /// <param name="requestBasePath"></param>
+        /// <returns></returns>
+        public string ConstructUrl(string requestBasePath)
+        {
+            return requestBasePath + PathAndQueryParams;
+        }
+
+        /// <summary>
+        /// Helper for constructing the request body.
+        /// </summary>
+        /// <returns>A list of IMultipartFormSection representing the request body.</returns>
+        public byte[] ConstructBody()
+        {
+            return null;
+        }
+
+        /// <summary>
+        /// Helper function for constructing the headers.
+        /// </summary>
+        /// <param name="accessToken">The auth access token to use.</param>
+        /// <param name="operationConfiguration">The operation configuration to use.</param>
+        /// <returns>A dictionary representing the request headers.</returns>
+        public Dictionary<string, string> ConstructHeaders(IAccessToken accessToken,
+            Configuration operationConfiguration = null)
+        {
+            var headers = new Dictionary<string, string>();
+            if(!string.IsNullOrEmpty(accessToken.AccessToken))
+            {
+                headers.Add("authorization", "Bearer " + accessToken.AccessToken);
+            }
+
+            // Analytics headers
+            headers.Add("Unity-Client-Version", Application.unityVersion);
+            headers.Add("Unity-Client-Mode", Scheduler.EngineStateHelper.IsPlaying ? "play" : "edit");
+
+            string[] contentTypes = {
+            };
+
+            string[] accepts = {
+                "application/json",
+                "application/problem+json"
+            };
+
+            var acceptHeader = GenerateAcceptHeader(accepts);
+            if (!string.IsNullOrEmpty(acceptHeader))
+            {
+                headers.Add("Accept", acceptHeader);
+            }
+            var httpMethod = "GET";
+            var contentTypeHeader = GenerateContentTypeHeader(contentTypes);
+            if (!string.IsNullOrEmpty(contentTypeHeader))
+            {
+                headers.Add("Content-Type", contentTypeHeader);
+            }
+            else if (httpMethod == "POST" || httpMethod == "PATCH")
+            {
+                headers.Add("Content-Type", "application/json");
+            }
+
+
+            // We also check if there are headers that are defined as part of
+            // the request configuration.
+            if (operationConfiguration != null && operationConfiguration.Headers != null)
+            {
+                foreach (var pair in operationConfiguration.Headers)
+                {
+                    headers[pair.Key] = pair.Value;
+                }
+            }
+
+            return headers;
+        }
+    }
+    /// <summary>
+    /// GetProtectedItemsRequest
+    /// Get Protected Player Items
+    /// </summary>
+    [Preserve]
+    internal class GetProtectedItemsRequest : DataApiBaseRequest
+    {
+        /// <summary>Accessor for projectId </summary>
+        [Preserve]
+        public string ProjectId { get; }
+        /// <summary>Accessor for playerId </summary>
+        [Preserve]
+        public string PlayerId { get; }
+        /// <summary>Accessor for keys </summary>
+        [Preserve]
+        public List<string> Keys { get; }
+        /// <summary>Accessor for after </summary>
+        [Preserve]
+        public string After { get; }
+        string PathAndQueryParams;
+
+        /// <summary>
+        /// GetProtectedItems Request Object.
+        /// Get Protected Player Items
+        /// </summary>
+        /// <param name="projectId">ID of the project.</param>
+        /// <param name="playerId">The player ID supplied by the Authorization service.</param>
+        /// <param name="keys">The keys to retrieve, in exploded form style, e.g. `keys=KEY1&keys=KEY2&keys=KEY3`.</param>
+        /// <param name="after">The key after which to retrieve the next page of keys.</param>
+        [Preserve]
+        public GetProtectedItemsRequest(string projectId, string playerId, List<string> keys = default(List<string>), string after = default(string))
+        {
+            ProjectId = projectId;
+
+            PlayerId = playerId;
+
+            Keys = keys;
+            After = after;
+            PathAndQueryParams = $"/v1/data/projects/{projectId}/players/{playerId}/protected/items";
+
+            List<string> queryParams = new List<string>();
+
+            if(Keys != null)
+            {
+                var keysStringValues = Keys.Select(v => v.ToString()).ToList();
+                queryParams = AddParamsToQueryParams(queryParams, "keys", keysStringValues, "form", true);
+            }
+            if(!string.IsNullOrEmpty(After))
+            {
+                queryParams = AddParamsToQueryParams(queryParams, "after", After);
+            }
+            if (queryParams.Count > 0)
+            {
+                PathAndQueryParams = $"{PathAndQueryParams}?{string.Join("&", queryParams)}";
+            }
+        }
+
+        /// <summary>
+        /// Helper function for constructing URL from request base path and
+        /// query params.
+        /// </summary>
+        /// <param name="requestBasePath"></param>
+        /// <returns></returns>
+        public string ConstructUrl(string requestBasePath)
+        {
+            return requestBasePath + PathAndQueryParams;
+        }
+
+        /// <summary>
+        /// Helper for constructing the request body.
+        /// </summary>
+        /// <returns>A list of IMultipartFormSection representing the request body.</returns>
+        public byte[] ConstructBody()
+        {
+            return null;
+        }
+
+        /// <summary>
+        /// Helper function for constructing the headers.
+        /// </summary>
+        /// <param name="accessToken">The auth access token to use.</param>
+        /// <param name="operationConfiguration">The operation configuration to use.</param>
+        /// <returns>A dictionary representing the request headers.</returns>
+        public Dictionary<string, string> ConstructHeaders(IAccessToken accessToken,
+            Configuration operationConfiguration = null)
+        {
+            var headers = new Dictionary<string, string>();
+            if(!string.IsNullOrEmpty(accessToken.AccessToken))
+            {
+                headers.Add("authorization", "Bearer " + accessToken.AccessToken);
+            }
+
+            // Analytics headers
+            headers.Add("Unity-Client-Version", Application.unityVersion);
+            headers.Add("Unity-Client-Mode", Scheduler.EngineStateHelper.IsPlaying ? "play" : "edit");
+
+            string[] contentTypes = {
+            };
+
+            string[] accepts = {
+                "application/json",
+                "application/problem+json"
+            };
+
+            var acceptHeader = GenerateAcceptHeader(accepts);
+            if (!string.IsNullOrEmpty(acceptHeader))
+            {
+                headers.Add("Accept", acceptHeader);
+            }
+            var httpMethod = "GET";
+            var contentTypeHeader = GenerateContentTypeHeader(contentTypes);
+            if (!string.IsNullOrEmpty(contentTypeHeader))
+            {
+                headers.Add("Content-Type", contentTypeHeader);
+            }
+            else if (httpMethod == "POST" || httpMethod == "PATCH")
+            {
+                headers.Add("Content-Type", "application/json");
+            }
+
+
+            // We also check if there are headers that are defined as part of
+            // the request configuration.
+            if (operationConfiguration != null && operationConfiguration.Headers != null)
+            {
+                foreach (var pair in operationConfiguration.Headers)
+                {
+                    headers[pair.Key] = pair.Value;
+                }
+            }
+
+            return headers;
+        }
+    }
+    /// <summary>
+    /// GetProtectedKeysRequest
+    /// Get Protected Player Keys
+    /// </summary>
+    [Preserve]
+    internal class GetProtectedKeysRequest : DataApiBaseRequest
+    {
+        /// <summary>Accessor for projectId </summary>
+        [Preserve]
+        public string ProjectId { get; }
+        /// <summary>Accessor for playerId </summary>
+        [Preserve]
+        public string PlayerId { get; }
+        /// <summary>Accessor for after </summary>
+        [Preserve]
+        public string After { get; }
+        string PathAndQueryParams;
+
+        /// <summary>
+        /// GetProtectedKeys Request Object.
+        /// Get Protected Player Keys
+        /// </summary>
+        /// <param name="projectId">ID of the project.</param>
+        /// <param name="playerId">The player ID supplied by the Authorization service.</param>
+        /// <param name="after">Returns the page of results after the key specified.</param>
+        [Preserve]
+        public GetProtectedKeysRequest(string projectId, string playerId, string after = default(string))
+        {
+            ProjectId = projectId;
+
+            PlayerId = playerId;
+
+            After = after;
+            PathAndQueryParams = $"/v1/data/projects/{projectId}/players/{playerId}/protected/keys";
+
+            List<string> queryParams = new List<string>();
+
+            if(!string.IsNullOrEmpty(After))
+            {
+                queryParams = AddParamsToQueryParams(queryParams, "after", After);
+            }
+            if (queryParams.Count > 0)
+            {
+                PathAndQueryParams = $"{PathAndQueryParams}?{string.Join("&", queryParams)}";
+            }
+        }
+
+        /// <summary>
+        /// Helper function for constructing URL from request base path and
+        /// query params.
+        /// </summary>
+        /// <param name="requestBasePath"></param>
+        /// <returns></returns>
+        public string ConstructUrl(string requestBasePath)
+        {
+            return requestBasePath + PathAndQueryParams;
+        }
+
+        /// <summary>
+        /// Helper for constructing the request body.
+        /// </summary>
+        /// <returns>A list of IMultipartFormSection representing the request body.</returns>
+        public byte[] ConstructBody()
+        {
+            return null;
+        }
+
+        /// <summary>
+        /// Helper function for constructing the headers.
+        /// </summary>
+        /// <param name="accessToken">The auth access token to use.</param>
+        /// <param name="operationConfiguration">The operation configuration to use.</param>
+        /// <returns>A dictionary representing the request headers.</returns>
+        public Dictionary<string, string> ConstructHeaders(IAccessToken accessToken,
+            Configuration operationConfiguration = null)
+        {
+            var headers = new Dictionary<string, string>();
+            if(!string.IsNullOrEmpty(accessToken.AccessToken))
+            {
+                headers.Add("authorization", "Bearer " + accessToken.AccessToken);
+            }
+
+            // Analytics headers
+            headers.Add("Unity-Client-Version", Application.unityVersion);
+            headers.Add("Unity-Client-Mode", Scheduler.EngineStateHelper.IsPlaying ? "play" : "edit");
+
+            string[] contentTypes = {
+            };
+
+            string[] accepts = {
+                "application/json",
+                "application/problem+json"
+            };
+
+            var acceptHeader = GenerateAcceptHeader(accepts);
+            if (!string.IsNullOrEmpty(acceptHeader))
+            {
+                headers.Add("Accept", acceptHeader);
+            }
+            var httpMethod = "GET";
+            var contentTypeHeader = GenerateContentTypeHeader(contentTypes);
+            if (!string.IsNullOrEmpty(contentTypeHeader))
+            {
+                headers.Add("Content-Type", contentTypeHeader);
+            }
+            else if (httpMethod == "POST" || httpMethod == "PATCH")
+            {
+                headers.Add("Content-Type", "application/json");
+            }
+
+
+            // We also check if there are headers that are defined as part of
+            // the request configuration.
+            if (operationConfiguration != null && operationConfiguration.Headers != null)
+            {
+                foreach (var pair in operationConfiguration.Headers)
+                {
+                    headers[pair.Key] = pair.Value;
+                }
+            }
+
+            return headers;
+        }
+    }
+    /// <summary>
+    /// GetPublicItemsRequest
+    /// Get Public Player Items
+    /// </summary>
+    [Preserve]
+    internal class GetPublicItemsRequest : DataApiBaseRequest
+    {
+        /// <summary>Accessor for projectId </summary>
+        [Preserve]
+        public string ProjectId { get; }
+        /// <summary>Accessor for playerId </summary>
+        [Preserve]
+        public string PlayerId { get; }
+        /// <summary>Accessor for keys </summary>
+        [Preserve]
+        public List<string> Keys { get; }
+        /// <summary>Accessor for after </summary>
+        [Preserve]
+        public string After { get; }
+        string PathAndQueryParams;
+
+        /// <summary>
+        /// GetPublicItems Request Object.
+        /// Get Public Player Items
+        /// </summary>
+        /// <param name="projectId">ID of the project.</param>
+        /// <param name="playerId">The player ID supplied by the Authorization service.</param>
+        /// <param name="keys">The keys to retrieve, in exploded form style, e.g. `keys=KEY1&keys=KEY2&keys=KEY3`.</param>
+        /// <param name="after">The key after which to retrieve the next page of keys.</param>
+        [Preserve]
+        public GetPublicItemsRequest(string projectId, string playerId, List<string> keys = default(List<string>), string after = default(string))
+        {
+            ProjectId = projectId;
+
+            PlayerId = playerId;
+
+            Keys = keys;
+            After = after;
+            PathAndQueryParams = $"/v1/data/projects/{projectId}/players/{playerId}/public/items";
+
+            List<string> queryParams = new List<string>();
+
+            if(Keys != null)
+            {
+                var keysStringValues = Keys.Select(v => v.ToString()).ToList();
+                queryParams = AddParamsToQueryParams(queryParams, "keys", keysStringValues, "form", true);
+            }
+            if(!string.IsNullOrEmpty(After))
+            {
+                queryParams = AddParamsToQueryParams(queryParams, "after", After);
+            }
+            if (queryParams.Count > 0)
+            {
+                PathAndQueryParams = $"{PathAndQueryParams}?{string.Join("&", queryParams)}";
+            }
+        }
+
+        /// <summary>
+        /// Helper function for constructing URL from request base path and
+        /// query params.
+        /// </summary>
+        /// <param name="requestBasePath"></param>
+        /// <returns></returns>
+        public string ConstructUrl(string requestBasePath)
+        {
+            return requestBasePath + PathAndQueryParams;
+        }
+
+        /// <summary>
+        /// Helper for constructing the request body.
+        /// </summary>
+        /// <returns>A list of IMultipartFormSection representing the request body.</returns>
+        public byte[] ConstructBody()
+        {
+            return null;
+        }
+
+        /// <summary>
+        /// Helper function for constructing the headers.
+        /// </summary>
+        /// <param name="accessToken">The auth access token to use.</param>
+        /// <param name="operationConfiguration">The operation configuration to use.</param>
+        /// <returns>A dictionary representing the request headers.</returns>
+        public Dictionary<string, string> ConstructHeaders(IAccessToken accessToken,
+            Configuration operationConfiguration = null)
+        {
+            var headers = new Dictionary<string, string>();
+            if(!string.IsNullOrEmpty(accessToken.AccessToken))
+            {
+                headers.Add("authorization", "Bearer " + accessToken.AccessToken);
+            }
+
+            // Analytics headers
+            headers.Add("Unity-Client-Version", Application.unityVersion);
+            headers.Add("Unity-Client-Mode", Scheduler.EngineStateHelper.IsPlaying ? "play" : "edit");
+
+            string[] contentTypes = {
+            };
+
+            string[] accepts = {
+                "application/json",
+                "application/problem+json"
+            };
+
+            var acceptHeader = GenerateAcceptHeader(accepts);
+            if (!string.IsNullOrEmpty(acceptHeader))
+            {
+                headers.Add("Accept", acceptHeader);
+            }
+            var httpMethod = "GET";
+            var contentTypeHeader = GenerateContentTypeHeader(contentTypes);
+            if (!string.IsNullOrEmpty(contentTypeHeader))
+            {
+                headers.Add("Content-Type", contentTypeHeader);
+            }
+            else if (httpMethod == "POST" || httpMethod == "PATCH")
+            {
+                headers.Add("Content-Type", "application/json");
+            }
+
+
+            // We also check if there are headers that are defined as part of
+            // the request configuration.
+            if (operationConfiguration != null && operationConfiguration.Headers != null)
+            {
+                foreach (var pair in operationConfiguration.Headers)
+                {
+                    headers[pair.Key] = pair.Value;
+                }
+            }
+
+            return headers;
+        }
+    }
+    /// <summary>
+    /// GetPublicKeysRequest
+    /// Get Public Player Keys
+    /// </summary>
+    [Preserve]
+    internal class GetPublicKeysRequest : DataApiBaseRequest
+    {
+        /// <summary>Accessor for projectId </summary>
+        [Preserve]
+        public string ProjectId { get; }
+        /// <summary>Accessor for playerId </summary>
+        [Preserve]
+        public string PlayerId { get; }
+        /// <summary>Accessor for after </summary>
+        [Preserve]
+        public string After { get; }
+        string PathAndQueryParams;
+
+        /// <summary>
+        /// GetPublicKeys Request Object.
+        /// Get Public Player Keys
+        /// </summary>
+        /// <param name="projectId">ID of the project.</param>
+        /// <param name="playerId">The player ID supplied by the Authorization service.</param>
+        /// <param name="after">Returns the page of results after the key specified.</param>
+        [Preserve]
+        public GetPublicKeysRequest(string projectId, string playerId, string after = default(string))
+        {
+            ProjectId = projectId;
+
+            PlayerId = playerId;
+
+            After = after;
+            PathAndQueryParams = $"/v1/data/projects/{projectId}/players/{playerId}/public/keys";
+
+            List<string> queryParams = new List<string>();
+
+            if(!string.IsNullOrEmpty(After))
+            {
+                queryParams = AddParamsToQueryParams(queryParams, "after", After);
+            }
+            if (queryParams.Count > 0)
+            {
+                PathAndQueryParams = $"{PathAndQueryParams}?{string.Join("&", queryParams)}";
+            }
+        }
+
+        /// <summary>
+        /// Helper function for constructing URL from request base path and
+        /// query params.
+        /// </summary>
+        /// <param name="requestBasePath"></param>
+        /// <returns></returns>
+        public string ConstructUrl(string requestBasePath)
+        {
+            return requestBasePath + PathAndQueryParams;
+        }
+
+        /// <summary>
+        /// Helper for constructing the request body.
+        /// </summary>
+        /// <returns>A list of IMultipartFormSection representing the request body.</returns>
+        public byte[] ConstructBody()
+        {
+            return null;
+        }
+
+        /// <summary>
+        /// Helper function for constructing the headers.
+        /// </summary>
+        /// <param name="accessToken">The auth access token to use.</param>
+        /// <param name="operationConfiguration">The operation configuration to use.</param>
+        /// <returns>A dictionary representing the request headers.</returns>
+        public Dictionary<string, string> ConstructHeaders(IAccessToken accessToken,
+            Configuration operationConfiguration = null)
+        {
+            var headers = new Dictionary<string, string>();
+            if(!string.IsNullOrEmpty(accessToken.AccessToken))
+            {
+                headers.Add("authorization", "Bearer " + accessToken.AccessToken);
+            }
+
+            // Analytics headers
+            headers.Add("Unity-Client-Version", Application.unityVersion);
+            headers.Add("Unity-Client-Mode", Scheduler.EngineStateHelper.IsPlaying ? "play" : "edit");
+
+            string[] contentTypes = {
+            };
+
+            string[] accepts = {
+                "application/json",
+                "application/problem+json"
+            };
+
+            var acceptHeader = GenerateAcceptHeader(accepts);
+            if (!string.IsNullOrEmpty(acceptHeader))
+            {
+                headers.Add("Accept", acceptHeader);
+            }
+            var httpMethod = "GET";
+            var contentTypeHeader = GenerateContentTypeHeader(contentTypes);
+            if (!string.IsNullOrEmpty(contentTypeHeader))
+            {
+                headers.Add("Content-Type", contentTypeHeader);
+            }
+            else if (httpMethod == "POST" || httpMethod == "PATCH")
+            {
+                headers.Add("Content-Type", "application/json");
+            }
+
+
+            // We also check if there are headers that are defined as part of
+            // the request configuration.
+            if (operationConfiguration != null && operationConfiguration.Headers != null)
+            {
+                foreach (var pair in operationConfiguration.Headers)
+                {
+                    headers[pair.Key] = pair.Value;
+                }
+            }
+
+            return headers;
+        }
+    }
+    /// <summary>
+    /// QueryDefaultCustomDataRequest
+    /// Query Default Custom Data
+    /// </summary>
+    [Preserve]
+    internal class QueryDefaultCustomDataRequest : DataApiBaseRequest
+    {
+        /// <summary>Accessor for projectId </summary>
+        [Preserve]
+        public string ProjectId { get; }
+        /// <summary>Accessor for queryIndexBody </summary>
+        [Preserve]
+        public Unity.Services.CloudSave.Internal.Models.QueryIndexBody QueryIndexBody { get; }
+        string PathAndQueryParams;
+
+        /// <summary>
+        /// QueryDefaultCustomData Request Object.
+        /// Query Default Custom Data
+        /// </summary>
+        /// <param name="projectId">ID of the project.</param>
+        /// <param name="queryIndexBody">Query object with an array of conditions to query the data with.</param>
+        [Preserve]
+        public QueryDefaultCustomDataRequest(string projectId, Unity.Services.CloudSave.Internal.Models.QueryIndexBody queryIndexBody = default(Unity.Services.CloudSave.Internal.Models.QueryIndexBody))
+        {
+            ProjectId = projectId;
+
+            QueryIndexBody = queryIndexBody;
+            PathAndQueryParams = $"/v1/data/projects/{projectId}/custom/query";
+
+
+        }
+
+        /// <summary>
+        /// Helper function for constructing URL from request base path and
+        /// query params.
+        /// </summary>
+        /// <param name="requestBasePath"></param>
+        /// <returns></returns>
+        public string ConstructUrl(string requestBasePath)
+        {
+            return requestBasePath + PathAndQueryParams;
+        }
+
+        /// <summary>
+        /// Helper for constructing the request body.
+        /// </summary>
+        /// <returns>A list of IMultipartFormSection representing the request body.</returns>
+        public byte[] ConstructBody()
+        {
+            if(QueryIndexBody != null)
+            {
+                return ConstructBody(QueryIndexBody);
+            }
+            return null;
+        }
+
+        /// <summary>
+        /// Helper function for constructing the headers.
+        /// </summary>
+        /// <param name="accessToken">The auth access token to use.</param>
+        /// <param name="operationConfiguration">The operation configuration to use.</param>
+        /// <returns>A dictionary representing the request headers.</returns>
+        public Dictionary<string, string> ConstructHeaders(IAccessToken accessToken,
+            Configuration operationConfiguration = null)
+        {
+            var headers = new Dictionary<string, string>();
+            if(!string.IsNullOrEmpty(accessToken.AccessToken))
+            {
+                headers.Add("authorization", "Bearer " + accessToken.AccessToken);
+            }
+
+            // Analytics headers
+            headers.Add("Unity-Client-Version", Application.unityVersion);
+            headers.Add("Unity-Client-Mode", Scheduler.EngineStateHelper.IsPlaying ? "play" : "edit");
+
+            string[] contentTypes = {
+                "application/json"
+            };
+
+            string[] accepts = {
+                "application/json",
+                "application/problem+json"
+            };
+
+            var acceptHeader = GenerateAcceptHeader(accepts);
+            if (!string.IsNullOrEmpty(acceptHeader))
+            {
+                headers.Add("Accept", acceptHeader);
+            }
             var httpMethod = "POST";
             var contentTypeHeader = GenerateContentTypeHeader(contentTypes);
             if (!string.IsNullOrEmpty(contentTypeHeader))
@@ -917,7 +2863,822 @@ namespace Unity.Services.CloudSave.Internal.Data
             return headers;
         }
     }
+    /// <summary>
+    /// QueryDefaultPlayerDataRequest
+    /// Query Default Player Data
+    /// </summary>
+    [Preserve]
+    internal class QueryDefaultPlayerDataRequest : DataApiBaseRequest
+    {
+        /// <summary>Accessor for projectId </summary>
+        [Preserve]
+        public string ProjectId { get; }
+        /// <summary>Accessor for queryIndexBody </summary>
+        [Preserve]
+        public Unity.Services.CloudSave.Internal.Models.QueryIndexBody QueryIndexBody { get; }
+        string PathAndQueryParams;
 
+        /// <summary>
+        /// QueryDefaultPlayerData Request Object.
+        /// Query Default Player Data
+        /// </summary>
+        /// <param name="projectId">ID of the project.</param>
+        /// <param name="queryIndexBody">Query object with an array of conditions to query the data with.</param>
+        [Preserve]
+        public QueryDefaultPlayerDataRequest(string projectId, Unity.Services.CloudSave.Internal.Models.QueryIndexBody queryIndexBody = default(Unity.Services.CloudSave.Internal.Models.QueryIndexBody))
+        {
+            ProjectId = projectId;
+
+            QueryIndexBody = queryIndexBody;
+            PathAndQueryParams = $"/v1/data/projects/{projectId}/players/query";
+
+
+        }
+
+        /// <summary>
+        /// Helper function for constructing URL from request base path and
+        /// query params.
+        /// </summary>
+        /// <param name="requestBasePath"></param>
+        /// <returns></returns>
+        public string ConstructUrl(string requestBasePath)
+        {
+            return requestBasePath + PathAndQueryParams;
+        }
+
+        /// <summary>
+        /// Helper for constructing the request body.
+        /// </summary>
+        /// <returns>A list of IMultipartFormSection representing the request body.</returns>
+        public byte[] ConstructBody()
+        {
+            if(QueryIndexBody != null)
+            {
+                return ConstructBody(QueryIndexBody);
+            }
+            return null;
+        }
+
+        /// <summary>
+        /// Helper function for constructing the headers.
+        /// </summary>
+        /// <param name="accessToken">The auth access token to use.</param>
+        /// <param name="operationConfiguration">The operation configuration to use.</param>
+        /// <returns>A dictionary representing the request headers.</returns>
+        public Dictionary<string, string> ConstructHeaders(IAccessToken accessToken,
+            Configuration operationConfiguration = null)
+        {
+            var headers = new Dictionary<string, string>();
+            if(!string.IsNullOrEmpty(accessToken.AccessToken))
+            {
+                headers.Add("authorization", "Bearer " + accessToken.AccessToken);
+            }
+
+            // Analytics headers
+            headers.Add("Unity-Client-Version", Application.unityVersion);
+            headers.Add("Unity-Client-Mode", Scheduler.EngineStateHelper.IsPlaying ? "play" : "edit");
+
+            string[] contentTypes = {
+                "application/json"
+            };
+
+            string[] accepts = {
+                "application/json",
+                "application/problem+json"
+            };
+
+            var acceptHeader = GenerateAcceptHeader(accepts);
+            if (!string.IsNullOrEmpty(acceptHeader))
+            {
+                headers.Add("Accept", acceptHeader);
+            }
+            var httpMethod = "POST";
+            var contentTypeHeader = GenerateContentTypeHeader(contentTypes);
+            if (!string.IsNullOrEmpty(contentTypeHeader))
+            {
+                headers.Add("Content-Type", contentTypeHeader);
+            }
+            else if (httpMethod == "POST" || httpMethod == "PATCH")
+            {
+                headers.Add("Content-Type", "application/json");
+            }
+
+
+            // We also check if there are headers that are defined as part of
+            // the request configuration.
+            if (operationConfiguration != null && operationConfiguration.Headers != null)
+            {
+                foreach (var pair in operationConfiguration.Headers)
+                {
+                    headers[pair.Key] = pair.Value;
+                }
+            }
+
+            return headers;
+        }
+    }
+    /// <summary>
+    /// QueryPrivateCustomDataRequest
+    /// Query Private Custom Data
+    /// </summary>
+    [Preserve]
+    internal class QueryPrivateCustomDataRequest : DataApiBaseRequest
+    {
+        /// <summary>Accessor for projectId </summary>
+        [Preserve]
+        public string ProjectId { get; }
+        /// <summary>Accessor for queryIndexBody </summary>
+        [Preserve]
+        public Unity.Services.CloudSave.Internal.Models.QueryIndexBody QueryIndexBody { get; }
+        string PathAndQueryParams;
+
+        /// <summary>
+        /// QueryPrivateCustomData Request Object.
+        /// Query Private Custom Data
+        /// </summary>
+        /// <param name="projectId">ID of the project.</param>
+        /// <param name="queryIndexBody">Query object with an array of conditions to query the data with.</param>
+        [Preserve]
+        public QueryPrivateCustomDataRequest(string projectId, Unity.Services.CloudSave.Internal.Models.QueryIndexBody queryIndexBody = default(Unity.Services.CloudSave.Internal.Models.QueryIndexBody))
+        {
+            ProjectId = projectId;
+
+            QueryIndexBody = queryIndexBody;
+            PathAndQueryParams = $"/v1/data/projects/{projectId}/custom/private/query";
+
+
+        }
+
+        /// <summary>
+        /// Helper function for constructing URL from request base path and
+        /// query params.
+        /// </summary>
+        /// <param name="requestBasePath"></param>
+        /// <returns></returns>
+        public string ConstructUrl(string requestBasePath)
+        {
+            return requestBasePath + PathAndQueryParams;
+        }
+
+        /// <summary>
+        /// Helper for constructing the request body.
+        /// </summary>
+        /// <returns>A list of IMultipartFormSection representing the request body.</returns>
+        public byte[] ConstructBody()
+        {
+            if(QueryIndexBody != null)
+            {
+                return ConstructBody(QueryIndexBody);
+            }
+            return null;
+        }
+
+        /// <summary>
+        /// Helper function for constructing the headers.
+        /// </summary>
+        /// <param name="accessToken">The auth access token to use.</param>
+        /// <param name="operationConfiguration">The operation configuration to use.</param>
+        /// <returns>A dictionary representing the request headers.</returns>
+        public Dictionary<string, string> ConstructHeaders(IAccessToken accessToken,
+            Configuration operationConfiguration = null)
+        {
+            var headers = new Dictionary<string, string>();
+            if(!string.IsNullOrEmpty(accessToken.AccessToken))
+            {
+                headers.Add("authorization", "Bearer " + accessToken.AccessToken);
+            }
+
+            // Analytics headers
+            headers.Add("Unity-Client-Version", Application.unityVersion);
+            headers.Add("Unity-Client-Mode", Scheduler.EngineStateHelper.IsPlaying ? "play" : "edit");
+
+            string[] contentTypes = {
+                "application/json"
+            };
+
+            string[] accepts = {
+                "application/json",
+                "application/problem+json"
+            };
+
+            var acceptHeader = GenerateAcceptHeader(accepts);
+            if (!string.IsNullOrEmpty(acceptHeader))
+            {
+                headers.Add("Accept", acceptHeader);
+            }
+            var httpMethod = "POST";
+            var contentTypeHeader = GenerateContentTypeHeader(contentTypes);
+            if (!string.IsNullOrEmpty(contentTypeHeader))
+            {
+                headers.Add("Content-Type", contentTypeHeader);
+            }
+            else if (httpMethod == "POST" || httpMethod == "PATCH")
+            {
+                headers.Add("Content-Type", "application/json");
+            }
+
+
+            // We also check if there are headers that are defined as part of
+            // the request configuration.
+            if (operationConfiguration != null && operationConfiguration.Headers != null)
+            {
+                foreach (var pair in operationConfiguration.Headers)
+                {
+                    headers[pair.Key] = pair.Value;
+                }
+            }
+
+            return headers;
+        }
+    }
+    /// <summary>
+    /// QueryProtectedPlayerDataRequest
+    /// Query Protected Player Data
+    /// </summary>
+    [Preserve]
+    internal class QueryProtectedPlayerDataRequest : DataApiBaseRequest
+    {
+        /// <summary>Accessor for projectId </summary>
+        [Preserve]
+        public string ProjectId { get; }
+        /// <summary>Accessor for queryIndexBody </summary>
+        [Preserve]
+        public Unity.Services.CloudSave.Internal.Models.QueryIndexBody QueryIndexBody { get; }
+        string PathAndQueryParams;
+
+        /// <summary>
+        /// QueryProtectedPlayerData Request Object.
+        /// Query Protected Player Data
+        /// </summary>
+        /// <param name="projectId">ID of the project.</param>
+        /// <param name="queryIndexBody">Query object with an array of conditions to query the data with.</param>
+        [Preserve]
+        public QueryProtectedPlayerDataRequest(string projectId, Unity.Services.CloudSave.Internal.Models.QueryIndexBody queryIndexBody = default(Unity.Services.CloudSave.Internal.Models.QueryIndexBody))
+        {
+            ProjectId = projectId;
+
+            QueryIndexBody = queryIndexBody;
+            PathAndQueryParams = $"/v1/data/projects/{projectId}/players/protected/query";
+
+
+        }
+
+        /// <summary>
+        /// Helper function for constructing URL from request base path and
+        /// query params.
+        /// </summary>
+        /// <param name="requestBasePath"></param>
+        /// <returns></returns>
+        public string ConstructUrl(string requestBasePath)
+        {
+            return requestBasePath + PathAndQueryParams;
+        }
+
+        /// <summary>
+        /// Helper for constructing the request body.
+        /// </summary>
+        /// <returns>A list of IMultipartFormSection representing the request body.</returns>
+        public byte[] ConstructBody()
+        {
+            if(QueryIndexBody != null)
+            {
+                return ConstructBody(QueryIndexBody);
+            }
+            return null;
+        }
+
+        /// <summary>
+        /// Helper function for constructing the headers.
+        /// </summary>
+        /// <param name="accessToken">The auth access token to use.</param>
+        /// <param name="operationConfiguration">The operation configuration to use.</param>
+        /// <returns>A dictionary representing the request headers.</returns>
+        public Dictionary<string, string> ConstructHeaders(IAccessToken accessToken,
+            Configuration operationConfiguration = null)
+        {
+            var headers = new Dictionary<string, string>();
+            if(!string.IsNullOrEmpty(accessToken.AccessToken))
+            {
+                headers.Add("authorization", "Bearer " + accessToken.AccessToken);
+            }
+
+            // Analytics headers
+            headers.Add("Unity-Client-Version", Application.unityVersion);
+            headers.Add("Unity-Client-Mode", Scheduler.EngineStateHelper.IsPlaying ? "play" : "edit");
+
+            string[] contentTypes = {
+                "application/json"
+            };
+
+            string[] accepts = {
+                "application/json",
+                "application/problem+json"
+            };
+
+            var acceptHeader = GenerateAcceptHeader(accepts);
+            if (!string.IsNullOrEmpty(acceptHeader))
+            {
+                headers.Add("Accept", acceptHeader);
+            }
+            var httpMethod = "POST";
+            var contentTypeHeader = GenerateContentTypeHeader(contentTypes);
+            if (!string.IsNullOrEmpty(contentTypeHeader))
+            {
+                headers.Add("Content-Type", contentTypeHeader);
+            }
+            else if (httpMethod == "POST" || httpMethod == "PATCH")
+            {
+                headers.Add("Content-Type", "application/json");
+            }
+
+
+            // We also check if there are headers that are defined as part of
+            // the request configuration.
+            if (operationConfiguration != null && operationConfiguration.Headers != null)
+            {
+                foreach (var pair in operationConfiguration.Headers)
+                {
+                    headers[pair.Key] = pair.Value;
+                }
+            }
+
+            return headers;
+        }
+    }
+    /// <summary>
+    /// QueryPublicPlayerDataRequest
+    /// Query Public Player Data
+    /// </summary>
+    [Preserve]
+    internal class QueryPublicPlayerDataRequest : DataApiBaseRequest
+    {
+        /// <summary>Accessor for projectId </summary>
+        [Preserve]
+        public string ProjectId { get; }
+        /// <summary>Accessor for queryIndexBody </summary>
+        [Preserve]
+        public Unity.Services.CloudSave.Internal.Models.QueryIndexBody QueryIndexBody { get; }
+        string PathAndQueryParams;
+
+        /// <summary>
+        /// QueryPublicPlayerData Request Object.
+        /// Query Public Player Data
+        /// </summary>
+        /// <param name="projectId">ID of the project.</param>
+        /// <param name="queryIndexBody">Query object with an array of conditions to query the data with.</param>
+        [Preserve]
+        public QueryPublicPlayerDataRequest(string projectId, Unity.Services.CloudSave.Internal.Models.QueryIndexBody queryIndexBody = default(Unity.Services.CloudSave.Internal.Models.QueryIndexBody))
+        {
+            ProjectId = projectId;
+
+            QueryIndexBody = queryIndexBody;
+            PathAndQueryParams = $"/v1/data/projects/{projectId}/players/public/query";
+
+
+        }
+
+        /// <summary>
+        /// Helper function for constructing URL from request base path and
+        /// query params.
+        /// </summary>
+        /// <param name="requestBasePath"></param>
+        /// <returns></returns>
+        public string ConstructUrl(string requestBasePath)
+        {
+            return requestBasePath + PathAndQueryParams;
+        }
+
+        /// <summary>
+        /// Helper for constructing the request body.
+        /// </summary>
+        /// <returns>A list of IMultipartFormSection representing the request body.</returns>
+        public byte[] ConstructBody()
+        {
+            if(QueryIndexBody != null)
+            {
+                return ConstructBody(QueryIndexBody);
+            }
+            return null;
+        }
+
+        /// <summary>
+        /// Helper function for constructing the headers.
+        /// </summary>
+        /// <param name="accessToken">The auth access token to use.</param>
+        /// <param name="operationConfiguration">The operation configuration to use.</param>
+        /// <returns>A dictionary representing the request headers.</returns>
+        public Dictionary<string, string> ConstructHeaders(IAccessToken accessToken,
+            Configuration operationConfiguration = null)
+        {
+            var headers = new Dictionary<string, string>();
+            if(!string.IsNullOrEmpty(accessToken.AccessToken))
+            {
+                headers.Add("authorization", "Bearer " + accessToken.AccessToken);
+            }
+
+            // Analytics headers
+            headers.Add("Unity-Client-Version", Application.unityVersion);
+            headers.Add("Unity-Client-Mode", Scheduler.EngineStateHelper.IsPlaying ? "play" : "edit");
+
+            string[] contentTypes = {
+                "application/json"
+            };
+
+            string[] accepts = {
+                "application/json",
+                "application/problem+json"
+            };
+
+            var acceptHeader = GenerateAcceptHeader(accepts);
+            if (!string.IsNullOrEmpty(acceptHeader))
+            {
+                headers.Add("Accept", acceptHeader);
+            }
+            var httpMethod = "POST";
+            var contentTypeHeader = GenerateContentTypeHeader(contentTypes);
+            if (!string.IsNullOrEmpty(contentTypeHeader))
+            {
+                headers.Add("Content-Type", contentTypeHeader);
+            }
+            else if (httpMethod == "POST" || httpMethod == "PATCH")
+            {
+                headers.Add("Content-Type", "application/json");
+            }
+
+
+            // We also check if there are headers that are defined as part of
+            // the request configuration.
+            if (operationConfiguration != null && operationConfiguration.Headers != null)
+            {
+                foreach (var pair in operationConfiguration.Headers)
+                {
+                    headers[pair.Key] = pair.Value;
+                }
+            }
+
+            return headers;
+        }
+    }
+    /// <summary>
+    /// SetCustomItemRequest
+    /// Set Custom Item
+    /// </summary>
+    [Preserve]
+    internal class SetCustomItemRequest : DataApiBaseRequest
+    {
+        /// <summary>Accessor for projectId </summary>
+        [Preserve]
+        public string ProjectId { get; }
+        /// <summary>Accessor for customId </summary>
+        [Preserve]
+        public string CustomId { get; }
+        /// <summary>Accessor for setItemBody </summary>
+        [Preserve]
+        public Unity.Services.CloudSave.Internal.Models.SetItemBody SetItemBody { get; }
+        string PathAndQueryParams;
+
+        /// <summary>
+        /// SetCustomItem Request Object.
+        /// Set Custom Item
+        /// </summary>
+        /// <param name="projectId">ID of the project.</param>
+        /// <param name="customId">The custom data ID specified by the user. Must be between 1 and 50 characters long and contain only alphanumeric characters, underscores, and hyphens.</param>
+        /// <param name="setItemBody">Add a data item to store for a custom ID.</param>
+        [Preserve]
+        public SetCustomItemRequest(string projectId, string customId, Unity.Services.CloudSave.Internal.Models.SetItemBody setItemBody = default(Unity.Services.CloudSave.Internal.Models.SetItemBody))
+        {
+            ProjectId = projectId;
+
+            CustomId = customId;
+
+            SetItemBody = setItemBody;
+            PathAndQueryParams = $"/v1/data/projects/{projectId}/custom/{customId}/items";
+
+
+        }
+
+        /// <summary>
+        /// Helper function for constructing URL from request base path and
+        /// query params.
+        /// </summary>
+        /// <param name="requestBasePath"></param>
+        /// <returns></returns>
+        public string ConstructUrl(string requestBasePath)
+        {
+            return requestBasePath + PathAndQueryParams;
+        }
+
+        /// <summary>
+        /// Helper for constructing the request body.
+        /// </summary>
+        /// <returns>A list of IMultipartFormSection representing the request body.</returns>
+        public byte[] ConstructBody()
+        {
+            if(SetItemBody != null)
+            {
+                return ConstructBody(SetItemBody);
+            }
+            return null;
+        }
+
+        /// <summary>
+        /// Helper function for constructing the headers.
+        /// </summary>
+        /// <param name="accessToken">The auth access token to use.</param>
+        /// <param name="operationConfiguration">The operation configuration to use.</param>
+        /// <returns>A dictionary representing the request headers.</returns>
+        public Dictionary<string, string> ConstructHeaders(IAccessToken accessToken,
+            Configuration operationConfiguration = null)
+        {
+            var headers = new Dictionary<string, string>();
+            if(!string.IsNullOrEmpty(accessToken.AccessToken))
+            {
+                headers.Add("authorization", "Bearer " + accessToken.AccessToken);
+            }
+
+            // Analytics headers
+            headers.Add("Unity-Client-Version", Application.unityVersion);
+            headers.Add("Unity-Client-Mode", Scheduler.EngineStateHelper.IsPlaying ? "play" : "edit");
+
+            string[] contentTypes = {
+                "application/json"
+            };
+
+            string[] accepts = {
+                "application/json",
+                "application/problem+json"
+            };
+
+            var acceptHeader = GenerateAcceptHeader(accepts);
+            if (!string.IsNullOrEmpty(acceptHeader))
+            {
+                headers.Add("Accept", acceptHeader);
+            }
+            var httpMethod = "POST";
+            var contentTypeHeader = GenerateContentTypeHeader(contentTypes);
+            if (!string.IsNullOrEmpty(contentTypeHeader))
+            {
+                headers.Add("Content-Type", contentTypeHeader);
+            }
+            else if (httpMethod == "POST" || httpMethod == "PATCH")
+            {
+                headers.Add("Content-Type", "application/json");
+            }
+
+
+            // We also check if there are headers that are defined as part of
+            // the request configuration.
+            if (operationConfiguration != null && operationConfiguration.Headers != null)
+            {
+                foreach (var pair in operationConfiguration.Headers)
+                {
+                    headers[pair.Key] = pair.Value;
+                }
+            }
+
+            return headers;
+        }
+    }
+    /// <summary>
+    /// SetCustomItemBatchRequest
+    /// Set Custom Item Batch
+    /// </summary>
+    [Preserve]
+    internal class SetCustomItemBatchRequest : DataApiBaseRequest
+    {
+        /// <summary>Accessor for projectId </summary>
+        [Preserve]
+        public string ProjectId { get; }
+        /// <summary>Accessor for customId </summary>
+        [Preserve]
+        public string CustomId { get; }
+        /// <summary>Accessor for setItemBatchBody </summary>
+        [Preserve]
+        public Unity.Services.CloudSave.Internal.Models.SetItemBatchBody SetItemBatchBody { get; }
+        string PathAndQueryParams;
+
+        /// <summary>
+        /// SetCustomItemBatch Request Object.
+        /// Set Custom Item Batch
+        /// </summary>
+        /// <param name="projectId">ID of the project.</param>
+        /// <param name="customId">The custom data ID specified by the user. Must be between 1 and 50 characters long and contain only alphanumeric characters, underscores, and hyphens.</param>
+        /// <param name="setItemBatchBody">Set batch data items for a custom ID.</param>
+        [Preserve]
+        public SetCustomItemBatchRequest(string projectId, string customId, Unity.Services.CloudSave.Internal.Models.SetItemBatchBody setItemBatchBody = default(Unity.Services.CloudSave.Internal.Models.SetItemBatchBody))
+        {
+            ProjectId = projectId;
+
+            CustomId = customId;
+
+            SetItemBatchBody = setItemBatchBody;
+            PathAndQueryParams = $"/v1/data/projects/{projectId}/custom/{customId}/item-batch";
+
+
+        }
+
+        /// <summary>
+        /// Helper function for constructing URL from request base path and
+        /// query params.
+        /// </summary>
+        /// <param name="requestBasePath"></param>
+        /// <returns></returns>
+        public string ConstructUrl(string requestBasePath)
+        {
+            return requestBasePath + PathAndQueryParams;
+        }
+
+        /// <summary>
+        /// Helper for constructing the request body.
+        /// </summary>
+        /// <returns>A list of IMultipartFormSection representing the request body.</returns>
+        public byte[] ConstructBody()
+        {
+            if(SetItemBatchBody != null)
+            {
+                return ConstructBody(SetItemBatchBody);
+            }
+            return null;
+        }
+
+        /// <summary>
+        /// Helper function for constructing the headers.
+        /// </summary>
+        /// <param name="accessToken">The auth access token to use.</param>
+        /// <param name="operationConfiguration">The operation configuration to use.</param>
+        /// <returns>A dictionary representing the request headers.</returns>
+        public Dictionary<string, string> ConstructHeaders(IAccessToken accessToken,
+            Configuration operationConfiguration = null)
+        {
+            var headers = new Dictionary<string, string>();
+            if(!string.IsNullOrEmpty(accessToken.AccessToken))
+            {
+                headers.Add("authorization", "Bearer " + accessToken.AccessToken);
+            }
+
+            // Analytics headers
+            headers.Add("Unity-Client-Version", Application.unityVersion);
+            headers.Add("Unity-Client-Mode", Scheduler.EngineStateHelper.IsPlaying ? "play" : "edit");
+
+            string[] contentTypes = {
+                "application/json"
+            };
+
+            string[] accepts = {
+                "application/json",
+                "application/problem+json"
+            };
+
+            var acceptHeader = GenerateAcceptHeader(accepts);
+            if (!string.IsNullOrEmpty(acceptHeader))
+            {
+                headers.Add("Accept", acceptHeader);
+            }
+            var httpMethod = "POST";
+            var contentTypeHeader = GenerateContentTypeHeader(contentTypes);
+            if (!string.IsNullOrEmpty(contentTypeHeader))
+            {
+                headers.Add("Content-Type", contentTypeHeader);
+            }
+            else if (httpMethod == "POST" || httpMethod == "PATCH")
+            {
+                headers.Add("Content-Type", "application/json");
+            }
+
+
+            // We also check if there are headers that are defined as part of
+            // the request configuration.
+            if (operationConfiguration != null && operationConfiguration.Headers != null)
+            {
+                foreach (var pair in operationConfiguration.Headers)
+                {
+                    headers[pair.Key] = pair.Value;
+                }
+            }
+
+            return headers;
+        }
+    }
+    /// <summary>
+    /// SetItemRequest
+    /// Set Player Item
+    /// </summary>
+    [Preserve]
+    internal class SetItemRequest : DataApiBaseRequest
+    {
+        /// <summary>Accessor for projectId </summary>
+        [Preserve]
+        public string ProjectId { get; }
+        /// <summary>Accessor for playerId </summary>
+        [Preserve]
+        public string PlayerId { get; }
+        /// <summary>Accessor for setItemBody </summary>
+        [Preserve]
+        public Unity.Services.CloudSave.Internal.Models.SetItemBody SetItemBody { get; }
+        string PathAndQueryParams;
+
+        /// <summary>
+        /// SetItem Request Object.
+        /// Set Player Item
+        /// </summary>
+        /// <param name="projectId">ID of the project.</param>
+        /// <param name="playerId">The player ID supplied by the Authorization service.</param>
+        /// <param name="setItemBody">Add a data item to store for a player.</param>
+        [Preserve]
+        public SetItemRequest(string projectId, string playerId, Unity.Services.CloudSave.Internal.Models.SetItemBody setItemBody = default(Unity.Services.CloudSave.Internal.Models.SetItemBody))
+        {
+            ProjectId = projectId;
+
+            PlayerId = playerId;
+
+            SetItemBody = setItemBody;
+            PathAndQueryParams = $"/v1/data/projects/{projectId}/players/{playerId}/items";
+
+
+        }
+
+        /// <summary>
+        /// Helper function for constructing URL from request base path and
+        /// query params.
+        /// </summary>
+        /// <param name="requestBasePath"></param>
+        /// <returns></returns>
+        public string ConstructUrl(string requestBasePath)
+        {
+            return requestBasePath + PathAndQueryParams;
+        }
+
+        /// <summary>
+        /// Helper for constructing the request body.
+        /// </summary>
+        /// <returns>A list of IMultipartFormSection representing the request body.</returns>
+        public byte[] ConstructBody()
+        {
+            if(SetItemBody != null)
+            {
+                return ConstructBody(SetItemBody);
+            }
+            return null;
+        }
+
+        /// <summary>
+        /// Helper function for constructing the headers.
+        /// </summary>
+        /// <param name="accessToken">The auth access token to use.</param>
+        /// <param name="operationConfiguration">The operation configuration to use.</param>
+        /// <returns>A dictionary representing the request headers.</returns>
+        public Dictionary<string, string> ConstructHeaders(IAccessToken accessToken,
+            Configuration operationConfiguration = null)
+        {
+            var headers = new Dictionary<string, string>();
+            if(!string.IsNullOrEmpty(accessToken.AccessToken))
+            {
+                headers.Add("authorization", "Bearer " + accessToken.AccessToken);
+            }
+
+            // Analytics headers
+            headers.Add("Unity-Client-Version", Application.unityVersion);
+            headers.Add("Unity-Client-Mode", Scheduler.EngineStateHelper.IsPlaying ? "play" : "edit");
+
+            string[] contentTypes = {
+                "application/json"
+            };
+
+            string[] accepts = {
+                "application/json",
+                "application/problem+json"
+            };
+
+            var acceptHeader = GenerateAcceptHeader(accepts);
+            if (!string.IsNullOrEmpty(acceptHeader))
+            {
+                headers.Add("Accept", acceptHeader);
+            }
+            var httpMethod = "POST";
+            var contentTypeHeader = GenerateContentTypeHeader(contentTypes);
+            if (!string.IsNullOrEmpty(contentTypeHeader))
+            {
+                headers.Add("Content-Type", contentTypeHeader);
+            }
+            else if (httpMethod == "POST" || httpMethod == "PATCH")
+            {
+                headers.Add("Content-Type", "application/json");
+            }
+
+
+            // We also check if there are headers that are defined as part of
+            // the request configuration.
+            if (operationConfiguration != null && operationConfiguration.Headers != null)
+            {
+                foreach (var pair in operationConfiguration.Headers)
+                {
+                    headers[pair.Key] = pair.Value;
+                }
+            }
+
+            return headers;
+        }
+    }
     /// <summary>
     /// SetItemBatchRequest
     /// Set Player Item Batch
@@ -928,15 +3689,12 @@ namespace Unity.Services.CloudSave.Internal.Data
         /// <summary>Accessor for projectId </summary>
         [Preserve]
         public string ProjectId { get; }
-
         /// <summary>Accessor for playerId </summary>
         [Preserve]
         public string PlayerId { get; }
-
         /// <summary>Accessor for setItemBatchBody </summary>
         [Preserve]
         public Unity.Services.CloudSave.Internal.Models.SetItemBatchBody SetItemBatchBody { get; }
-
         string PathAndQueryParams;
 
         /// <summary>
@@ -947,9 +3705,7 @@ namespace Unity.Services.CloudSave.Internal.Data
         /// <param name="playerId">The player ID supplied by the Authorization service.</param>
         /// <param name="setItemBatchBody">Set batch data items for a player.</param>
         [Preserve]
-        public SetItemBatchRequest(string projectId, string playerId,
-            Unity.Services.CloudSave.Internal.Models.SetItemBatchBody setItemBatchBody =
-                default(Unity.Services.CloudSave.Internal.Models.SetItemBatchBody))
+        public SetItemBatchRequest(string projectId, string playerId, Unity.Services.CloudSave.Internal.Models.SetItemBatchBody setItemBatchBody = default(Unity.Services.CloudSave.Internal.Models.SetItemBatchBody))
         {
             ProjectId = projectId;
 
@@ -978,11 +3734,10 @@ namespace Unity.Services.CloudSave.Internal.Data
         /// <returns>A list of IMultipartFormSection representing the request body.</returns>
         public byte[] ConstructBody()
         {
-            if (SetItemBatchBody != null)
+            if(SetItemBatchBody != null)
             {
                 return ConstructBody(SetItemBatchBody);
             }
-
             return null;
         }
 
@@ -996,7 +3751,7 @@ namespace Unity.Services.CloudSave.Internal.Data
             Configuration operationConfiguration = null)
         {
             var headers = new Dictionary<string, string>();
-            if (!string.IsNullOrEmpty(accessToken.AccessToken))
+            if(!string.IsNullOrEmpty(accessToken.AccessToken))
             {
                 headers.Add("authorization", "Bearer " + accessToken.AccessToken);
             }
@@ -1005,16 +3760,20 @@ namespace Unity.Services.CloudSave.Internal.Data
             headers.Add("Unity-Client-Version", Application.unityVersion);
             headers.Add("Unity-Client-Mode", Scheduler.EngineStateHelper.IsPlaying ? "play" : "edit");
 
-            string[] contentTypes = { "application/json" };
+            string[] contentTypes = {
+                "application/json"
+            };
 
-            string[] accepts = { "application/json", "application/problem+json" };
+            string[] accepts = {
+                "application/json",
+                "application/problem+json"
+            };
 
             var acceptHeader = GenerateAcceptHeader(accepts);
             if (!string.IsNullOrEmpty(acceptHeader))
             {
                 headers.Add("Accept", acceptHeader);
             }
-
             var httpMethod = "POST";
             var contentTypeHeader = GenerateContentTypeHeader(contentTypes);
             if (!string.IsNullOrEmpty(contentTypeHeader))
@@ -1040,69 +3799,42 @@ namespace Unity.Services.CloudSave.Internal.Data
             return headers;
         }
     }
-
     /// <summary>
-    /// GetCustomItemsRequest
-    /// Get Custom Items
+    /// SetPrivateCustomItemRequest
+    /// Set Private Custom Item
     /// </summary>
     [Preserve]
-    internal class GetCustomItemsRequest : DataApiBaseRequest
+    internal class SetPrivateCustomItemRequest : DataApiBaseRequest
     {
         /// <summary>Accessor for projectId </summary>
         [Preserve]
         public string ProjectId { get; }
-
         /// <summary>Accessor for customId </summary>
         [Preserve]
         public string CustomId { get; }
-
-        /// <summary>Accessor for keys </summary>
+        /// <summary>Accessor for setItemBody </summary>
         [Preserve]
-        public List<string> Keys { get; }
-
-        /// <summary>Accessor for after </summary>
-        [Preserve]
-        public string After { get; }
-
+        public Unity.Services.CloudSave.Internal.Models.SetItemBody SetItemBody { get; }
         string PathAndQueryParams;
 
         /// <summary>
-        /// GetCustomItems Request Object.
-        /// Get Custom Items
+        /// SetPrivateCustomItem Request Object.
+        /// Set Private Custom Item
         /// </summary>
         /// <param name="projectId">ID of the project.</param>
         /// <param name="customId">The custom data ID specified by the user. Must be between 1 and 50 characters long and contain only alphanumeric characters, underscores, and hyphens.</param>
-        /// <param name="keys">The keys to retrieve, in exploded form style, e.g. `keys=KEY1&keys=KEY2&keys=KEY3`.</param>
-        /// <param name="after">The key after which to retrieve the next page of keys.</param>
+        /// <param name="setItemBody">Add a data item to store for a custom ID.</param>
         [Preserve]
-        public GetCustomItemsRequest(string projectId, string customId, List<string> keys = default(List<string>),
-            string after = default(string))
+        public SetPrivateCustomItemRequest(string projectId, string customId, Unity.Services.CloudSave.Internal.Models.SetItemBody setItemBody = default(Unity.Services.CloudSave.Internal.Models.SetItemBody))
         {
             ProjectId = projectId;
 
             CustomId = customId;
 
-            Keys = keys;
-            After = after;
-            PathAndQueryParams = $"/v1/data/projects/{projectId}/custom/{customId}/items";
+            SetItemBody = setItemBody;
+            PathAndQueryParams = $"/v1/data/projects/{projectId}/custom/{customId}/private/items";
 
-            List<string> queryParams = new List<string>();
 
-            if (Keys != null)
-            {
-                var keysStringValues = Keys.Select(v => v.ToString()).ToList();
-                queryParams = AddParamsToQueryParams(queryParams, "keys", keysStringValues, "form", true);
-            }
-
-            if (!string.IsNullOrEmpty(After))
-            {
-                queryParams = AddParamsToQueryParams(queryParams, "after", After);
-            }
-
-            if (queryParams.Count > 0)
-            {
-                PathAndQueryParams = $"{PathAndQueryParams}?{string.Join("&", queryParams)}";
-            }
         }
 
         /// <summary>
@@ -1122,6 +3854,10 @@ namespace Unity.Services.CloudSave.Internal.Data
         /// <returns>A list of IMultipartFormSection representing the request body.</returns>
         public byte[] ConstructBody()
         {
+            if(SetItemBody != null)
+            {
+                return ConstructBody(SetItemBody);
+            }
             return null;
         }
 
@@ -1135,7 +3871,7 @@ namespace Unity.Services.CloudSave.Internal.Data
             Configuration operationConfiguration = null)
         {
             var headers = new Dictionary<string, string>();
-            if (!string.IsNullOrEmpty(accessToken.AccessToken))
+            if(!string.IsNullOrEmpty(accessToken.AccessToken))
             {
                 headers.Add("authorization", "Bearer " + accessToken.AccessToken);
             }
@@ -1144,17 +3880,21 @@ namespace Unity.Services.CloudSave.Internal.Data
             headers.Add("Unity-Client-Version", Application.unityVersion);
             headers.Add("Unity-Client-Mode", Scheduler.EngineStateHelper.IsPlaying ? "play" : "edit");
 
-            string[] contentTypes = { };
+            string[] contentTypes = {
+                "application/json"
+            };
 
-            string[] accepts = { "application/json", "application/problem+json" };
+            string[] accepts = {
+                "application/json",
+                "application/problem+json"
+            };
 
             var acceptHeader = GenerateAcceptHeader(accepts);
             if (!string.IsNullOrEmpty(acceptHeader))
             {
                 headers.Add("Accept", acceptHeader);
             }
-
-            var httpMethod = "GET";
+            var httpMethod = "POST";
             var contentTypeHeader = GenerateContentTypeHeader(contentTypes);
             if (!string.IsNullOrEmpty(contentTypeHeader))
             {
@@ -1179,56 +3919,42 @@ namespace Unity.Services.CloudSave.Internal.Data
             return headers;
         }
     }
-
     /// <summary>
-    /// GetCustomKeysRequest
-    /// Get Custom Keys
+    /// SetPrivateCustomItemBatchRequest
+    /// Set Private Custom Item Batch
     /// </summary>
     [Preserve]
-    internal class GetCustomKeysRequest : DataApiBaseRequest
+    internal class SetPrivateCustomItemBatchRequest : DataApiBaseRequest
     {
         /// <summary>Accessor for projectId </summary>
         [Preserve]
         public string ProjectId { get; }
-
         /// <summary>Accessor for customId </summary>
         [Preserve]
         public string CustomId { get; }
-
-        /// <summary>Accessor for after </summary>
+        /// <summary>Accessor for setItemBatchBody </summary>
         [Preserve]
-        public string After { get; }
-
+        public Unity.Services.CloudSave.Internal.Models.SetItemBatchBody SetItemBatchBody { get; }
         string PathAndQueryParams;
 
         /// <summary>
-        /// GetCustomKeys Request Object.
-        /// Get Custom Keys
+        /// SetPrivateCustomItemBatch Request Object.
+        /// Set Private Custom Item Batch
         /// </summary>
         /// <param name="projectId">ID of the project.</param>
         /// <param name="customId">The custom data ID specified by the user. Must be between 1 and 50 characters long and contain only alphanumeric characters, underscores, and hyphens.</param>
-        /// <param name="after">Returns the page of results after the key specified.</param>
+        /// <param name="setItemBatchBody">Set batch data items for a custom ID.</param>
         [Preserve]
-        public GetCustomKeysRequest(string projectId, string customId, string after = default(string))
+        public SetPrivateCustomItemBatchRequest(string projectId, string customId, Unity.Services.CloudSave.Internal.Models.SetItemBatchBody setItemBatchBody = default(Unity.Services.CloudSave.Internal.Models.SetItemBatchBody))
         {
             ProjectId = projectId;
 
             CustomId = customId;
 
-            After = after;
-            PathAndQueryParams = $"/v1/data/projects/{projectId}/custom/{customId}/keys";
+            SetItemBatchBody = setItemBatchBody;
+            PathAndQueryParams = $"/v1/data/projects/{projectId}/custom/{customId}/private/item-batch";
 
-            List<string> queryParams = new List<string>();
 
-            if (!string.IsNullOrEmpty(After))
-            {
-                queryParams = AddParamsToQueryParams(queryParams, "after", After);
-            }
-
-            if (queryParams.Count > 0)
-            {
-                PathAndQueryParams = $"{PathAndQueryParams}?{string.Join("&", queryParams)}";
-            }
         }
 
         /// <summary>
@@ -1248,6 +3974,10 @@ namespace Unity.Services.CloudSave.Internal.Data
         /// <returns>A list of IMultipartFormSection representing the request body.</returns>
         public byte[] ConstructBody()
         {
+            if(SetItemBatchBody != null)
+            {
+                return ConstructBody(SetItemBatchBody);
+            }
             return null;
         }
 
@@ -1261,7 +3991,7 @@ namespace Unity.Services.CloudSave.Internal.Data
             Configuration operationConfiguration = null)
         {
             var headers = new Dictionary<string, string>();
-            if (!string.IsNullOrEmpty(accessToken.AccessToken))
+            if(!string.IsNullOrEmpty(accessToken.AccessToken))
             {
                 headers.Add("authorization", "Bearer " + accessToken.AccessToken);
             }
@@ -1270,17 +4000,501 @@ namespace Unity.Services.CloudSave.Internal.Data
             headers.Add("Unity-Client-Version", Application.unityVersion);
             headers.Add("Unity-Client-Mode", Scheduler.EngineStateHelper.IsPlaying ? "play" : "edit");
 
-            string[] contentTypes = { };
+            string[] contentTypes = {
+                "application/json"
+            };
 
-            string[] accepts = { "application/json", "application/problem+json" };
+            string[] accepts = {
+                "application/json",
+                "application/problem+json"
+            };
 
             var acceptHeader = GenerateAcceptHeader(accepts);
             if (!string.IsNullOrEmpty(acceptHeader))
             {
                 headers.Add("Accept", acceptHeader);
             }
+            var httpMethod = "POST";
+            var contentTypeHeader = GenerateContentTypeHeader(contentTypes);
+            if (!string.IsNullOrEmpty(contentTypeHeader))
+            {
+                headers.Add("Content-Type", contentTypeHeader);
+            }
+            else if (httpMethod == "POST" || httpMethod == "PATCH")
+            {
+                headers.Add("Content-Type", "application/json");
+            }
 
-            var httpMethod = "GET";
+
+            // We also check if there are headers that are defined as part of
+            // the request configuration.
+            if (operationConfiguration != null && operationConfiguration.Headers != null)
+            {
+                foreach (var pair in operationConfiguration.Headers)
+                {
+                    headers[pair.Key] = pair.Value;
+                }
+            }
+
+            return headers;
+        }
+    }
+    /// <summary>
+    /// SetProtectedItemRequest
+    /// Set Protected Player Item
+    /// </summary>
+    [Preserve]
+    internal class SetProtectedItemRequest : DataApiBaseRequest
+    {
+        /// <summary>Accessor for projectId </summary>
+        [Preserve]
+        public string ProjectId { get; }
+        /// <summary>Accessor for playerId </summary>
+        [Preserve]
+        public string PlayerId { get; }
+        /// <summary>Accessor for setItemBody </summary>
+        [Preserve]
+        public Unity.Services.CloudSave.Internal.Models.SetItemBody SetItemBody { get; }
+        string PathAndQueryParams;
+
+        /// <summary>
+        /// SetProtectedItem Request Object.
+        /// Set Protected Player Item
+        /// </summary>
+        /// <param name="projectId">ID of the project.</param>
+        /// <param name="playerId">The player ID supplied by the Authorization service.</param>
+        /// <param name="setItemBody">Add a data item to store for a player.</param>
+        [Preserve]
+        public SetProtectedItemRequest(string projectId, string playerId, Unity.Services.CloudSave.Internal.Models.SetItemBody setItemBody = default(Unity.Services.CloudSave.Internal.Models.SetItemBody))
+        {
+            ProjectId = projectId;
+
+            PlayerId = playerId;
+
+            SetItemBody = setItemBody;
+            PathAndQueryParams = $"/v1/data/projects/{projectId}/players/{playerId}/protected/items";
+
+
+        }
+
+        /// <summary>
+        /// Helper function for constructing URL from request base path and
+        /// query params.
+        /// </summary>
+        /// <param name="requestBasePath"></param>
+        /// <returns></returns>
+        public string ConstructUrl(string requestBasePath)
+        {
+            return requestBasePath + PathAndQueryParams;
+        }
+
+        /// <summary>
+        /// Helper for constructing the request body.
+        /// </summary>
+        /// <returns>A list of IMultipartFormSection representing the request body.</returns>
+        public byte[] ConstructBody()
+        {
+            if(SetItemBody != null)
+            {
+                return ConstructBody(SetItemBody);
+            }
+            return null;
+        }
+
+        /// <summary>
+        /// Helper function for constructing the headers.
+        /// </summary>
+        /// <param name="accessToken">The auth access token to use.</param>
+        /// <param name="operationConfiguration">The operation configuration to use.</param>
+        /// <returns>A dictionary representing the request headers.</returns>
+        public Dictionary<string, string> ConstructHeaders(IAccessToken accessToken,
+            Configuration operationConfiguration = null)
+        {
+            var headers = new Dictionary<string, string>();
+            if(!string.IsNullOrEmpty(accessToken.AccessToken))
+            {
+                headers.Add("authorization", "Bearer " + accessToken.AccessToken);
+            }
+
+            // Analytics headers
+            headers.Add("Unity-Client-Version", Application.unityVersion);
+            headers.Add("Unity-Client-Mode", Scheduler.EngineStateHelper.IsPlaying ? "play" : "edit");
+
+            string[] contentTypes = {
+                "application/json"
+            };
+
+            string[] accepts = {
+                "application/json",
+                "application/problem+json"
+            };
+
+            var acceptHeader = GenerateAcceptHeader(accepts);
+            if (!string.IsNullOrEmpty(acceptHeader))
+            {
+                headers.Add("Accept", acceptHeader);
+            }
+            var httpMethod = "POST";
+            var contentTypeHeader = GenerateContentTypeHeader(contentTypes);
+            if (!string.IsNullOrEmpty(contentTypeHeader))
+            {
+                headers.Add("Content-Type", contentTypeHeader);
+            }
+            else if (httpMethod == "POST" || httpMethod == "PATCH")
+            {
+                headers.Add("Content-Type", "application/json");
+            }
+
+
+            // We also check if there are headers that are defined as part of
+            // the request configuration.
+            if (operationConfiguration != null && operationConfiguration.Headers != null)
+            {
+                foreach (var pair in operationConfiguration.Headers)
+                {
+                    headers[pair.Key] = pair.Value;
+                }
+            }
+
+            return headers;
+        }
+    }
+    /// <summary>
+    /// SetProtectedItemBatchRequest
+    /// Set Protected Player Item Batch
+    /// </summary>
+    [Preserve]
+    internal class SetProtectedItemBatchRequest : DataApiBaseRequest
+    {
+        /// <summary>Accessor for projectId </summary>
+        [Preserve]
+        public string ProjectId { get; }
+        /// <summary>Accessor for playerId </summary>
+        [Preserve]
+        public string PlayerId { get; }
+        /// <summary>Accessor for setItemBatchBody </summary>
+        [Preserve]
+        public Unity.Services.CloudSave.Internal.Models.SetItemBatchBody SetItemBatchBody { get; }
+        string PathAndQueryParams;
+
+        /// <summary>
+        /// SetProtectedItemBatch Request Object.
+        /// Set Protected Player Item Batch
+        /// </summary>
+        /// <param name="projectId">ID of the project.</param>
+        /// <param name="playerId">The player ID supplied by the Authorization service.</param>
+        /// <param name="setItemBatchBody">Set batch data items for a player.</param>
+        [Preserve]
+        public SetProtectedItemBatchRequest(string projectId, string playerId, Unity.Services.CloudSave.Internal.Models.SetItemBatchBody setItemBatchBody = default(Unity.Services.CloudSave.Internal.Models.SetItemBatchBody))
+        {
+            ProjectId = projectId;
+
+            PlayerId = playerId;
+
+            SetItemBatchBody = setItemBatchBody;
+            PathAndQueryParams = $"/v1/data/projects/{projectId}/players/{playerId}/protected/item-batch";
+
+
+        }
+
+        /// <summary>
+        /// Helper function for constructing URL from request base path and
+        /// query params.
+        /// </summary>
+        /// <param name="requestBasePath"></param>
+        /// <returns></returns>
+        public string ConstructUrl(string requestBasePath)
+        {
+            return requestBasePath + PathAndQueryParams;
+        }
+
+        /// <summary>
+        /// Helper for constructing the request body.
+        /// </summary>
+        /// <returns>A list of IMultipartFormSection representing the request body.</returns>
+        public byte[] ConstructBody()
+        {
+            if(SetItemBatchBody != null)
+            {
+                return ConstructBody(SetItemBatchBody);
+            }
+            return null;
+        }
+
+        /// <summary>
+        /// Helper function for constructing the headers.
+        /// </summary>
+        /// <param name="accessToken">The auth access token to use.</param>
+        /// <param name="operationConfiguration">The operation configuration to use.</param>
+        /// <returns>A dictionary representing the request headers.</returns>
+        public Dictionary<string, string> ConstructHeaders(IAccessToken accessToken,
+            Configuration operationConfiguration = null)
+        {
+            var headers = new Dictionary<string, string>();
+            if(!string.IsNullOrEmpty(accessToken.AccessToken))
+            {
+                headers.Add("authorization", "Bearer " + accessToken.AccessToken);
+            }
+
+            // Analytics headers
+            headers.Add("Unity-Client-Version", Application.unityVersion);
+            headers.Add("Unity-Client-Mode", Scheduler.EngineStateHelper.IsPlaying ? "play" : "edit");
+
+            string[] contentTypes = {
+                "application/json"
+            };
+
+            string[] accepts = {
+                "application/json",
+                "application/problem+json"
+            };
+
+            var acceptHeader = GenerateAcceptHeader(accepts);
+            if (!string.IsNullOrEmpty(acceptHeader))
+            {
+                headers.Add("Accept", acceptHeader);
+            }
+            var httpMethod = "POST";
+            var contentTypeHeader = GenerateContentTypeHeader(contentTypes);
+            if (!string.IsNullOrEmpty(contentTypeHeader))
+            {
+                headers.Add("Content-Type", contentTypeHeader);
+            }
+            else if (httpMethod == "POST" || httpMethod == "PATCH")
+            {
+                headers.Add("Content-Type", "application/json");
+            }
+
+
+            // We also check if there are headers that are defined as part of
+            // the request configuration.
+            if (operationConfiguration != null && operationConfiguration.Headers != null)
+            {
+                foreach (var pair in operationConfiguration.Headers)
+                {
+                    headers[pair.Key] = pair.Value;
+                }
+            }
+
+            return headers;
+        }
+    }
+    /// <summary>
+    /// SetPublicItemRequest
+    /// Set Public Player Item
+    /// </summary>
+    [Preserve]
+    internal class SetPublicItemRequest : DataApiBaseRequest
+    {
+        /// <summary>Accessor for projectId </summary>
+        [Preserve]
+        public string ProjectId { get; }
+        /// <summary>Accessor for playerId </summary>
+        [Preserve]
+        public string PlayerId { get; }
+        /// <summary>Accessor for setItemBody </summary>
+        [Preserve]
+        public Unity.Services.CloudSave.Internal.Models.SetItemBody SetItemBody { get; }
+        string PathAndQueryParams;
+
+        /// <summary>
+        /// SetPublicItem Request Object.
+        /// Set Public Player Item
+        /// </summary>
+        /// <param name="projectId">ID of the project.</param>
+        /// <param name="playerId">The player ID supplied by the Authorization service.</param>
+        /// <param name="setItemBody">Add a data item to store for a player.</param>
+        [Preserve]
+        public SetPublicItemRequest(string projectId, string playerId, Unity.Services.CloudSave.Internal.Models.SetItemBody setItemBody = default(Unity.Services.CloudSave.Internal.Models.SetItemBody))
+        {
+            ProjectId = projectId;
+
+            PlayerId = playerId;
+
+            SetItemBody = setItemBody;
+            PathAndQueryParams = $"/v1/data/projects/{projectId}/players/{playerId}/public/items";
+
+
+        }
+
+        /// <summary>
+        /// Helper function for constructing URL from request base path and
+        /// query params.
+        /// </summary>
+        /// <param name="requestBasePath"></param>
+        /// <returns></returns>
+        public string ConstructUrl(string requestBasePath)
+        {
+            return requestBasePath + PathAndQueryParams;
+        }
+
+        /// <summary>
+        /// Helper for constructing the request body.
+        /// </summary>
+        /// <returns>A list of IMultipartFormSection representing the request body.</returns>
+        public byte[] ConstructBody()
+        {
+            if(SetItemBody != null)
+            {
+                return ConstructBody(SetItemBody);
+            }
+            return null;
+        }
+
+        /// <summary>
+        /// Helper function for constructing the headers.
+        /// </summary>
+        /// <param name="accessToken">The auth access token to use.</param>
+        /// <param name="operationConfiguration">The operation configuration to use.</param>
+        /// <returns>A dictionary representing the request headers.</returns>
+        public Dictionary<string, string> ConstructHeaders(IAccessToken accessToken,
+            Configuration operationConfiguration = null)
+        {
+            var headers = new Dictionary<string, string>();
+            if(!string.IsNullOrEmpty(accessToken.AccessToken))
+            {
+                headers.Add("authorization", "Bearer " + accessToken.AccessToken);
+            }
+
+            // Analytics headers
+            headers.Add("Unity-Client-Version", Application.unityVersion);
+            headers.Add("Unity-Client-Mode", Scheduler.EngineStateHelper.IsPlaying ? "play" : "edit");
+
+            string[] contentTypes = {
+                "application/json"
+            };
+
+            string[] accepts = {
+                "application/json",
+                "application/problem+json"
+            };
+
+            var acceptHeader = GenerateAcceptHeader(accepts);
+            if (!string.IsNullOrEmpty(acceptHeader))
+            {
+                headers.Add("Accept", acceptHeader);
+            }
+            var httpMethod = "POST";
+            var contentTypeHeader = GenerateContentTypeHeader(contentTypes);
+            if (!string.IsNullOrEmpty(contentTypeHeader))
+            {
+                headers.Add("Content-Type", contentTypeHeader);
+            }
+            else if (httpMethod == "POST" || httpMethod == "PATCH")
+            {
+                headers.Add("Content-Type", "application/json");
+            }
+
+
+            // We also check if there are headers that are defined as part of
+            // the request configuration.
+            if (operationConfiguration != null && operationConfiguration.Headers != null)
+            {
+                foreach (var pair in operationConfiguration.Headers)
+                {
+                    headers[pair.Key] = pair.Value;
+                }
+            }
+
+            return headers;
+        }
+    }
+    /// <summary>
+    /// SetPublicItemBatchRequest
+    /// Set Public Player Item Batch
+    /// </summary>
+    [Preserve]
+    internal class SetPublicItemBatchRequest : DataApiBaseRequest
+    {
+        /// <summary>Accessor for projectId </summary>
+        [Preserve]
+        public string ProjectId { get; }
+        /// <summary>Accessor for playerId </summary>
+        [Preserve]
+        public string PlayerId { get; }
+        /// <summary>Accessor for setItemBatchBody </summary>
+        [Preserve]
+        public Unity.Services.CloudSave.Internal.Models.SetItemBatchBody SetItemBatchBody { get; }
+        string PathAndQueryParams;
+
+        /// <summary>
+        /// SetPublicItemBatch Request Object.
+        /// Set Public Player Item Batch
+        /// </summary>
+        /// <param name="projectId">ID of the project.</param>
+        /// <param name="playerId">The player ID supplied by the Authorization service.</param>
+        /// <param name="setItemBatchBody">Set batch data items for a player.</param>
+        [Preserve]
+        public SetPublicItemBatchRequest(string projectId, string playerId, Unity.Services.CloudSave.Internal.Models.SetItemBatchBody setItemBatchBody = default(Unity.Services.CloudSave.Internal.Models.SetItemBatchBody))
+        {
+            ProjectId = projectId;
+
+            PlayerId = playerId;
+
+            SetItemBatchBody = setItemBatchBody;
+            PathAndQueryParams = $"/v1/data/projects/{projectId}/players/{playerId}/public/item-batch";
+
+
+        }
+
+        /// <summary>
+        /// Helper function for constructing URL from request base path and
+        /// query params.
+        /// </summary>
+        /// <param name="requestBasePath"></param>
+        /// <returns></returns>
+        public string ConstructUrl(string requestBasePath)
+        {
+            return requestBasePath + PathAndQueryParams;
+        }
+
+        /// <summary>
+        /// Helper for constructing the request body.
+        /// </summary>
+        /// <returns>A list of IMultipartFormSection representing the request body.</returns>
+        public byte[] ConstructBody()
+        {
+            if(SetItemBatchBody != null)
+            {
+                return ConstructBody(SetItemBatchBody);
+            }
+            return null;
+        }
+
+        /// <summary>
+        /// Helper function for constructing the headers.
+        /// </summary>
+        /// <param name="accessToken">The auth access token to use.</param>
+        /// <param name="operationConfiguration">The operation configuration to use.</param>
+        /// <returns>A dictionary representing the request headers.</returns>
+        public Dictionary<string, string> ConstructHeaders(IAccessToken accessToken,
+            Configuration operationConfiguration = null)
+        {
+            var headers = new Dictionary<string, string>();
+            if(!string.IsNullOrEmpty(accessToken.AccessToken))
+            {
+                headers.Add("authorization", "Bearer " + accessToken.AccessToken);
+            }
+
+            // Analytics headers
+            headers.Add("Unity-Client-Version", Application.unityVersion);
+            headers.Add("Unity-Client-Mode", Scheduler.EngineStateHelper.IsPlaying ? "play" : "edit");
+
+            string[] contentTypes = {
+                "application/json"
+            };
+
+            string[] accepts = {
+                "application/json",
+                "application/problem+json"
+            };
+
+            var acceptHeader = GenerateAcceptHeader(accepts);
+            if (!string.IsNullOrEmpty(acceptHeader))
+            {
+                headers.Add("Accept", acceptHeader);
+            }
+            var httpMethod = "POST";
             var contentTypeHeader = GenerateContentTypeHeader(contentTypes);
             if (!string.IsNullOrEmpty(contentTypeHeader))
             {

@@ -19,29 +19,36 @@ namespace Unity.Services.CloudSave.Internal
     {
         /// <summary>The base service path which is overridable. Should be set to a valid URL.</summary>
         public string BasePath;
+
         /// <summary>The configuration request timeout.</summary>
         public int? RequestTimeout;
+
         /// <summary>Number of retries to attempt the operation.</summary>
         public int? NumberOfRetries;
+
         /// <summary>Headers for the operation.</summary>
         public IDictionary<string, string> Headers;
-
 
         /// <summary>
         /// Configuration constructor.
         /// </summary>
         /// <param name="basePath">The base service path which is overridable. Should be set to a valid URL.</param>
         /// <param name="requestTimeout">Request timeout for the configuration.</param>
-        /// <param name="numRetries">Number of retries for the configuration.</param>        
+        /// <param name="numRetries">Number of retries for the configuration.</param>
         /// <param name="headers">Headers for the configuration.</param>
-        public Configuration(string basePath, int? requestTimeout, int? numRetries, IDictionary<string, string> headers)
+        public Configuration(
+            string basePath,
+            int? requestTimeout,
+            int? numRetries,
+            IDictionary<string, string> headers)
         {
             BasePath = basePath;
             RequestTimeout = requestTimeout;
             NumberOfRetries = numRetries;
+
             if(headers == null)
             {
-                Headers = headers;
+                Headers = new Dictionary<string, string>();
             }
             else
             {
@@ -68,7 +75,11 @@ namespace Unity.Services.CloudSave.Internal
                 return a ?? b;
             }
 
-            Configuration mergedConfig = new Configuration(a.BasePath, a.RequestTimeout, a.NumberOfRetries, a.Headers);
+            Configuration mergedConfig = new Configuration(
+                a.BasePath,
+                a.RequestTimeout,
+                a.NumberOfRetries,
+                a.Headers);
 
             if(mergedConfig.BasePath == null)
             {
@@ -96,7 +107,6 @@ namespace Unity.Services.CloudSave.Internal
             mergedConfig.Headers = headers;
             mergedConfig.RequestTimeout = mergedConfig.RequestTimeout ?? b.RequestTimeout;
             mergedConfig.NumberOfRetries = mergedConfig.NumberOfRetries ?? b.NumberOfRetries;
-
 
             return mergedConfig;
         }

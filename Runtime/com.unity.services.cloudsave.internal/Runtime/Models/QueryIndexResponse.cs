@@ -22,58 +22,52 @@ using Unity.Services.CloudSave.Internal.Http;
 namespace Unity.Services.CloudSave.Internal.Models
 {
     /// <summary>
-    /// Timestamp for when the object was modified.
+    /// The response to an index query request containing a list of the resulting entity IDs and their associated data.
     /// </summary>
     [Preserve]
-    [DataContract(Name = "ModifiedMetadata")]
-    internal class ModifiedMetadata
+    [DataContract(Name = "QueryIndexResponse")]
+    internal class QueryIndexResponse
     {
         /// <summary>
-        /// Timestamp for when the object was modified.
+        /// The response to an index query request containing a list of the resulting entity IDs and their associated data.
         /// </summary>
-        /// <param name="date">Date time in ISO 8601 format. Null if there is no associated value.</param>
+        /// <param name="results">results param</param>
         [Preserve]
-        public ModifiedMetadata(DateTime? date)
+        public QueryIndexResponse(List<QueryIndexResponseResultsInner> results = default)
         {
-            Date = date;
+            Results = results;
         }
 
         /// <summary>
-        /// Date time in ISO 8601 format. Null if there is no associated value.
+        /// Parameter results of QueryIndexResponse
         /// </summary>
         [Preserve]
-        [DataMember(Name = "date", IsRequired = true, EmitDefaultValue = true)]
-        public DateTime? Date{ get; }
+        [DataMember(Name = "results", EmitDefaultValue = false)]
+        public List<QueryIndexResponseResultsInner> Results{ get; }
     
         /// <summary>
-        /// Formats a ModifiedMetadata into a string of key-value pairs for use as a path parameter.
+        /// Formats a QueryIndexResponse into a string of key-value pairs for use as a path parameter.
         /// </summary>
         /// <returns>Returns a string representation of the key-value pairs.</returns>
         internal string SerializeAsPathParam()
         {
             var serializedModel = "";
 
-            if (Date != null)
+            if (Results != null)
             {
-                serializedModel += "date," + Date.ToString();
+                serializedModel += "results," + Results.ToString();
             }
             return serializedModel;
         }
 
         /// <summary>
-        /// Returns a ModifiedMetadata as a dictionary of key-value pairs for use as a query parameter.
+        /// Returns a QueryIndexResponse as a dictionary of key-value pairs for use as a query parameter.
         /// </summary>
         /// <returns>Returns a dictionary of string key-value pairs.</returns>
         internal Dictionary<string, string> GetAsQueryParam()
         {
             var dictionary = new Dictionary<string, string>();
 
-            if (Date != null)
-            {
-                var dateStringValue = Date.ToString();
-                dictionary.Add("date", dateStringValue);
-            }
-            
             return dictionary;
         }
     }

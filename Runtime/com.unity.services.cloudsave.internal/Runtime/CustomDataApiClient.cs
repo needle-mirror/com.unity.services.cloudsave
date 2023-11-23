@@ -1,10 +1,14 @@
+using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
 using Unity.Services.CloudSave.Internal.Data;
 using Unity.Services.CloudSave.Internal.Models;
+using Unity.Services.CloudSave.Models;
 using Unity.Services.Core;
 using Unity.Services.Core.Configuration.Internal;
+using FieldFilter = Unity.Services.CloudSave.Internal.Models.FieldFilter;
 
 [assembly: InternalsVisibleTo("Unity.Services.CloudSave.Tests")]
 
@@ -17,6 +21,7 @@ namespace Unity.Services.CloudSave.Internal
     {
         Task<Response<GetKeysResponse>> ListKeysAsync(string customID, string afterKey);
         Task<Response<GetItemsResponse>> LoadAsync(string customID, ISet<string> keys, string afterKey);
+        Task<Response<QueryIndexResponse>> QueryAsync(Query query, AccessClass accessClass = AccessClass.Default);
     }
 
     class CustomDataApiClient : ICustomDataApiClient
@@ -26,7 +31,7 @@ namespace Unity.Services.CloudSave.Internal
         readonly IAuthentication m_Authentication;
 
         internal CustomDataApiClient(ICloudProjectId cloudProjectId, IAuthentication authentication,
-            Internal.Apis.Data.IDataApiClient dataClient)
+                                     Internal.Apis.Data.IDataApiClient dataClient)
         {
             m_CloudProjectId = cloudProjectId;
             m_DataClient = dataClient;
@@ -52,6 +57,31 @@ namespace Unity.Services.CloudSave.Internal
             return await m_DataClient.GetCustomItemsAsync(request);
         }
 
+        public async Task<Response<QueryIndexResponse>> QueryAsync(Query query,
+            AccessClass accessClass = AccessClass.Default)
+        {
+            ValidateRequiredDependencies();
+            var queryFields = query?.Fields?.Select(FieldFilterToInternalFieldFilter).ToList() ??
+                new List<FieldFilter>();
+            var queryKeys = query?.ReturnKeys?.ToList() ?? new List<string>();
+            var offset = query?.Offset ?? 0;
+            var limit = query?.Limit ?? 0;
+
+            switch (accessClass)
+            {
+                case AccessClass.Default:
+                    var request = new QueryDefaultCustomDataRequest(m_CloudProjectId.GetCloudProjectId(),
+                        new QueryIndexBody(queryFields, queryKeys, offset, limit));
+                    return await m_DataClient.QueryDefaultCustomDataAsync(request);
+                case AccessClass.Public:
+                case AccessClass.Private:
+                case AccessClass.Protected:
+                default:
+                    throw new InvalidOperationException(
+                        "QueryAsync can only be called with Default AccessClass");
+            }
+        }
+
         void ValidateRequiredDependencies()
         {
             if (string.IsNullOrEmpty(m_CloudProjectId.GetCloudProjectId()))
@@ -67,6 +97,12 @@ namespace Unity.Services.CloudSave.Internal
                     "Access token is missing - ensure you are signed in through the Authentication SDK and try again.",
                     null);
             }
+        }
+
+        static FieldFilter FieldFilterToInternalFieldFilter(CloudSave.Models.FieldFilter fieldFilter)
+        {
+            return new FieldFilter(fieldFilter.Key, fieldFilter.Value, (FieldFilter.OpOptions)fieldFilter.Op,
+                fieldFilter.Asc);
         }
     }
 }

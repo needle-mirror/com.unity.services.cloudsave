@@ -33,7 +33,7 @@ namespace Unity.Services.CloudSave.Internal.Models
         /// </summary>
         /// <param name="results">results param</param>
         [Preserve]
-        public SetItemBatchResponse(List<SetItemBatchResponseResults> results = default)
+        public SetItemBatchResponse(List<SetItemBatchResponseResultsInner> results = default)
         {
             Results = results;
         }
@@ -43,7 +43,7 @@ namespace Unity.Services.CloudSave.Internal.Models
         /// </summary>
         [Preserve]
         [DataMember(Name = "results", EmitDefaultValue = false)]
-        public List<SetItemBatchResponseResults> Results{ get; }
+        public List<SetItemBatchResponseResultsInner> Results{ get; }
     
         /// <summary>
         /// Formats a SetItemBatchResponse into a string of key-value pairs for use as a path parameter.

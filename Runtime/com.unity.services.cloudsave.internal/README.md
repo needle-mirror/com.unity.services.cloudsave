@@ -7,7 +7,7 @@ Window > Package Manager
 ## Install Cloud Save API
 
 In the Package Manager Click on the "+" sign in the top left corner then select
-"Add Package From Disk" then browse to `com.unity.services.cloudsave.internal` and select package.json
+"Add Package From Disk" then browse to `com.unity.services.cloudsave` and select package.json
 > open
 
 ## Setting Up the Scoped Repository to Access Preview Packages

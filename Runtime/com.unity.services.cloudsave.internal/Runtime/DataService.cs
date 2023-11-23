@@ -101,6 +101,12 @@ namespace Unity.Services.CloudSave.Internal
         public IPlayerDataService Player { get; }
         public ICustomDataService Custom { get; }
 
+        internal static FieldFilter FieldFilterToInternalFieldFilter(CloudSave.Models.FieldFilter fieldFilter)
+        {
+            return new FieldFilter(fieldFilter.Key, fieldFilter.Value, (FieldFilter.OpOptions)fieldFilter.Op,
+                fieldFilter.Asc);
+        }
+
         #region Deprecated, pre v3.0.0
         public async Task<List<string>> RetrieveAllKeysAsync()
         {
@@ -298,6 +304,7 @@ namespace Unity.Services.CloudSave.Internal
         {
             return await LoadAsync();
         }
+
         #endregion
     }
 }

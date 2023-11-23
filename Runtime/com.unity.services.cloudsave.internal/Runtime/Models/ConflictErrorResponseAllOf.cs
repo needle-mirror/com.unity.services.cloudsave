@@ -44,7 +44,7 @@ namespace Unity.Services.CloudSave.Internal.Models
         [Preserve]
         [DataMember(Name = "data", EmitDefaultValue = false)]
         public ConflictErrorResponseData Data{ get; }
-
+    
         /// <summary>
         /// Formats a ConflictErrorResponseAllOf into a string of key-value pairs for use as a path parameter.
         /// </summary>

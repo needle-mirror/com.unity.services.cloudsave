@@ -173,7 +173,7 @@ namespace Unity.Services.CloudSave.Internal.Models
 
         public override bool CanConvert(Type objectType)
         {
-            throw new NotImplementedException();
+            return objectType == typeof(SetItemBatch400Response);
         }
     }
 }

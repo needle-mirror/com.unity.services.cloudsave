@@ -104,6 +104,7 @@ namespace Unity.Services.CloudSave.Internal
         public System.Threading.Tasks.Task<System.Collections.Generic.List<Unity.Services.CloudSave.Models.ItemKey>> ListAllKeysAsync(string customDataID);
         public System.Threading.Tasks.Task<System.Collections.Generic.Dictionary<string, Unity.Services.CloudSave.Models.Item>> LoadAllAsync(string customDataID);
         public System.Threading.Tasks.Task<System.Collections.Generic.Dictionary<string, Unity.Services.CloudSave.Models.Item>> LoadAsync(string customDataID, System.Collections.Generic.ISet<string> keys);
+        public System.Threading.Tasks.Task<System.Collections.Generic.List<Unity.Services.CloudSave.Models.EntityData>> QueryAsync(Unity.Services.CloudSave.Models.Query query, Unity.Services.CloudSave.Models.Data.Custom.QueryOptions options = default(Unity.Services.CloudSave.Models.Data.Custom.QueryOptions));
     }
 
     public interface IDataService
@@ -132,12 +133,20 @@ namespace Unity.Services.CloudSave.Internal
     public interface IPlayerDataService
     {
         public System.Threading.Tasks.Task DeleteAllAsync();
+        public System.Threading.Tasks.Task DeleteAllAsync(Unity.Services.CloudSave.Models.Data.Player.DeleteAllOptions options);
         public System.Threading.Tasks.Task DeleteAsync(string key, DeleteOptions deleteOptions = default(DeleteOptions));
+        public System.Threading.Tasks.Task DeleteAsync(string key, Unity.Services.CloudSave.Models.Data.Player.DeleteOptions options);
         public System.Threading.Tasks.Task<System.Collections.Generic.List<Unity.Services.CloudSave.Models.ItemKey>> ListAllKeysAsync();
+        public System.Threading.Tasks.Task<System.Collections.Generic.List<Unity.Services.CloudSave.Models.ItemKey>> ListAllKeysAsync(Unity.Services.CloudSave.Models.Data.Player.ListAllKeysOptions options);
         public System.Threading.Tasks.Task<System.Collections.Generic.Dictionary<string, Unity.Services.CloudSave.Models.Item>> LoadAllAsync();
+        public System.Threading.Tasks.Task<System.Collections.Generic.Dictionary<string, Unity.Services.CloudSave.Models.Item>> LoadAllAsync(Unity.Services.CloudSave.Models.Data.Player.LoadAllOptions options);
         public System.Threading.Tasks.Task<System.Collections.Generic.Dictionary<string, Unity.Services.CloudSave.Models.Item>> LoadAsync(System.Collections.Generic.ISet<string> keys);
+        public System.Threading.Tasks.Task<System.Collections.Generic.Dictionary<string, Unity.Services.CloudSave.Models.Item>> LoadAsync(System.Collections.Generic.ISet<string> keys, Unity.Services.CloudSave.Models.Data.Player.LoadOptions options);
+        public System.Threading.Tasks.Task<System.Collections.Generic.List<Unity.Services.CloudSave.Models.EntityData>> QueryAsync(Unity.Services.CloudSave.Models.Query query, Unity.Services.CloudSave.Models.Data.Player.QueryOptions options);
         public System.Threading.Tasks.Task<System.Collections.Generic.Dictionary<string, string>> SaveAsync(System.Collections.Generic.IDictionary<string, object> data);
         public System.Threading.Tasks.Task<System.Collections.Generic.Dictionary<string, string>> SaveAsync(System.Collections.Generic.IDictionary<string, Unity.Services.CloudSave.Models.SaveItem> data);
+        public System.Threading.Tasks.Task<System.Collections.Generic.Dictionary<string, string>> SaveAsync(System.Collections.Generic.IDictionary<string, object> data, Unity.Services.CloudSave.Models.Data.Player.SaveOptions options);
+        public System.Threading.Tasks.Task<System.Collections.Generic.Dictionary<string, string>> SaveAsync(System.Collections.Generic.IDictionary<string, Unity.Services.CloudSave.Models.SaveItem> data, Unity.Services.CloudSave.Models.Data.Player.SaveOptions options);
     }
 
     public interface IPlayerFilesService
@@ -187,6 +196,39 @@ namespace Unity.Services.CloudSave.Internal.Models
 
 namespace Unity.Services.CloudSave.Models
 {
+    public enum AccessClass
+    {
+        Default = 0,
+        Private = 1,
+        Protected = 2,
+        Public = 3,
+    }
+
+    [System.Runtime.Serialization.DataContract(Name = @"QueryResult")] [UnityEngine.Scripting.Preserve] public class EntityData
+    {
+        [System.Runtime.Serialization.DataMember(EmitDefaultValue = false, Name = @"data")] [UnityEngine.Scripting.Preserve] public System.Collections.Generic.List<Item> Data { get; }
+        [System.Runtime.Serialization.DataMember(EmitDefaultValue = false, Name = @"id")] [UnityEngine.Scripting.Preserve] public string Id { get; }
+        [UnityEngine.Scripting.Preserve] public EntityData(string id = default(string), System.Collections.Generic.List<Item> data = default(System.Collections.Generic.List<Item>)) {}
+    }
+
+    [System.Runtime.Serialization.DataContract(Name = @"FieldFilter")] [UnityEngine.Scripting.Preserve] public class FieldFilter
+    {
+        [System.Runtime.Serialization.DataMember(EmitDefaultValue = true, IsRequired = true, Name = @"asc")] [UnityEngine.Scripting.Preserve] public bool Asc { get; }
+        [System.Runtime.Serialization.DataMember(EmitDefaultValue = true, IsRequired = true, Name = @"key")] [UnityEngine.Scripting.Preserve] public string Key { get; }
+        [Newtonsoft.Json.JsonConverter(typeof(Newtonsoft.Json.Converters.StringEnumConverter))] [System.Runtime.Serialization.DataMember(EmitDefaultValue = true, IsRequired = true, Name = @"op")] [UnityEngine.Scripting.Preserve] public FieldFilter.OpOptions Op { get; }
+        [Newtonsoft.Json.JsonConverter(typeof(Unity.Services.CloudSave.Internal.Http.JsonObjectConverter))] [System.Runtime.Serialization.DataMember(EmitDefaultValue = true, IsRequired = true, Name = @"value")] [UnityEngine.Scripting.Preserve] public Unity.Services.CloudSave.Internal.Http.IDeserializable Value { get; }
+        [UnityEngine.Scripting.Preserve] public FieldFilter(string key, object value, FieldFilter.OpOptions op, bool asc) {}
+        [Newtonsoft.Json.JsonConverter(typeof(Newtonsoft.Json.Converters.StringEnumConverter))] [UnityEngine.Scripting.Preserve] public enum OpOptions
+        {
+            [System.Runtime.Serialization.EnumMember(Value = @"EQ")] EQ = 1,
+            [System.Runtime.Serialization.EnumMember(Value = @"GE")] GE = 6,
+            [System.Runtime.Serialization.EnumMember(Value = @"GT")] GT = 5,
+            [System.Runtime.Serialization.EnumMember(Value = @"LE")] LE = 4,
+            [System.Runtime.Serialization.EnumMember(Value = @"LT")] LT = 3,
+            [System.Runtime.Serialization.EnumMember(Value = @"NE")] NE = 2,
+        }
+    }
+
     public class FileItem
     {
         public string ContentType { get; }
@@ -195,6 +237,17 @@ namespace Unity.Services.CloudSave.Models
         public System.Nullable<System.DateTime> Modified { get; }
         public long Size { get; }
         public string WriteLock { get; }
+    }
+
+    public interface IAccessClassOptions
+    {
+        public AccessClass AccessClass { get; }
+        public string PlayerId { get; }
+    }
+
+    public interface IAccessControlOptions
+    {
+        public IAccessClassOptions AccessClassOptions { get; }
     }
 
     public class Item
@@ -213,10 +266,132 @@ namespace Unity.Services.CloudSave.Models
         public string WriteLock { get; }
     }
 
+    [System.Runtime.Serialization.DataContract(Name = @"Query")] [UnityEngine.Scripting.Preserve] public class Query
+    {
+        [System.Runtime.Serialization.DataMember(EmitDefaultValue = true, IsRequired = true, Name = @"fields")] [UnityEngine.Scripting.Preserve] public System.Collections.Generic.List<FieldFilter> Fields { get; }
+        [System.Runtime.Serialization.DataMember(EmitDefaultValue = false, Name = @"limit")] [UnityEngine.Scripting.Preserve] public int Limit { get; }
+        [System.Runtime.Serialization.DataMember(EmitDefaultValue = false, Name = @"offset")] [UnityEngine.Scripting.Preserve] public int Offset { get; }
+        [System.Runtime.Serialization.DataMember(EmitDefaultValue = false, Name = @"returnKeys")] [UnityEngine.Scripting.Preserve] public System.Collections.Generic.HashSet<string> ReturnKeys { get; }
+        [UnityEngine.Scripting.Preserve] public Query(System.Collections.Generic.List<FieldFilter> fields, System.Collections.Generic.HashSet<string> returnKeys = default(System.Collections.Generic.HashSet<string>), int offset = 0, int limit = 0) {}
+    }
+
     public class SaveItem
     {
         public object Value { get; }
         public string WriteLock { get; }
         public SaveItem(object value, string writeLock) {}
+    }
+
+    public abstract class WriteLockOptions
+    {
+        public string WriteLock { get; set; }
+        protected WriteLockOptions() {}
+    }
+}
+
+namespace Unity.Services.CloudSave.Models.Data.Custom
+{
+    public class QueryOptions
+    {
+        public QueryOptions() {}
+    }
+}
+
+namespace Unity.Services.CloudSave.Models.Data.Player
+{
+    public class DefaultReadAccessClassOptions : ReadAccessClassOptions
+    {
+        public override AccessClass AccessClass { get; }
+        public override string PlayerId { get; }
+        public DefaultReadAccessClassOptions() {}
+    }
+
+    public class DefaultWriteAccessClassOptions : WriteAccessClassOptions
+    {
+        public override AccessClass AccessClass { get; }
+        public DefaultWriteAccessClassOptions() {}
+    }
+
+    public class DeleteAllOptions : IAccessControlOptions
+    {
+        public IAccessClassOptions AccessClassOptions { get; }
+        public DeleteAllOptions() {}
+        public DeleteAllOptions(WriteAccessClassOptions accessClassOptions) {}
+    }
+
+    public class DeleteOptions : WriteLockOptions, IAccessControlOptions
+    {
+        public IAccessClassOptions AccessClassOptions { get; }
+        public DeleteOptions() {}
+        public DeleteOptions(WriteAccessClassOptions accessClassOptions) {}
+    }
+
+    public class ListAllKeysOptions : IAccessControlOptions
+    {
+        public IAccessClassOptions AccessClassOptions { get; }
+        public ListAllKeysOptions() {}
+        public ListAllKeysOptions(ReadAccessClassOptions accessClassOptions) {}
+    }
+
+    public class LoadAllOptions : IAccessControlOptions
+    {
+        public IAccessClassOptions AccessClassOptions { get; }
+        public LoadAllOptions() {}
+        public LoadAllOptions(ReadAccessClassOptions accessClassOptions) {}
+    }
+
+    public class LoadOptions : IAccessControlOptions
+    {
+        public IAccessClassOptions AccessClassOptions { get; }
+        public LoadOptions() {}
+        public LoadOptions(ReadAccessClassOptions accessClassOptions) {}
+    }
+
+    public class ProtectedReadAccessClassOptions : ReadAccessClassOptions
+    {
+        public override AccessClass AccessClass { get; }
+        public override string PlayerId { get; }
+        public ProtectedReadAccessClassOptions() {}
+    }
+
+    public class PublicReadAccessClassOptions : ReadAccessClassOptions
+    {
+        public override AccessClass AccessClass { get; }
+        public override string PlayerId { get; }
+        public PublicReadAccessClassOptions() {}
+        public PublicReadAccessClassOptions(string playerId) {}
+    }
+
+    public class PublicWriteAccessClassOptions : WriteAccessClassOptions
+    {
+        public override AccessClass AccessClass { get; }
+        public PublicWriteAccessClassOptions() {}
+    }
+
+    public class QueryOptions : IAccessControlOptions
+    {
+        public IAccessClassOptions AccessClassOptions { get; }
+        public QueryOptions() {}
+    }
+
+    public abstract class ReadAccessClassOptions : IAccessClassOptions
+    {
+        public abstract AccessClass AccessClass { get; }
+        public abstract string PlayerId { get; }
+        protected ReadAccessClassOptions() {}
+    }
+
+    public class SaveOptions : IAccessControlOptions
+    {
+        public IAccessClassOptions AccessClassOptions { get; }
+        public SaveOptions() {}
+        public SaveOptions(WriteAccessClassOptions accessClassOptions) {}
+    }
+
+    public abstract class WriteAccessClassOptions : IAccessClassOptions
+    {
+        public abstract AccessClass AccessClass { get; }
+        public string PlayerId { get; }
+        protected WriteAccessClassOptions() {}
     }
 }

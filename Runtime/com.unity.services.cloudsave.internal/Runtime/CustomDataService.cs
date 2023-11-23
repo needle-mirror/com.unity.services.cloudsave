@@ -1,7 +1,9 @@
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using Unity.Services.CloudSave.Internal.Models;
 using Unity.Services.CloudSave.Models;
+using Unity.Services.CloudSave.Models.Data.Custom;
 using Item = Unity.Services.CloudSave.Models.Item;
 
 namespace Unity.Services.CloudSave.Internal
@@ -39,6 +41,18 @@ namespace Unity.Services.CloudSave.Internal
         /// <exception cref="CloudSaveValidationException">Thrown if the service returned validation error.</exception>
         /// <exception cref="CloudSaveRateLimitedException">Thrown if the service returned rate limited error.</exception>
         Task<Dictionary<string, Item>> LoadAllAsync(string customDataID);
+
+        /// <summary>
+        /// Queries indexed custom data from Cloud Save, and returns the requested keys for matching items.
+        /// Throws a CloudSaveException with a reason code and explanation of what happened.
+        /// </summary>
+        /// <param name="query">The query conditions to apply, including field filters and sort orders</param>
+        /// <param name="options">Options to modify the behavior of the method</param>
+        /// <returns>The dictionary of all key-value pairs that represents the current state of data on the server including their write locks</returns>
+        /// <exception cref="CloudSaveException">Thrown if request is unsuccessful.</exception>
+        /// <exception cref="CloudSaveValidationException">Thrown if the service returned validation error.</exception>
+        /// <exception cref="CloudSaveRateLimitedException">Thrown if the service returned rate limited error.</exception>
+        Task<List<EntityData>> QueryAsync(Query query, QueryOptions options = null);
     }
 
     class CustomDataService : ICustomDataService
@@ -118,6 +132,15 @@ namespace Unity.Services.CloudSave.Internal
                 while (!string.IsNullOrEmpty(response.Result.Links.Next));
 
                 return result;
+            });
+        }
+
+        public async Task<List<EntityData>> QueryAsync(Query query, QueryOptions options = null)
+        {
+            return await m_ErrorHandler.RunWithErrorHandling(async() =>
+            {
+                var queryResponse = await m_DataApiClient.QueryAsync(query);
+                return queryResponse.Result.Results.Select(ed => new EntityData(ed.Id, ed.Data.Select(item => new Item(item)).ToList())).ToList();
             });
         }
     }

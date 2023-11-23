@@ -4,6 +4,23 @@ All notable changes to this package will be documented in this file.
 The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/)
 and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.html).
 
+## [3.1.0] - 2023-11-23
+### Changed
+* The existing `CloudSaveService.Instance.Data.Player.DeleteAsync` has been marked as Obsolete, with a new version added that accepts options of type `CloudSave.Models.Data.Player.DeleteOptions` instead of `CloudSave.DeleteOptions`.
+  This enables the addition of new options to support Access Classes (see below in **Added**).
+
+### Added
+* Support for Access Classes when interacting with Player Data, via the addition of optional `options` objects to existing methods in the `CloudSaveService.Instance.Data.Player` API.
+For more information on Access Classes, please refer to [the documentation](https://docs.unity.com/ugs/en-us/manual/cloud-save/manual/concepts/player-data#Access_Classes).
+  * Allows players to save data to the Public Access Class in addition to the existing Default, which allows saved data to be visible to other players.
+  * Allows players to read data from Public and Protected Access Classes in addition to the existing Default, where Protected Player Data can only be set by a server authoritative source (e.g. Cloud Code)
+  * Allows players to read other players' Public Player Data, by providing their Player ID as part of the new `options` object.
+
+* Support for Querying in both Public Player Data and Default Custom Data, via the new `QueryAsync` method.
+For more information on Querying, please refer to [the documentation](https://docs.unity.com/ugs/en-us/manual/cloud-save/manual/concepts/queries).
+  * Any data for which an index is configured can be queried by specifying filters on the indexed data (e.g. clanMemberCount < 20)
+  * Any data stored for the returned entities (whether indexed or not) can be retrieved as part of the query response by specifying `ReturnKeys` in the `Query` object.
+
 ## [3.0.0] - 2023-07-25
 ### Changed
 * All existing methods have been marked as obsolete. They have mostly been replicated in new namespaces with some additional changes:

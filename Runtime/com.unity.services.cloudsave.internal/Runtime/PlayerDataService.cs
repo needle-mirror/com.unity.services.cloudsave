@@ -4,22 +4,24 @@ using System.Linq;
 using System.Threading.Tasks;
 using Unity.Services.CloudSave.Internal.Models;
 using Unity.Services.CloudSave.Models;
+using Unity.Services.CloudSave.Models.Data.Player;
 using Item = Unity.Services.CloudSave.Models.Item;
 using ApiItem = Unity.Services.CloudSave.Internal.Models.Item;
 
 namespace Unity.Services.CloudSave.Internal
 {
-    public interface IPlayerDataService
+    public partial interface IPlayerDataService
     {
         /// <summary>
         /// Returns all keys stored in Cloud Save for the logged in player.
         /// Throws a CloudSaveException with a reason code and explanation of what happened.
         /// </summary>
+        /// <param name="options">Options to modify the behavior of the method, specifying AccessClass and PlayerId</param>
         /// <returns>A list of keys and their metadata as stored in the server for the logged in player.</returns>
         /// <exception cref="CloudSaveException">Thrown if request is unsuccessful.</exception>
         /// <exception cref="CloudSaveValidationException">Thrown if the service returned validation error.</exception>
         /// <exception cref="CloudSaveRateLimitedException">Thrown if the service returned rate limited error.</exception>
-        Task<List<ItemKey>> ListAllKeysAsync();
+        Task<List<ItemKey>> ListAllKeysAsync(ListAllKeysOptions options);
 
         /// <summary>
         /// Downloads data from Cloud Save for the keys provided.
@@ -27,21 +29,23 @@ namespace Unity.Services.CloudSave.Internal
         /// Throws a CloudSaveException with a reason code and explanation of what happened.
         /// </summary>
         /// <param name="keys">The optional set of keys to load data for</param>
+        /// <param name="options">Options to modify the behavior of the method, specifying AccessClass and PlayerId</param>
         /// <returns>The dictionary of all key-value pairs that represents the current state of data on the server including their write locks</returns>
         /// <exception cref="CloudSaveException">Thrown if request is unsuccessful.</exception>
         /// <exception cref="CloudSaveValidationException">Thrown if the service returned validation error.</exception>
         /// <exception cref="CloudSaveRateLimitedException">Thrown if the service returned rate limited error.</exception>
-        Task<Dictionary<string, Item>> LoadAsync(ISet<string> keys);
+        Task<Dictionary<string, Item>> LoadAsync(ISet<string> keys, LoadOptions options);
 
         /// <summary>
         /// Downloads data from Cloud Save for all keys.
         /// Throws a CloudSaveException with a reason code and explanation of what happened.
         /// </summary>
+        /// <param name="options">Options to modify the behavior of the method, specifying AccessClass and PlayerId</param>
         /// <returns>The dictionary of all key-value pairs that represents the current state of data on the server including their write locks</returns>
         /// <exception cref="CloudSaveException">Thrown if request is unsuccessful.</exception>
         /// <exception cref="CloudSaveValidationException">Thrown if the service returned validation error.</exception>
         /// <exception cref="CloudSaveRateLimitedException">Thrown if the service returned rate limited error.</exception>
-        Task<Dictionary<string, Item>> LoadAllAsync();
+        Task<Dictionary<string, Item>> LoadAllAsync(LoadAllOptions options);
 
         /// <summary>
         /// Upload one or more key-value pairs to the Cloud Save service, with optional write lock validation.
@@ -55,12 +59,13 @@ namespace Unity.Services.CloudSave.Internal
         /// There is no client validation in place, which means the API can be called regardless if data or keys are incorrect, invalid, and/or missing.
         /// </summary>
         /// <param name="data">The dictionary of keys and corresponding values to upload, together with optional write lock to check conflict</param>
+        /// <param name="options">Options to modify the behavior of the method, specifying AccessClass and PlayerId</param>
         /// <returns>The dictionary of saved keys and the corresponding updated write lock</returns>
         /// <exception cref="CloudSaveException">Thrown if request is unsuccessful.</exception>
         /// <exception cref="CloudSaveValidationException">Thrown if the service returned validation error.</exception>
         /// <exception cref="CloudSaveRateLimitedException">Thrown if the service returned rate limited error.</exception>
         /// <exception cref="CloudSaveConflictException">Thrown if the service returned write lock conflict error.</exception>
-        Task<Dictionary<string, string>> SaveAsync(IDictionary<string, SaveItem> data);
+        Task<Dictionary<string, string>> SaveAsync(IDictionary<string, SaveItem> data, Unity.Services.CloudSave.Models.Data.Player.SaveOptions options);
 
         /// <summary>
         /// Upload one or more key-value pairs to the Cloud Save service without write lock validation, overwriting any values
@@ -72,11 +77,12 @@ namespace Unity.Services.CloudSave.Internal
         /// There is no client validation in place, which means the API can be called regardless if data is incorrect, invalid, and/or missing.
         /// </summary>
         /// <param name="data">The dictionary of keys and corresponding values to upload</param>
+        /// <param name="options">Options to modify the behavior of the method, specifying AccessClass</param>
         /// <returns>The dictionary of saved keys and the corresponding updated write lock</returns>
         /// <exception cref="CloudSaveException">Thrown if request is unsuccessful.</exception>
         /// <exception cref="CloudSaveValidationException">Thrown if the service returned validation error.</exception>
         /// <exception cref="CloudSaveRateLimitedException">Thrown if the service returned rate limited error.</exception>
-        Task<Dictionary<string, string>> SaveAsync(IDictionary<string, object> data);
+        Task<Dictionary<string, string>> SaveAsync(IDictionary<string, object> data, Unity.Services.CloudSave.Models.Data.Player.SaveOptions options);
 
         /// <summary>
         /// Removes one key at a time, with optional write lock validation. If the given key doesn't exist, there is no feedback in place to inform a developer about it.
@@ -86,24 +92,36 @@ namespace Unity.Services.CloudSave.Internal
         ///
         /// </summary>
         /// <param name="key">The key to be removed from the server</param>
-        /// <param name="deleteOptions">The optional options object for specifying the write lock to check conflict in the server</param>
+        /// <param name="options">The optional options object for specifying the write lock to check conflict in the server, as well as AccessClass</param>
         /// <exception cref="CloudSaveException">Thrown if request is unsuccessful.</exception>
         /// <exception cref="CloudSaveValidationException">Thrown if the service returned validation error.</exception>
         /// <exception cref="CloudSaveRateLimitedException">Thrown if the service returned rate limited error.</exception>
         /// <exception cref="CloudSaveConflictException">Thrown if the service returned write lock conflict error.</exception>
-        Task DeleteAsync(string key, DeleteOptions deleteOptions = null);
+        Task DeleteAsync(string key, Unity.Services.CloudSave.Models.Data.Player.DeleteOptions options);
 
         /// <summary>
         /// Removes all keys for the player without write lock validation.
         /// Throws a CloudSaveException with a reason code and explanation of what happened.
-        ///
         /// </summary>
+        /// <param name="options">Options to modify the behavior of the method, specifying AccessClass and PlayerId</param>
         /// <exception cref="CloudSaveException">Thrown if request is unsuccessful.</exception>
         /// <exception cref="CloudSaveRateLimitedException">Thrown if the service returned rate limited error.</exception>
-        Task DeleteAllAsync();
+        Task DeleteAllAsync(Unity.Services.CloudSave.Models.Data.Player.DeleteAllOptions options);
+
+        /// <summary>
+        /// Queries indexed player data from Cloud Save, and returns the requested keys for matching items.
+        /// Throws a CloudSaveException with a reason code and explanation of what happened.
+        /// </summary>
+        /// <param name="options">The query conditions to apply, including field filters and sort orders</param>
+        /// <param name="options">Options to modify the behavior of the method, specifying AccessClass</param>
+        /// <returns>The dictionary of all key-value pairs that represents the current state of data on the server including their write locks</returns>
+        /// <exception cref="CloudSaveException">Thrown if request is unsuccessful.</exception>
+        /// <exception cref="CloudSaveValidationException">Thrown if the service returned validation error.</exception>
+        /// <exception cref="CloudSaveRateLimitedException">Thrown if the service returned rate limited error.</exception>
+        Task<List<EntityData>> QueryAsync(Query query, Unity.Services.CloudSave.Models.Data.Player.QueryOptions options);
     }
 
-    class PlayerDataService : IPlayerDataService
+    partial class PlayerDataService : IPlayerDataService
     {
         readonly IPlayerDataApiClient m_PlayerDataApiClient;
         readonly IApiErrorHandler m_ErrorHandler;
@@ -114,7 +132,7 @@ namespace Unity.Services.CloudSave.Internal
             m_ErrorHandler = errorHandler;
         }
 
-        public async Task<List<ItemKey>> ListAllKeysAsync()
+        public async Task<List<ItemKey>> ListAllKeysAsync(ListAllKeysOptions options)
         {
             return await m_ErrorHandler.RunWithErrorHandling(async() =>
             {
@@ -123,7 +141,7 @@ namespace Unity.Services.CloudSave.Internal
                 string lastAddedKey = null;
                 do
                 {
-                    response = await m_PlayerDataApiClient.ListKeysAsync(lastAddedKey);
+                    response = await m_PlayerDataApiClient.ListKeysAsync(lastAddedKey, options.AccessClassOptions.AccessClass, options.AccessClassOptions.PlayerId);
                     var items = response.Result.Results;
                     if (items.Count > 0)
                     {
@@ -141,22 +159,22 @@ namespace Unity.Services.CloudSave.Internal
             });
         }
 
-        public async Task<Dictionary<string, Item>> LoadAsync(ISet<string> keys)
+        public async Task<Dictionary<string, Item>> LoadAsync(ISet<string> keys, LoadOptions options)
         {
             if (keys == null || keys.Count == 0)
             {
                 return new Dictionary<string, Item>();
             }
 
-            return await LoadWithErrorHandlingAsync(keys);
+            return await LoadWithErrorHandlingAsync(options.AccessClassOptions, keys);
         }
 
-        public async Task<Dictionary<string, Item>> LoadAllAsync()
+        public async Task<Dictionary<string, Item>> LoadAllAsync(LoadAllOptions options)
         {
-            return await LoadWithErrorHandlingAsync();
+            return await LoadWithErrorHandlingAsync(options.AccessClassOptions);
         }
 
-        async Task<Dictionary<string, Item>> LoadWithErrorHandlingAsync(ISet<string> keys = null)
+        async Task<Dictionary<string, Item>> LoadWithErrorHandlingAsync(IAccessClassOptions options, ISet<string> keys = null)
         {
             return await m_ErrorHandler.RunWithErrorHandling(async() =>
             {
@@ -165,7 +183,7 @@ namespace Unity.Services.CloudSave.Internal
                 string lastAddedKey = null;
                 do
                 {
-                    response = await m_PlayerDataApiClient.LoadAsync(keys, lastAddedKey);
+                    response = await m_PlayerDataApiClient.LoadAsync(keys, lastAddedKey, options.AccessClass, options.PlayerId);
                     var items = response.Result.Results;
                     if (items.Count > 0)
                     {
@@ -183,17 +201,17 @@ namespace Unity.Services.CloudSave.Internal
             });
         }
 
-        public async Task<Dictionary<string, string>> SaveAsync(IDictionary<string, SaveItem> data)
+        public async Task<Dictionary<string, string>> SaveAsync(IDictionary<string, SaveItem> data, Unity.Services.CloudSave.Models.Data.Player.SaveOptions options)
         {
             if (data == null || data.Count == 0)
             {
                 return new Dictionary<string, string>();
             }
 
-            return await SaveWithErrorHandlingAsync(data);
+            return await SaveWithErrorHandlingAsync(options.AccessClassOptions, data);
         }
 
-        public async Task<Dictionary<string, string>> SaveAsync(IDictionary<string, object> data)
+        public async Task<Dictionary<string, string>> SaveAsync(IDictionary<string, object> data, Unity.Services.CloudSave.Models.Data.Player.SaveOptions options)
         {
             if (data == null || data.Count == 0)
             {
@@ -206,16 +224,16 @@ namespace Unity.Services.CloudSave.Internal
                 dict.Add(item.Key, new SaveItem(item.Value, null));
             }
 
-            return await SaveWithErrorHandlingAsync(dict);
+            return await SaveWithErrorHandlingAsync(options.AccessClassOptions, dict);
         }
 
-        async Task<Dictionary<string, string>> SaveWithErrorHandlingAsync(IDictionary<string, SaveItem> data)
+        async Task<Dictionary<string, string>> SaveWithErrorHandlingAsync(IAccessClassOptions options, IDictionary<string, SaveItem> data)
         {
             return await m_ErrorHandler.RunWithErrorHandling(async() =>
             {
                 if (data.Count < 20)
                 {
-                    var response = await m_PlayerDataApiClient.SaveAsync(data);
+                    var response = await m_PlayerDataApiClient.SaveAsync(data, options.AccessClass);
                     return response.Result.Results.ToDictionary(r => r.Key, r => r.WriteLock);
                 }
 
@@ -225,7 +243,7 @@ namespace Unity.Services.CloudSave.Internal
                 {
                     var batch = data.Skip(i * 20).Take(20)
                         .ToDictionary(k => k.Key, v => v.Value);
-                    var response = await m_PlayerDataApiClient.SaveAsync(batch);
+                    var response = await m_PlayerDataApiClient.SaveAsync(batch, options.AccessClass);
                     response.Result.Results.ForEach(item => results.Add(item.Key, item.WriteLock));
                 }
 
@@ -233,19 +251,28 @@ namespace Unity.Services.CloudSave.Internal
             });
         }
 
-        public async Task DeleteAsync(string key, DeleteOptions deleteOptions = null)
+        public async Task DeleteAsync(string key, Unity.Services.CloudSave.Models.Data.Player.DeleteOptions options)
         {
             await m_ErrorHandler.RunWithErrorHandling(async() =>
             {
-                await m_PlayerDataApiClient.DeleteAsync(key, deleteOptions?.WriteLock);
+                await m_PlayerDataApiClient.DeleteAsync(key, options.WriteLock, options.AccessClassOptions.AccessClass);
             });
         }
 
-        public async Task DeleteAllAsync()
+        public async Task DeleteAllAsync(DeleteAllOptions options)
         {
             await m_ErrorHandler.RunWithErrorHandling(async() =>
             {
-                await m_PlayerDataApiClient.DeleteAllAsync();
+                await m_PlayerDataApiClient.DeleteAllAsync(options.AccessClassOptions.AccessClass);
+            });
+        }
+
+        public async Task<List<EntityData>> QueryAsync(Query query, QueryOptions options)
+        {
+            return await m_ErrorHandler.RunWithErrorHandling(async() =>
+            {
+                var queryResponse = await m_PlayerDataApiClient.QueryAsync(query, options.AccessClassOptions.AccessClass);
+                return queryResponse.Result.Results.Select(ed => new EntityData(ed.Id, ed.Data.Select(item => new Item(item)).ToList())).ToList();
             });
         }
     }

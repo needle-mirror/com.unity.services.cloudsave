@@ -46,14 +46,14 @@ namespace Unity.Services.CloudSave.Internal.Models
         [Preserve]
         [DataMember(Name = "attempted", EmitDefaultValue = false)]
         public AttemptedItem Attempted{ get; }
-
+        
         /// <summary>
         /// Parameter existing of ConflictErrorResponseData
         /// </summary>
         [Preserve]
         [DataMember(Name = "existing", EmitDefaultValue = false)]
         public Item Existing{ get; }
-
+    
         /// <summary>
         /// Formats a ConflictErrorResponseData into a string of key-value pairs for use as a path parameter.
         /// </summary>

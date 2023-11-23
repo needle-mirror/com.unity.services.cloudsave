@@ -32,7 +32,7 @@ namespace Unity.Services.CloudSave.Internal.Models
         /// Response type for an attempted Data Item sent to the Cloud Save service.
         /// </summary>
         /// <param name="key">Item key</param>
-        /// <param name="value">Any JSON serializable structure</param>
+        /// <param name="value">Any JSON serializable structure with a maximum size of 5 MB.</param>
         /// <param name="writeLock">Enforces conflict checking when updating an existing data item. This field should be omitted when creating a new data item. When updating an existing item, omitting this field ignores write conflicts. When present, an error response will be returned if the writeLock in the request does not match the stored writeLock.</param>
         [Preserve]
         public AttemptedItem(string key, object value, string writeLock)
@@ -50,7 +50,7 @@ namespace Unity.Services.CloudSave.Internal.Models
         public string Key{ get; }
         
         /// <summary>
-        /// Any JSON serializable structure
+        /// Any JSON serializable structure with a maximum size of 5 MB.
         /// </summary>
         [Preserve][JsonConverter(typeof(JsonObjectConverter))]
         [DataMember(Name = "value", IsRequired = true, EmitDefaultValue = true)]
