@@ -1,7 +1,7 @@
 {
   "name": "com.unity.services.cloudsave",
   "displayName": "Cloud Save",
-  "version": "3.1.0",
+  "version": "3.1.1",
   "unity": "2020.3",
   "description": "Build better player experiences with seamless game data stored securely in the cloud.\n\nUse Cloud Save to store your players’ progress and preferences, by doing so you can share this data between all the players’ devices and any game backend services.",
   "dependencies": {
@@ -31,18 +31,18 @@
       "Windows 8 Universal",
       "Windows 10 Universal"
     ],
-    "changelog": "### Changed\n* The existing `CloudSaveService.Instance.Data.Player.DeleteAsync` has been marked as Obsolete, with a new version added that accepts options of type `CloudSave.Models.Data.Player.DeleteOptions` instead of `CloudSave.DeleteOptions`.\n  This enables the addition of new options to support Access Classes (see below in **Added**).\n\n### Added\n* Support for Access Classes when interacting with Player Data, via the addition of optional `options` objects to existing methods in the `CloudSaveService.Instance.Data.Player` API.\nFor more information on Access Classes, please refer to [the documentation](https://docs.unity.com/ugs/en-us/manual/cloud-save/manual/concepts/player-data#Access_Classes).\n  * Allows players to save data to the Public Access Class in addition to the existing Default, which allows saved data to be visible to other players.\n  * Allows players to read data from Public and Protected Access Classes in addition to the existing Default, where Protected Player Data can only be set by a server authoritative source (e.g. Cloud Code)\n  * Allows players to read other players' Public Player Data, by providing their Player ID as part of the new `options` object.\n\n* Support for Querying in both Public Player Data and Default Custom Data, via the new `QueryAsync` method.\nFor more information on Querying, please refer to [the documentation](https://docs.unity.com/ugs/en-us/manual/cloud-save/manual/concepts/queries).\n  * Any data for which an index is configured can be queried by specifying filters on the indexed data (e.g. clanMemberCount < 20)\n  * Any data stored for the returned entities (whether indexed or not) can be retrieved as part of the query response by specifying `ReturnKeys` in the `Query` object."
+    "changelog": "* Added Apple Privacy Manifest"
   },
   "relatedPackages": {
-    "com.unity.services.cloudsave.tests": "3.1.0"
+    "com.unity.services.cloudsave.tests": "3.1.1"
   },
   "upmCi": {
-    "footprint": "f97823a8e4f54d0363d732abc15b3350f1ecb54d"
+    "footprint": "50ac7e69aeb803acc27584154cf6d4b73f16b1c5"
   },
   "documentationUrl": "https://docs.unity3d.com/Packages/com.unity.services.cloudsave@3.1/manual/index.html",
   "repository": {
     "url": "https://github.cds.internal.unity3d.com/unity/operate-services-sdk.git",
     "type": "git",
-    "revision": "91e650fb2ba6daef69eacf96657602ab1a61177b"
+    "revision": "293b837e4f6ab68d9d7583c1be050e3863be1b51"
   }
 }
