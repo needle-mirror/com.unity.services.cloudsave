@@ -1,12 +1,12 @@
 {
   "name": "com.unity.services.cloudsave",
   "displayName": "Cloud Save",
-  "version": "3.1.1",
+  "version": "3.2.0",
   "unity": "2020.3",
   "description": "Build better player experiences with seamless game data stored securely in the cloud.\n\nUse Cloud Save to store your players’ progress and preferences, by doing so you can share this data between all the players’ devices and any game backend services.",
   "dependencies": {
-    "com.unity.services.authentication": "2.6.1",
-    "com.unity.services.core": "1.4.3"
+    "com.unity.services.authentication": "3.3.1",
+    "com.unity.services.core": "1.12.5"
   },
   "samples": [
     {
@@ -31,18 +31,18 @@
       "Windows 8 Universal",
       "Windows 10 Universal"
     ],
-    "changelog": "* Added Apple Privacy Manifest"
+    "changelog": "### Changed\n* Updated Apple Privacy Manifest\n\n### Added\n* Support for sampling in public player data and public custom data queries."
   },
   "relatedPackages": {
-    "com.unity.services.cloudsave.tests": "3.1.1"
+    "com.unity.services.cloudsave.tests": "3.2.0"
   },
   "upmCi": {
-    "footprint": "50ac7e69aeb803acc27584154cf6d4b73f16b1c5"
+    "footprint": "185fc71c843db9a4966e8acdc0ddd281acd963f5"
   },
-  "documentationUrl": "https://docs.unity3d.com/Packages/com.unity.services.cloudsave@3.1/manual/index.html",
+  "documentationUrl": "https://docs.unity3d.com/Packages/com.unity.services.cloudsave@3.2/manual/index.html",
   "repository": {
     "url": "https://github.cds.internal.unity3d.com/unity/operate-services-sdk.git",
     "type": "git",
-    "revision": "293b837e4f6ab68d9d7583c1be050e3863be1b51"
+    "revision": "a097e4d4e1103afb2a3469c275424091e3fd972a"
   }
 }

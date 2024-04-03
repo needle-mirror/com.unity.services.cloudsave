@@ -66,12 +66,13 @@ namespace Unity.Services.CloudSave.Internal
             var queryKeys = query?.ReturnKeys?.ToList() ?? new List<string>();
             var offset = query?.Offset ?? 0;
             var limit = query?.Limit ?? 0;
+            var sampleSize = query?.SampleSize;
 
             switch (accessClass)
             {
                 case AccessClass.Default:
                     var request = new QueryDefaultCustomDataRequest(m_CloudProjectId.GetCloudProjectId(),
-                        new QueryIndexBody(queryFields, queryKeys, offset, limit));
+                        new QueryIndexBody(queryFields, queryKeys, offset, limit, sampleSize));
                     return await m_DataClient.QueryDefaultCustomDataAsync(request);
                 case AccessClass.Public:
                 case AccessClass.Private:

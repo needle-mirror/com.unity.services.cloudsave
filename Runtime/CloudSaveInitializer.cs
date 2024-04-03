@@ -11,15 +11,21 @@ using Unity.Services.Core.Configuration.Internal;
 
 namespace Unity.Services.CloudSave
 {
-    internal class CloudSaveInitializer : IInitializablePackage
+    internal class CloudSaveInitializer : IInitializablePackageV2
     {
         const string k_CloudEnvironmentKey = "com.unity.services.core.cloud-environment";
         const string k_StagingEnvironment = "staging";
 
         [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.BeforeSceneLoad)]
-        static void Register()
+        static void InitializeOnLoad()
         {
-            CoreRegistry.Instance.RegisterPackage(new CloudSaveInitializer())
+            var initializer = new CloudSaveInitializer();
+            initializer.Register(CorePackageRegistry.Instance);
+        }
+
+        public void Register(CorePackageRegistry registry)
+        {
+            registry.Register(this)
                 .DependsOn<ICloudProjectId>()
                 .DependsOn<IPlayerId>()
                 .DependsOn<IInstallationId>()
@@ -27,6 +33,18 @@ namespace Unity.Services.CloudSave
         }
 
         public Task Initialize(CoreRegistry registry)
+        {
+            CloudSaveService.instance = InitializeService(registry);
+            return Task.CompletedTask;
+        }
+
+        public Task InitializeInstanceAsync(CoreRegistry registry)
+        {
+            InitializeService(registry);
+            return Task.CompletedTask;
+        }
+
+        CloudSaveServiceInstance InitializeService(CoreRegistry registry)
         {
             var projectConfiguration = registry.GetServiceComponent<IProjectConfiguration>();
             var cloudProjectId = registry.GetServiceComponent<ICloudProjectId>();
@@ -57,9 +75,9 @@ namespace Unity.Services.CloudSave
                 new PlayerFilesService(internalFilesApiClient, new ApiErrorHandler(new RateLimiter()))
             );
 
-            CloudSaveService.instance = new CloudSaveServiceInstance(dataService, filesService);
-
-            return Task.CompletedTask;
+            var service = new CloudSaveServiceInstance(dataService, filesService);
+            registry.RegisterService<ICloudSaveService>(service);
+            return service;
         }
 
         static string GetHost(IProjectConfiguration projectConfiguration)

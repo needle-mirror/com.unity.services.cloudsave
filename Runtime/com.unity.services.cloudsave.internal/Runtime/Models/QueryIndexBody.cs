@@ -35,13 +35,15 @@ namespace Unity.Services.CloudSave.Internal.Models
         /// <param name="returnKeys">The keys to return in the response. This can include keys not on the index. If not specified or empty, the data on the results will be empty for any returned entities.</param>
         /// <param name="offset">The number of results to skip. Defaults to 0.</param>
         /// <param name="limit">The maximum number of results to return. Defaults to 10. Specifying 0 will return the default number of results.</param>
+        /// <param name="sampleSize">If set, the given number of random items will be chosen from the total query results and returned as a sample. Defaults to null.</param>
         [Preserve]
-        public QueryIndexBody(List<FieldFilter> fields, List<string> returnKeys = default, int offset = default, int limit = default)
+        public QueryIndexBody(List<FieldFilter> fields, List<string> returnKeys = default, int offset = default, int limit = default, int? sampleSize = null)
         {
             Fields = fields;
             ReturnKeys = returnKeys;
             Offset = offset;
             Limit = limit;
+            SampleSize = sampleSize;
         }
 
         /// <summary>
@@ -50,70 +52,33 @@ namespace Unity.Services.CloudSave.Internal.Models
         [Preserve]
         [DataMember(Name = "fields", IsRequired = true, EmitDefaultValue = true)]
         public List<FieldFilter> Fields{ get; }
-        
+
         /// <summary>
         /// The keys to return in the response. This can include keys not on the index. If not specified or empty, the data on the results will be empty for any returned entities.
         /// </summary>
         [Preserve]
         [DataMember(Name = "returnKeys", EmitDefaultValue = false)]
         public List<string> ReturnKeys{ get; }
-        
+
         /// <summary>
         /// The number of results to skip. Defaults to 0.
         /// </summary>
         [Preserve]
         [DataMember(Name = "offset", EmitDefaultValue = false)]
         public int Offset{ get; }
-        
+
         /// <summary>
         /// The maximum number of results to return. Defaults to 10. Specifying 0 will return the default number of results.
         /// </summary>
         [Preserve]
         [DataMember(Name = "limit", EmitDefaultValue = false)]
         public int Limit{ get; }
-    
-        /// <summary>
-        /// Formats a QueryIndexBody into a string of key-value pairs for use as a path parameter.
-        /// </summary>
-        /// <returns>Returns a string representation of the key-value pairs.</returns>
-        internal string SerializeAsPathParam()
-        {
-            var serializedModel = "";
-
-            if (Fields != null)
-            {
-                serializedModel += "fields," + Fields.ToString() + ",";
-            }
-            if (ReturnKeys != null)
-            {
-                serializedModel += "returnKeys," + ReturnKeys.ToString() + ",";
-            }
-            serializedModel += "offset," + Offset.ToString() + ",";
-            serializedModel += "limit," + Limit.ToString();
-            return serializedModel;
-        }
 
         /// <summary>
-        /// Returns a QueryIndexBody as a dictionary of key-value pairs for use as a query parameter.
+        /// The maximum number of results to return. Defaults to 10. Specifying 0 will return the default number of results.
         /// </summary>
-        /// <returns>Returns a dictionary of string key-value pairs.</returns>
-        internal Dictionary<string, string> GetAsQueryParam()
-        {
-            var dictionary = new Dictionary<string, string>();
-
-            if (ReturnKeys != null)
-            {
-                var returnKeysStringValue = ReturnKeys.ToString();
-                dictionary.Add("returnKeys", returnKeysStringValue);
-            }
-            
-            var offsetStringValue = Offset.ToString();
-            dictionary.Add("offset", offsetStringValue);
-            
-            var limitStringValue = Limit.ToString();
-            dictionary.Add("limit", limitStringValue);
-            
-            return dictionary;
-        }
+        [Preserve]
+        [DataMember(Name = "sampleSize", EmitDefaultValue = false)]
+        public int? SampleSize{ get; }
     }
 }
