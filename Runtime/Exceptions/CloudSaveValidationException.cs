@@ -11,6 +11,9 @@ namespace Unity.Services.CloudSave
     [Preserve]
     public class CloudSaveValidationException : CloudSaveException
     {
+        /// <summary>
+        /// Details of the validation error.
+        /// </summary>
         [Preserve] public List<CloudSaveValidationErrorDetail> Details { get; private set; }
 
         internal CloudSaveValidationException(CloudSaveExceptionReason reason, int errorCode, string message, Exception innerException)
@@ -27,6 +30,9 @@ namespace Unity.Services.CloudSave
         }
     }
 
+    /// <summary>
+    /// Single error in the Validation Error Response.
+    /// </summary>
     [Preserve]
     public class CloudSaveValidationErrorDetail
     {
@@ -57,12 +63,22 @@ namespace Unity.Services.CloudSave
             Messages = errorBody.Messages;
         }
 
+        /// <summary>
+        /// The field in the data that caused the error.
+        /// </summary>
         [Preserve]
         public string Field { get; }
 
+
+        /// <summary>
+        /// The data key that caused the error.
+        /// </summary>
         [Preserve]
         public string Key { get; }
 
+        /// <summary>
+        /// Messages that describe the errors.
+        /// </summary>
         [Preserve]
         public List<string> Messages { get; }
     }

@@ -10,6 +10,9 @@ using ApiItem = Unity.Services.CloudSave.Internal.Models.Item;
 
 namespace Unity.Services.CloudSave.Internal
 {
+    /// <summary>
+    /// Interface for the Player Data API Service.
+    /// </summary>
     public partial interface IPlayerDataService
     {
         /// <summary>
@@ -55,7 +58,7 @@ namespace Unity.Services.CloudSave.Internal
         /// Keys can only contain alphanumeric characters, dashes, and underscores and be up to a length of 255 characters.
         /// Throws a CloudSaveException with a reason code and explanation of what happened.
         ///
-        /// <code>Dictionary</code> as a parameter ensures the uniqueness of given keys.
+        /// <c>Dictionary</c> as a parameter ensures the uniqueness of given keys.
         /// There is no client validation in place, which means the API can be called regardless if data or keys are incorrect, invalid, and/or missing.
         /// </summary>
         /// <param name="data">The dictionary of keys and corresponding values to upload, together with optional write lock to check conflict</param>
@@ -73,7 +76,7 @@ namespace Unity.Services.CloudSave.Internal
         /// Key can only contain alphanumeric characters, dashes, and underscores and be up to a length of 255 characters.
         /// Throws a CloudSaveException with a reason code and explanation of what happened.
         ///
-        /// <code>Dictionary</code> as a parameter ensures the uniqueness of given keys.
+        /// <c>Dictionary</c> as a parameter ensures the uniqueness of given keys.
         /// There is no client validation in place, which means the API can be called regardless if data is incorrect, invalid, and/or missing.
         /// </summary>
         /// <param name="data">The dictionary of keys and corresponding values to upload</param>
@@ -93,6 +96,7 @@ namespace Unity.Services.CloudSave.Internal
         /// </summary>
         /// <param name="key">The key to be removed from the server</param>
         /// <param name="options">The optional options object for specifying the write lock to check conflict in the server, as well as AccessClass</param>
+        /// <returns>Returns void.</returns>
         /// <exception cref="CloudSaveException">Thrown if request is unsuccessful.</exception>
         /// <exception cref="CloudSaveValidationException">Thrown if the service returned validation error.</exception>
         /// <exception cref="CloudSaveRateLimitedException">Thrown if the service returned rate limited error.</exception>
@@ -104,6 +108,7 @@ namespace Unity.Services.CloudSave.Internal
         /// Throws a CloudSaveException with a reason code and explanation of what happened.
         /// </summary>
         /// <param name="options">Options to modify the behavior of the method, specifying AccessClass and PlayerId</param>
+        /// <returns>Returns void.</returns>
         /// <exception cref="CloudSaveException">Thrown if request is unsuccessful.</exception>
         /// <exception cref="CloudSaveRateLimitedException">Thrown if the service returned rate limited error.</exception>
         Task DeleteAllAsync(Unity.Services.CloudSave.Models.Data.Player.DeleteAllOptions options);
@@ -112,8 +117,8 @@ namespace Unity.Services.CloudSave.Internal
         /// Queries indexed player data from Cloud Save, and returns the requested keys for matching items.
         /// Throws a CloudSaveException with a reason code and explanation of what happened.
         /// </summary>
+        /// <param name="query">The query to run, including fields to query and keys to return</param>
         /// <param name="options">The query conditions to apply, including field filters and sort orders</param>
-        /// <param name="options">Options to modify the behavior of the method, specifying AccessClass</param>
         /// <returns>The dictionary of all key-value pairs that represents the current state of data on the server including their write locks</returns>
         /// <exception cref="CloudSaveException">Thrown if request is unsuccessful.</exception>
         /// <exception cref="CloudSaveValidationException">Thrown if the service returned validation error.</exception>

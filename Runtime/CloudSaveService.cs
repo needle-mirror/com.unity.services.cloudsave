@@ -14,7 +14,7 @@ namespace Unity.Services.CloudSave
         /// The default singleton instance to access the Cloud Save service.
         /// </summary>
         /// <exception cref="ServicesInitializationException">
-        /// This exception is thrown if the <code>UnityServices.InitializeAsync()</code>
+        /// This exception is thrown if the <c>UnityServices.InitializeAsync()</c>
         /// has not finished before accessing the singleton.
         /// </exception>
         public static ICloudSaveService Instance
@@ -31,9 +31,19 @@ namespace Unity.Services.CloudSave
         }
     }
 
+    /// <summary>
+    /// The current instance of the Cloud Save Service.
+    /// </summary>
     public class CloudSaveServiceInstance : ICloudSaveService
     {
+        /// <summary>
+        /// The Data API service.
+        /// </summary>
         public IDataService Data { get; }
+
+        /// <summary>
+        /// The Files API service.
+        /// </summary>
         public IFilesService Files { get; }
 
         internal CloudSaveServiceInstance(IDataService data, IFilesService files)
@@ -43,9 +53,20 @@ namespace Unity.Services.CloudSave
         }
     }
 
+
+    /// <summary>
+    /// Interface for Cloud Save Service.
+    /// </summary>
     public interface ICloudSaveService
     {
+        /// <summary>
+        /// Interface for the Data API service.
+        /// </summary>
         IDataService Data { get; }
+
+        /// <summary>
+        /// Interface for the Files API service.
+        /// </summary>
         IFilesService Files { get; }
     }
 }

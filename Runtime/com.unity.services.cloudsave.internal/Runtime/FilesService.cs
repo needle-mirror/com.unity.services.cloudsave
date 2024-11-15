@@ -6,8 +6,14 @@ using FileItem = Unity.Services.CloudSave.Models.FileItem;
 
 namespace Unity.Services.CloudSave.Internal
 {
+    /// <summary>
+    /// Interface for the Files API service.
+    /// </summary>
     public interface IFilesService
     {
+        /// <summary>
+        /// Player to look up files for.
+        /// </summary>
         IPlayerFilesService Player { get; }
 
         #region Deprecated, pre v3.0.0
@@ -28,6 +34,7 @@ namespace Unity.Services.CloudSave.Internal
         /// Returns the metadata of a file stored in Cloud Save for the logged in player.
         /// Throws a CloudSaveException with a reason code and explanation of what happened.
         /// </summary>
+        /// <param name="key">Key to return metadata for.</param>
         /// <returns>The metadata of the specified file stored in Cloud Save for the logged in player</returns>
         /// <exception cref="CloudSaveException">Thrown if request is unsuccessful.</exception>
         /// <exception cref="CloudSaveValidationException">Thrown if the service returned validation error.</exception>
@@ -44,6 +51,7 @@ namespace Unity.Services.CloudSave.Internal
         /// <param name="key">The key at which to upload the file</param>
         /// <param name="stream">The Stream containing the file data</param>
         /// <param name="options">Options object with "WriteLock", the expected stored writeLock of the file - if this value is provided and is not a match then the operation will not succeed. If it is not provided then the operation will be performed regardless of the stored writeLock value.</param>
+        /// <returns>Returns void.</returns>
         /// <exception cref="CloudSaveException">Thrown if request is unsuccessful.</exception>
         /// <exception cref="CloudSaveValidationException">Thrown if the service returned validation error.</exception>
         /// <exception cref="CloudSaveRateLimitedException">Thrown if the service returned rate limited error.</exception>
@@ -59,6 +67,7 @@ namespace Unity.Services.CloudSave.Internal
         /// <param name="key">The key at which to upload the file</param>
         /// <param name="bytes">The byte array containing the file data</param>
         /// <param name="options">Options object with "WriteLock", the expected stored writeLock of the file - if this value is provided and is not a match then the operation will not succeed. If it is not provided then the operation will be performed regardless of the stored writeLock value.</param>
+        /// <returns>Returns void.</returns>
         /// <exception cref="CloudSaveException">Thrown if request is unsuccessful.</exception>
         /// <exception cref="CloudSaveValidationException">Thrown if the service returned validation error.</exception>
         /// <exception cref="CloudSaveRateLimitedException">Thrown if the service returned rate limited error.</exception>
@@ -101,6 +110,7 @@ namespace Unity.Services.CloudSave.Internal
         /// </summary>
         /// <param name="key">The key of the saved file to be deleted.</param>
         /// <param name="options">Options object with "WriteLock", the expected stored writeLock of the file - if this value is provided and is not a match then the operation will not succeed. If it is not provided then the operation will be performed regardless of the stored writeLock value.</param>
+        /// <returns>Returns void.</returns>
         /// <exception cref="CloudSaveException">Thrown if request is unsuccessful.</exception>
         /// <exception cref="CloudSaveValidationException">Thrown if the service returned validation error.</exception>
         /// <exception cref="CloudSaveRateLimitedException">Thrown if the service returned rate limited error.</exception>

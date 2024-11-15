@@ -6,9 +6,19 @@ using Unity.Services.CloudSave.Internal.Models;
 
 namespace Unity.Services.CloudSave.Internal
 {
+    /// <summary>
+    /// Interface for the Data API service.
+    /// </summary>
     public interface IDataService
     {
+        /// <summary>
+        /// The Player Data API service.
+        /// </summary>
         public IPlayerDataService Player { get; }
+
+        /// <summary>
+        /// The Custom Data API service.
+        /// </summary>
         public ICustomDataService Custom { get; }
 
         #region Deprecated, pre v3.0.0
@@ -29,11 +39,11 @@ namespace Unity.Services.CloudSave.Internal
         /// Upload one or more key-value pairs to the Cloud Save service, overwriting any values
         /// that are currently stored under the given keys.
         /// Throws a CloudSaveException with a reason code and explanation of what happened.
-        ///
-        /// <code>Dictionary</code> as a parameter ensures the uniqueness of given keys.
+        /// <c>Dictionary</c> as a parameter ensures the uniqueness of given keys.
         /// There is no client validation in place, which means the API can be called regardless if data is incorrect and/or missing.
         /// </summary>
         /// <param name="data">The dictionary of keys and corresponding values to upload</param>
+        /// <returns>Returns void.</returns>
         /// <exception cref="CloudSaveException">Thrown if request is unsuccessful.</exception>
         /// <exception cref="CloudSaveValidationException">Thrown if the service returned validation error.</exception>
         /// <exception cref="CloudSaveRateLimitedException">Thrown if the service returned rate limited error.</exception>
@@ -44,9 +54,9 @@ namespace Unity.Services.CloudSave.Internal
         /// Removes one key at the time. If a given key doesn't exist, there is no feedback in place to inform a developer about it.
         /// There is no client validation implemented for this method.
         /// Throws a CloudSaveException with a reason code and explanation of what happened.
-        ///
         /// </summary>
         /// <param name="key">The key to be removed from the server</param>
+        /// <returns>Returns void.</returns>
         /// <exception cref="CloudSaveException">Thrown if request is unsuccessful.</exception>
         /// <exception cref="CloudSaveValidationException">Thrown if the service returned validation error.</exception>
         /// <exception cref="CloudSaveRateLimitedException">Thrown if the service returned rate limited error.</exception>
@@ -55,7 +65,7 @@ namespace Unity.Services.CloudSave.Internal
 
         /// <summary>
         /// Downloads one or more values from Cloud Save, based on provided keys.
-        /// <code>HashSet</code> as a parameter ensures the uniqueness of keys.
+        /// <c>HashSet</c> as a parameter ensures the uniqueness of keys.
         /// There is no client validation in place.
         /// This method includes pagination.
         /// Throws a CloudSaveException with a reason code and explanation of what happened.

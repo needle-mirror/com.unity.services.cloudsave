@@ -10,6 +10,9 @@ namespace Unity.Services.CloudSave
     [Preserve]
     public class CloudSaveConflictException : CloudSaveException
     {
+        /// <summary>
+        /// The details of the exception
+        /// </summary>
         [Preserve] public List<CloudSaveConflictErrorDetail> Details { get; private set; }
 
         internal CloudSaveConflictException(CloudSaveExceptionReason reason, int errorCode, string message,
@@ -20,6 +23,9 @@ namespace Unity.Services.CloudSave
         }
     }
 
+    /// <summary>
+    /// Represents the details for a conflict error from the Cloud Save service.
+    /// </summary>
     [Preserve]
     public class CloudSaveConflictErrorDetail
     {
@@ -28,8 +34,7 @@ namespace Unity.Services.CloudSave
         /// </summary>
         /// <param name="key">The item key.</param>
         /// <param name="attemptedWriteLock">The conflict write lock in the data that caused the error.</param>
-        /// <param name="existingWriteLock">The current existing write lock</param>
-
+        /// <param name="existingWriteLock">The current existing write lock.</param>
         internal CloudSaveConflictErrorDetail(string key, string attemptedWriteLock, string existingWriteLock)
         {
             Key = key;
@@ -37,12 +42,21 @@ namespace Unity.Services.CloudSave
             ExistingWriteLock = existingWriteLock;
         }
 
+        /// <summary>
+        /// The item key.
+        /// </summary>
         [Preserve]
         public string Key { get; }
 
+        /// <summary>
+        /// The conflict write lock in the data that caused the error.
+        /// </summary>
         [Preserve]
         public string AttemptedWriteLock { get; }
 
+        /// <summary>
+        /// The current existing write locks.
+        /// </summary>
         [Preserve]
         public string ExistingWriteLock { get; }
     }

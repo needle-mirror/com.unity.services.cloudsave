@@ -57,7 +57,7 @@ namespace Unity.Services.CloudSave.Internal
         /// Keys can only contain alphanumeric characters, dashes, and underscores and be up to a length of 255 characters.
         /// Throws a CloudSaveException with a reason code and explanation of what happened.
         ///
-        /// <code>Dictionary</code> as a parameter ensures the uniqueness of given keys.
+        /// <c>Dictionary</c> as a parameter ensures the uniqueness of given keys.
         /// There is no client validation in place, which means the API can be called regardless if data or keys are incorrect, invalid, and/or missing.
         /// </summary>
         /// <param name="data">The dictionary of keys and corresponding values to upload, together with optional write lock to check conflict</param>
@@ -74,7 +74,7 @@ namespace Unity.Services.CloudSave.Internal
         /// Key can only contain alphanumeric characters, dashes, and underscores and be up to a length of 255 characters.
         /// Throws a CloudSaveException with a reason code and explanation of what happened.
         ///
-        /// <code>Dictionary</code> as a parameter ensures the uniqueness of given keys.
+        /// <c>Dictionary</c> as a parameter ensures the uniqueness of given keys.
         /// There is no client validation in place, which means the API can be called regardless if data is incorrect, invalid, and/or missing.
         /// </summary>
         /// <param name="data">The dictionary of keys and corresponding values to upload</param>
@@ -93,6 +93,7 @@ namespace Unity.Services.CloudSave.Internal
         /// </summary>
         /// <param name="key">The key to be removed from the server</param>
         /// <param name="deleteOptions">The optional options object for specifying the write lock to check conflict in the server</param>
+        /// <returns>Returns void.</returns>
         /// <exception cref="CloudSaveException">Thrown if request is unsuccessful.</exception>
         /// <exception cref="CloudSaveValidationException">Thrown if the service returned validation error.</exception>
         /// <exception cref="CloudSaveRateLimitedException">Thrown if the service returned rate limited error.</exception>
@@ -107,6 +108,7 @@ namespace Unity.Services.CloudSave.Internal
         /// Throws a CloudSaveException with a reason code and explanation of what happened.
         ///
         /// </summary>
+        /// <returns>Returns void.</returns>
         /// <exception cref="CloudSaveException">Thrown if request is unsuccessful.</exception>
         /// <exception cref="CloudSaveRateLimitedException">Thrown if the service returned rate limited error.</exception>
         Task DeleteAllAsync();

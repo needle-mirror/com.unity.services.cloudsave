@@ -8,12 +8,16 @@ using Item = Unity.Services.CloudSave.Models.Item;
 
 namespace Unity.Services.CloudSave.Internal
 {
+    /// <summary>
+    /// Interface for Custom Data Service.
+    /// </summary>
     public interface ICustomDataService
     {
         /// <summary>
         /// Returns all keys stored in Cloud Save for the specified custom data ID.
         /// Throws a CloudSaveException with a reason code and explanation of what happened.
         /// </summary>
+        /// <param name="customDataID">The custom data ID to return all keys for.</param>
         /// <returns>A list of keys and their metadata as stored in the server for the logged in player.</returns>
         /// <exception cref="CloudSaveException">Thrown if request is unsuccessful.</exception>
         /// <exception cref="CloudSaveValidationException">Thrown if the service returned validation error.</exception>
@@ -25,6 +29,8 @@ namespace Unity.Services.CloudSave.Internal
         /// There is no client validation in place.
         /// Throws a CloudSaveException with a reason code and explanation of what happened.
         /// </summary>
+        /// <param name="customDataID">The custom data ID to return keys for.</param>
+        /// <param name="keys">The keys to return.</param>
         /// <returns>The dictionary of all key-value pairs that represents the current state of data on the server</returns>
         /// <exception cref="CloudSaveException">Thrown if request is unsuccessful.</exception>
         /// <exception cref="CloudSaveValidationException">Thrown if the service returned validation error.</exception>
@@ -36,6 +42,7 @@ namespace Unity.Services.CloudSave.Internal
         /// There is no client validation in place.
         /// Throws a CloudSaveException with a reason code and explanation of what happened.
         /// </summary>
+        /// <param name="customDataID">The custom data ID to return keys for.</param>
         /// <returns>The dictionary of all key-value pairs that represents the current state of data on the server</returns>
         /// <exception cref="CloudSaveException">Thrown if request is unsuccessful.</exception>
         /// <exception cref="CloudSaveValidationException">Thrown if the service returned validation error.</exception>

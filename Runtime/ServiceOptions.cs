@@ -1,7 +1,13 @@
 namespace Unity.Services.CloudSave
 {
+    /// <summary>
+    /// Options for storing writelock
+    /// </summary>
     public class WriteLockOptions
     {
+        /// <summary>
+        /// The writelock
+        /// </summary>
         public string WriteLock { get; set; }
     }
 

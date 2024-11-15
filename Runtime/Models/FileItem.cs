@@ -2,6 +2,9 @@ using System;
 
 namespace Unity.Services.CloudSave.Models
 {
+    /// <summary>
+    /// Class representing a single file.
+    /// </summary>
     public class FileItem
     {
         /// <summary>
