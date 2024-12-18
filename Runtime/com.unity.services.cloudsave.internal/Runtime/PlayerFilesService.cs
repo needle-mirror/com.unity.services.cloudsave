@@ -130,7 +130,7 @@ namespace Unity.Services.CloudSave.Internal
                     if (items.Count > 0)
                     {
                         returnSet.AddRange(items);
-                        lastAddedKey = response.Result.Links.Next;
+                        lastAddedKey = response.Result.Links.Next?.Split("after=")[1];
                     }
                 }
                 while (!string.IsNullOrEmpty(response.Result.Links.Next));
